@@ -1,4 +1,4 @@
-package se_frms_backend.SE_FRMS.frms;
+package com.se_frms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
