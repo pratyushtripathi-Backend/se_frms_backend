@@ -4,6 +4,7 @@ import com.se_frms.auth.dto.LoginRequestDTO;
 import com.se_frms.auth.dto.LoginResponseDTO;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.dto.UserRegistrationRequest;
+import com.se_frms.auth.exception.AccountBlockedException;
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRoleException;
@@ -99,6 +100,10 @@ public class AuthServiceImpl
                                 )
                         );
 
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new AccountBlockedException("Your account is blocked");
+        }
+
         boolean passwordMatches =
                 passwordEncoder.matches(
                         request.getPassword(),
@@ -114,7 +119,7 @@ public class AuthServiceImpl
 
         String token =
                 jwtUtil.generateToken(
-                        user.getEmail()
+                        user
                 );
 
         return LoginResponseDTO
@@ -122,6 +127,7 @@ public class AuthServiceImpl
                 .userId(user.getId())
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .tokenType("Bearer")
                 .token(token)
                 .build();
     }
@@ -153,10 +159,10 @@ public class AuthServiceImpl
 
         Role role = Role.EMPLOYEE;
 
-        if (role == Role.ADMIN) {
+        if (role == Role.ADMIN || role == Role.SUPER_ADMIN) {
 
             throw new InvalidRoleException(
-                    "Public ADMIN registration is not allowed"
+                    "Public privileged registration is not allowed"
             );
         }
 

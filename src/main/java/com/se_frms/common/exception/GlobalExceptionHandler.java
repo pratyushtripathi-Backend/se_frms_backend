@@ -2,6 +2,7 @@ package com.se_frms.common.exception;
 
 
 import com.se_frms.auth.dto.AuthResponseDTO;
+import com.se_frms.auth.exception.AccountBlockedException;
 import com.se_frms.user.exception.InvalidCredentialsException;
 
 import com.se_frms.auth.exception.DuplicateEmailException;
@@ -13,6 +14,7 @@ import com.se_frms.auth.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -124,6 +126,34 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(
+            AccountBlockedException.class
+    )
+    public ResponseEntity<AuthResponseDTO<Object>>
+    handleAccountBlockedException(
+            AccountBlockedException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.FORBIDDEN,
+                ex.getMessage()
+        );
+    }
+
+    @ExceptionHandler(
+            AccessDeniedException.class
+    )
+    public ResponseEntity<AuthResponseDTO<Object>>
+    handleAccessDeniedException(
+            AccessDeniedException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.FORBIDDEN,
+                "You do not have permission to access this resource"
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleGenericException(
@@ -156,4 +186,3 @@ public class GlobalExceptionHandler {
     }
 
 }
-

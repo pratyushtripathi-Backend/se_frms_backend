@@ -1,8 +1,6 @@
 package com.se_frms.user.repository;
 
 
-
-import com.se_frms.user.dto.UserResponseDTO;
 import com.se_frms.user.model.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,11 +18,5 @@ public interface UserRepository
     boolean existsByPhoneNumber(String phoneNumber);
 
     Optional<User> findByEmail(String email);
-
-
-    UserResponseDTO getUserById(UUID id);
-
-    Optional<User> findById(UUID id);
 }
-
 
