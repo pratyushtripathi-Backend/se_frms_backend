@@ -61,7 +61,7 @@ public class UserRegistrationRequest {
     )
     private String phoneNumber;
 
-    @NotBlank(message = "Password is required")
+
     @Size(
             min = 8,
             max = 20,

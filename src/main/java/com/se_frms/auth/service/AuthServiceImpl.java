@@ -2,14 +2,30 @@ package com.se_frms.auth.service;
 
 import com.se_frms.auth.dto.LoginRequestDTO;
 import com.se_frms.auth.dto.LoginResponseDTO;
+
+import com.se_frms.auth.dto.ResetPasswordRequest;
+import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRoleException;
+
+import com.se_frms.auth.exception.*;
+
+import com.se_frms.auth.service.AuthService;
+
+import com.se_frms.auth.util.PasswordGeneratorUtil;
+
+import com.se_frms.mail.service.MailService;
+import com.se_frms.passwordreset.model.PasswordResetToken;
 import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
+
+import com.se_frms.auth.dto.ForgotPasswordRequest;
+import com.se_frms.passwordreset.repository.PasswordResetTokenRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.user.exception.InvalidCredentialsException;
 import com.se_frms.common.security.JwtUtil;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +47,10 @@ public class AuthServiceImpl
 
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    private final MailService mailService;
+
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
     public RegistrationResponseDTO registerUser(
@@ -50,10 +72,11 @@ public class AuthServiceImpl
 
         Role role = validateAndAssignRole();
 
+        String generatedPassword =
+                PasswordGeneratorUtil.generateSecurePassword();
+
         String encryptedPassword =
-                passwordEncoder.encode(
-                        request.getPassword()
-                );
+                passwordEncoder.encode(generatedPassword);
 
         User user = User.builder()
                 .firstName(request.getFirstName().trim())
@@ -66,6 +89,11 @@ public class AuthServiceImpl
 
         User savedUser =
                 userRepository.save(user);
+        mailService.sendLoginCredentials(
+                savedUser.getEmail(),
+                savedUser.getFirstName(),
+                request.getPassword()
+        );
 
         return RegistrationResponseDTO
                 .builder()
@@ -73,13 +101,148 @@ public class AuthServiceImpl
                 .build();
     }
 
-//    @Override
-//    public LoginResponseDTO login(
-//            LoginRequestDTO request
-//    ) {
-//        return null;
-//    }
+    private void validateDuplicateEmail(
+            String email
+    ) {
 
+        if (userRepository.existsByEmail(email)) {
+
+            throw new DuplicateEmailException(
+                    "Email already registered"
+            );
+        }
+    }
+
+    private void validateDuplicatePhone(
+            String phoneNumber
+    ) {
+
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+
+            throw new DuplicatePhoneException(
+                    "Phone number already registered"
+            );
+        }
+    }
+
+    private Role validateAndAssignRole() {
+
+        Role role = Role.EMPLOYEE;
+
+        if (role == Role.ADMIN) {
+
+            throw new InvalidRoleException(
+                    "Public ADMIN registration is not allowed"
+            );
+        }
+
+        return role;
+    }
+
+    @Override
+    public void forgotPassword(
+            ForgotPasswordRequest request
+    ) {
+
+        User user =
+                userRepository.findByEmail(
+                        request.getEmail()
+                ).orElseThrow(
+                        () -> new InvalidRequestException(
+                                "User not found"
+                        )
+                );
+
+        String token =
+                UUID.randomUUID().toString();
+
+        String resetLink =
+                "http://localhost:3000/reset-password?token="
+                        + token;
+
+        PasswordResetToken resetToken =
+                PasswordResetToken.builder()
+                        .token(token)
+                        .user(user)
+                        .createdAt(
+                                LocalDateTime.now()
+                        )
+                        .used(false)
+                        .expiryTime(
+                                LocalDateTime.now()
+                                        .plusMinutes(15)
+                        )
+                        .build();
+
+        passwordResetTokenRepository.save(
+                resetToken
+        );
+
+        mailService.sendPasswordResetMail(
+                user.getEmail(),
+                user.getFirstName(),
+                resetLink
+        );
+    }
+
+    @Override
+    public void resetPassword(
+            ResetPasswordRequest request
+    ) {
+
+        if (request.getNewPassword() == null
+                || request.getNewPassword().isBlank()) {
+
+            throw new InvalidRequestException(
+                    "New password is required"
+            );
+        }
+
+        PasswordResetToken resetToken =
+                passwordResetTokenRepository
+                        .findByToken(
+                                request.getToken()
+                        )
+                        .orElseThrow(
+                                () -> new InvalidTokenException(
+                                        "Invalid token"
+                                )
+                        );
+
+        if (resetToken.isUsed()) {
+
+            throw new InvalidTokenException(
+                    "Token already used"
+            );
+        }
+
+        if (resetToken.getExpiryTime()
+                .isBefore(LocalDateTime.now())) {
+
+            throw new TokenExpiredException(
+                    "Token expired"
+            );
+        }
+
+        User user =
+                resetToken.getUser();
+
+        user.setPasswordHash(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        userRepository.save(
+                user
+        );
+
+        resetToken.setUsed(true);
+
+        passwordResetTokenRepository.save(
+                resetToken
+        );
+    }
 
     @Override
     public LoginResponseDTO login(
@@ -125,41 +288,6 @@ public class AuthServiceImpl
                 .token(token)
                 .build();
     }
-    private void validateDuplicateEmail(
-            String email
-    ) {
-
-        if (userRepository.existsByEmail(email)) {
-
-            throw new DuplicateEmailException(
-                    "Email already registered"
-            );
-        }
-    }
-
-    private void validateDuplicatePhone(
-            String phoneNumber
-    ) {
-
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
-
-            throw new DuplicatePhoneException(
-                    "Phone number already registered"
-            );
-        }
-    }
-
-    private Role validateAndAssignRole() {
-
-        Role role = Role.EMPLOYEE;
-
-        if (role == Role.ADMIN) {
-
-            throw new InvalidRoleException(
-                    "Public ADMIN registration is not allowed"
-            );
-        }
-
-        return role;
-    }
 }
+
+

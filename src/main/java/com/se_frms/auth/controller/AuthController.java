@@ -68,5 +68,49 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<AuthResponseDTO<Object>>
+    resetPassword(
+            @Valid
+            @RequestBody
+            ResetPasswordRequest request
+    ) {
+
+        authService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO.builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Password reset successful"
+                        )
+                        .responseData(null)
+                        .build()
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<AuthResponseDTO<Object>>
+    forgotPassword(
+            @Valid
+            @RequestBody
+            ForgotPasswordRequest request
+    ) {
+
+        authService.forgotPassword(request);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO.builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Password reset link sent"
+                        )
+                        .responseData(null)
+                        .build()
+        );
+    }
 }
 

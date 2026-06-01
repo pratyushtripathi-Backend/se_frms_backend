@@ -1,14 +1,15 @@
 package com.se_frms.common.exception;
 
-
 import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.user.exception.InvalidCredentialsException;
 
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
-import com.se_frms.auth.exception.InvalidRoleException;
 import com.se_frms.auth.exception.InvalidRequestException;
+import com.se_frms.auth.exception.InvalidRoleException;
 import com.se_frms.auth.exception.UserAlreadyExistsException;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.Instant;
-
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(
-            DuplicateEmailException.class
-    )
+    @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleDuplicateEmailException(
             DuplicateEmailException ex
@@ -36,9 +34,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(
-            DuplicatePhoneException.class
-    )
+    @ExceptionHandler(DuplicatePhoneException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleDuplicatePhoneException(
             DuplicatePhoneException ex
@@ -50,9 +46,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(
-            InvalidRoleException.class
-    )
+    @ExceptionHandler(InvalidRoleException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleInvalidRoleException(
             InvalidRoleException ex
@@ -64,9 +58,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(
-            InvalidRequestException.class
-    )
+    @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleInvalidRequestException(
             InvalidRequestException ex
@@ -78,9 +70,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(
-            UserAlreadyExistsException.class
-    )
+    @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleUserAlreadyExistsException(
             UserAlreadyExistsException ex
@@ -92,9 +82,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(
-            MethodArgumentNotValidException.class
-    )
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleValidationException(
             MethodArgumentNotValidException ex
@@ -102,8 +90,11 @@ public class GlobalExceptionHandler {
 
         String errorMessage =
                 ex.getBindingResult()
-                        .getFieldError()
-                        .getDefaultMessage();
+                        .getFieldErrors()
+                        .stream()
+                        .findFirst()
+                        .map(error -> error.getDefaultMessage())
+                        .orElse("Validation failed");
 
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
@@ -130,9 +121,14 @@ public class GlobalExceptionHandler {
             Exception ex
     ) {
 
+        log.error(
+                "Unhandled Exception",
+                ex
+        );
+
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred"
+                ex.getMessage()
         );
     }
 
@@ -156,4 +152,3 @@ public class GlobalExceptionHandler {
     }
 
 }
-
