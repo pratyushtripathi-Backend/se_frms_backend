@@ -32,6 +32,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.user.exception.InvalidCredentialsException;
 import com.se_frms.common.security.JwtUtil;
+import com.se_frms.auth.dto.SendOtpRequestDTO;
+import com.se_frms.auth.dto.VerifyOtpRequestDTO;
+import com.se_frms.auth.model.EmailOtp;
+import com.se_frms.auth.repository.EmailOtpRepository;
+
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+
+import java.time.LocalDateTime;
+import java.util.Random;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -47,6 +57,9 @@ public class AuthServiceImpl
 
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailOtpRepository emailOtpRepository;
+
+    private final JavaMailSender mailSender;
 
     private final MailService mailService;
 
@@ -92,7 +105,7 @@ public class AuthServiceImpl
         mailService.sendLoginCredentials(
                 savedUser.getEmail(),
                 savedUser.getFirstName(),
-                request.getPassword()
+                generatedPassword
         );
 
         return RegistrationResponseDTO
@@ -275,10 +288,194 @@ public class AuthServiceImpl
             );
         }
 
-        String token =
-                jwtUtil.generateToken(
-                        user.getEmail()
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        return LoginResponseDTO
+                .builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .token(token)
+                .build();
+    }
+
+
+//    @Override
+//    public void sendOtp(
+//            SendOtpRequestDTO request
+//    ) {
+//
+//        User user =
+//                userRepository
+//                        .findByEmail(
+//                                request.getEmail()
+//                                        .trim()
+//                                        .toLowerCase()
+//                        )
+//                        .orElseThrow(
+//                                () -> new InvalidCredentialsException(
+//                                        "Email not registered"
+//                                )
+//                        );
+//
+//        String otp =
+//                String.valueOf(
+//                        100000 +
+//                                new Random().nextInt(900000)
+//                );
+//
+//        EmailOtp emailOtp =
+//                EmailOtp.builder()
+//                        .email(user.getEmail())
+//                        .otp(otp)
+//                        .expiryTime(
+//                                LocalDateTime.now()
+//                                        .plusMinutes(5)
+//                        )
+//                        .verified(false)
+//                        .build();
+//
+//        emailOtpRepository.save(emailOtp);
+//
+//        SimpleMailMessage message =
+//                new SimpleMailMessage();
+//
+//        message.setTo(
+//                user.getEmail()
+//        );
+//
+//        message.setSubject(
+//                "FRMS Login OTP"
+//        );
+//
+//        message.setText(
+//                "Your OTP is : " + otp
+//        );
+//
+//        mailSender.send(message);
+//    }
+
+    @Override
+    public void sendOtp(
+            SendOtpRequestDTO request
+    ) {
+
+        User user =
+                userRepository
+                        .findByEmail(
+                                request.getEmail()
+                                        .trim()
+                                        .toLowerCase()
+                        )
+                        .orElseThrow(
+                                () -> new InvalidCredentialsException(
+                                        "Email not registered"
+                                )
+                        );
+
+        String otp =
+                String.valueOf(
+                        100000 +
+                                new Random().nextInt(900000)
                 );
+
+        EmailOtp emailOtp =
+                EmailOtp.builder()
+                        .email(user.getEmail())
+                        .otp(otp)
+                        .expiryTime(
+                                LocalDateTime.now()
+                                        .plusMinutes(5)
+                        )
+                        .verified(false)
+                        .build();
+
+        emailOtpRepository.save(emailOtp);
+
+        System.out.println("OTP SAVED IN DB");
+
+        SimpleMailMessage message =
+                new SimpleMailMessage();
+
+        message.setTo(user.getEmail());
+        message.setSubject("FRMS Login OTP");
+        message.setText("Your OTP is : " + otp);
+
+        System.out.println("BEFORE MAIL SEND");
+
+        try {
+            mailSender.send(message);
+            System.out.println("MAIL SENT SUCCESSFULLY");
+        } catch (Exception e) {
+            System.out.println("MAIL ERROR");
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    @Override
+    public LoginResponseDTO verifyOtp(
+            VerifyOtpRequestDTO request
+    ) {
+
+        EmailOtp emailOtp =
+                emailOtpRepository
+                        .findTopByEmailOrderByIdDesc(
+                                request.getEmail()
+                        )
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "OTP not found"
+                                )
+                        );
+
+        if (
+                emailOtp.getExpiryTime()
+                        .isBefore(
+                                LocalDateTime.now()
+                        )
+        ) {
+
+            throw new RuntimeException(
+                    "OTP expired"
+            );
+        }
+
+        if (
+                !emailOtp.getOtp()
+                        .equals(
+                                request.getOtp()
+                        )
+        ) {
+
+            throw new RuntimeException(
+                    "Invalid OTP"
+            );
+        }
+
+        User user =
+                userRepository
+                        .findByEmail(
+                                request.getEmail()
+                        )
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        emailOtp.setVerified(true);
+
+        emailOtpRepository.save(
+                emailOtp
+        );
 
         return LoginResponseDTO
                 .builder()
@@ -289,5 +486,3 @@ public class AuthServiceImpl
                 .build();
     }
 }
-
-

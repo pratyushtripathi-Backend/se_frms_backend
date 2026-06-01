@@ -65,10 +65,7 @@ public class User {
     )
     private String phoneNumber;
 
-    @Column(
-            name = "password_hash",
-            nullable = false
-    )
+
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)

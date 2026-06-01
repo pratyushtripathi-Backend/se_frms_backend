@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.se_frms.auth.dto.SendOtpRequestDTO;
+import com.se_frms.auth.dto.VerifyOtpRequestDTO;
+import org.springframework.security.core.Authentication;
 
 import java.time.Instant;
 
@@ -111,6 +114,52 @@ public class AuthController {
                         .responseData(null)
                         .build()
         );
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<String> sendOtp(
+            @Valid
+            @RequestBody
+            SendOtpRequestDTO request
+    ) {
+
+        authService.sendOtp(request);
+
+        return ResponseEntity.ok(
+                "OTP sent successfully"
+        );
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<AuthResponseDTO<LoginResponseDTO>>
+    verifyOtp(
+            @Valid
+            @RequestBody
+            VerifyOtpRequestDTO request
+    ) {
+
+        LoginResponseDTO responseData =
+                authService.verifyOtp(request);
+
+        AuthResponseDTO<LoginResponseDTO> response =
+                AuthResponseDTO
+                        .<LoginResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "OTP Login successful"
+                        )
+                        .responseData(responseData)
+                        .build();
+
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/test")
+    public String test(Authentication authentication) {
+
+        System.out.println(authentication);
+
+        return "Authenticated User";
     }
 }
 

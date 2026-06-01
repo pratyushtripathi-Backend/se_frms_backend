@@ -7,6 +7,7 @@ import com.se_frms.auth.dto.ResetPasswordRequest;
 import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.dto.UserRegistrationRequest;
+import com.se_frms.auth.dto.*;
 
 public interface AuthService {
 
@@ -24,5 +25,13 @@ public interface AuthService {
 
     LoginResponseDTO login(
             LoginRequestDTO request
+    );
+
+    void sendOtp(
+            SendOtpRequestDTO request
+    );
+
+    LoginResponseDTO verifyOtp(
+            VerifyOtpRequestDTO request
     );
 }
