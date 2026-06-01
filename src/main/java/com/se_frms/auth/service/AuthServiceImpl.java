@@ -1,27 +1,21 @@
 package com.se_frms.auth.service;
 
-
-import com.se_frms.auth.dto.UserRegistrationRequest;
+import com.se_frms.auth.dto.LoginRequestDTO;
+import com.se_frms.auth.dto.LoginResponseDTO;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
-
+import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRoleException;
-
-import com.se_frms.auth.service.AuthService;
-
-import com.se_frms.auth.util.PasswordGeneratorUtil;
-
 import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+import com.se_frms.user.exception.InvalidCredentialsException;
+import com.se_frms.common.security.JwtUtil;
 
 import java.util.Locale;
 
@@ -34,6 +28,7 @@ public class AuthServiceImpl
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
     public RegistrationResponseDTO registerUser(
@@ -55,35 +50,18 @@ public class AuthServiceImpl
 
         Role role = validateAndAssignRole();
 
-        String generatedPassword =
-                PasswordGeneratorUtil
-                        .generateSecurePassword();
-
         String encryptedPassword =
                 passwordEncoder.encode(
-                        generatedPassword
+                        request.getPassword()
                 );
 
         User user = User.builder()
-
-                .firstName(
-                        request.getFirstName().trim()
-                )
-
-                .lastName(
-                        request.getLastName().trim()
-                )
-
+                .firstName(request.getFirstName().trim())
+                .lastName(request.getLastName().trim())
                 .email(email)
-
                 .phoneNumber(phoneNumber)
-
-                .passwordHash(
-                        encryptedPassword
-                )
-
+                .passwordHash(encryptedPassword)
                 .role(role)
-
                 .build();
 
         User savedUser =
@@ -95,6 +73,58 @@ public class AuthServiceImpl
                 .build();
     }
 
+//    @Override
+//    public LoginResponseDTO login(
+//            LoginRequestDTO request
+//    ) {
+//        return null;
+//    }
+
+
+    @Override
+    public LoginResponseDTO login(
+            LoginRequestDTO request
+    ) {
+
+        User user =
+                userRepository
+                        .findByEmail(
+                                request.getEmail()
+                                        .trim()
+                                        .toLowerCase()
+                        )
+                        .orElseThrow(
+                                () -> new InvalidCredentialsException(
+                                        "Invalid email or password"
+                                )
+                        );
+
+        boolean passwordMatches =
+                passwordEncoder.matches(
+                        request.getPassword(),
+                        user.getPasswordHash()
+                );
+
+        if (!passwordMatches) {
+
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
+        }
+
+        String token =
+                jwtUtil.generateToken(
+                        user.getEmail()
+                );
+
+        return LoginResponseDTO
+                .builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .token(token)
+                .build();
+    }
     private void validateDuplicateEmail(
             String email
     ) {
@@ -133,5 +163,3 @@ public class AuthServiceImpl
         return role;
     }
 }
-
-

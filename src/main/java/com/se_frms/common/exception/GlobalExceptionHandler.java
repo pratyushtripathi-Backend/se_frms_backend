@@ -2,6 +2,7 @@ package com.se_frms.common.exception;
 
 
 import com.se_frms.auth.dto.AuthResponseDTO;
+import com.se_frms.user.exception.InvalidCredentialsException;
 
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
@@ -109,6 +110,19 @@ public class GlobalExceptionHandler {
                 errorMessage
         );
     }
+    @ExceptionHandler(
+            InvalidCredentialsException.class
+    )
+    public ResponseEntity<AuthResponseDTO<Object>>
+    handleInvalidCredentialsException(
+            InvalidCredentialsException ex
+    ) {
+
+        return buildErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage()
+        );
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<AuthResponseDTO<Object>>
@@ -140,5 +154,6 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(response);
     }
+
 }
 

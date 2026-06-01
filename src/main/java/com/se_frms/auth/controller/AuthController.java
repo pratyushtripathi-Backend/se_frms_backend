@@ -46,5 +46,27 @@ public class AuthController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO<LoginResponseDTO>>
+    login(
+            @Valid
+            @RequestBody
+            LoginRequestDTO request
+    ) {
+
+        LoginResponseDTO responseData =
+                authService.login(request);
+
+        AuthResponseDTO<LoginResponseDTO> response =
+                AuthResponseDTO
+                        .<LoginResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Login successful")
+                        .responseData(responseData)
+                        .build();
+
+        return ResponseEntity.ok(response);
+    }
 }
 
