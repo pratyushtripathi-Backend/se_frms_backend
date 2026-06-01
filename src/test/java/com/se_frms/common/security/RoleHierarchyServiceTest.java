@@ -20,18 +20,17 @@ class RoleHierarchyServiceTest {
     }
 
     @Test
-    void superAdminShouldInheritAdminPermissions() {
-        Set<String> authorities = roleHierarchyService.buildAuthorities(Role.SUPER_ADMIN).stream()
+    void adminShouldInheritUserAndEmployeePermissions() {
+        Set<String> authorities = roleHierarchyService.buildAuthorities(Role.ADMIN).stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
         assertThat(authorities).contains(
-                Permission.SYSTEM_ADMIN.value(),
                 Permission.AUDIT_LOGS_READ.value(),
                 Permission.USERS_READ.value(),
-                "ROLE_SUPER_ADMIN",
                 "ROLE_ADMIN",
-                "ROLE_USER"
+                "ROLE_USER",
+                "ROLE_EMPLOYEE"
         );
     }
 

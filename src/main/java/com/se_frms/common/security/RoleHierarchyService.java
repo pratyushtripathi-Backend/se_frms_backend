@@ -21,11 +21,7 @@ public class RoleHierarchyService {
     static {
         IMPLIED_ROLES.put(Role.EMPLOYEE, EnumSet.of(Role.EMPLOYEE));
         IMPLIED_ROLES.put(Role.USER, EnumSet.of(Role.USER));
-        IMPLIED_ROLES.put(Role.MANAGER, EnumSet.of(Role.MANAGER, Role.USER));
-        IMPLIED_ROLES.put(Role.DEPARTMENT_HEAD, EnumSet.of(Role.DEPARTMENT_HEAD, Role.MANAGER, Role.USER));
-        IMPLIED_ROLES.put(Role.HR, EnumSet.of(Role.HR, Role.USER));
-        IMPLIED_ROLES.put(Role.ADMIN, EnumSet.of(Role.ADMIN, Role.HR, Role.DEPARTMENT_HEAD, Role.MANAGER, Role.USER));
-        IMPLIED_ROLES.put(Role.SUPER_ADMIN, EnumSet.of(Role.SUPER_ADMIN, Role.ADMIN, Role.HR, Role.DEPARTMENT_HEAD, Role.MANAGER, Role.USER));
+        IMPLIED_ROLES.put(Role.ADMIN, EnumSet.of(Role.ADMIN, Role.USER, Role.EMPLOYEE));
 
         DIRECT_PERMISSIONS.put(Role.EMPLOYEE, EnumSet.of(
                 Permission.AUTH_LOGIN,
@@ -39,28 +35,15 @@ public class RoleHierarchyService {
                 Permission.PROFILE_READ_SELF,
                 Permission.PROFILE_UPDATE_SELF
         ));
-        DIRECT_PERMISSIONS.put(Role.MANAGER, EnumSet.of(
-                Permission.USERS_READ
-        ));
-        DIRECT_PERMISSIONS.put(Role.DEPARTMENT_HEAD, EnumSet.of(
-                Permission.DEPARTMENT_USERS_READ,
-                Permission.USERS_UPDATE
-        ));
-        DIRECT_PERMISSIONS.put(Role.HR, EnumSet.of(
+        DIRECT_PERMISSIONS.put(Role.ADMIN, EnumSet.of(
                 Permission.USERS_READ,
                 Permission.USERS_UPDATE,
                 Permission.USERS_BLOCK,
-                Permission.USERS_UNBLOCK
-        ));
-        DIRECT_PERMISSIONS.put(Role.ADMIN, EnumSet.of(
+                Permission.USERS_UNBLOCK,
                 Permission.AUDIT_LOGS_READ,
                 Permission.RULES_MANAGE,
                 Permission.ALERTS_MANAGE,
                 Permission.USERS_ASSIGN_ROLE
-        ));
-        DIRECT_PERMISSIONS.put(Role.SUPER_ADMIN, EnumSet.of(
-                Permission.SECURITY_CONFIG_MANAGE,
-                Permission.SYSTEM_ADMIN
         ));
     }
 

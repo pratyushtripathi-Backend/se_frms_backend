@@ -159,7 +159,7 @@ public class AuthServiceImpl
 
         Role role = Role.EMPLOYEE;
 
-        if (role == Role.ADMIN || role == Role.SUPER_ADMIN) {
+        if (role == Role.ADMIN) {
 
             throw new InvalidRoleException(
                     "Public privileged registration is not allowed"
