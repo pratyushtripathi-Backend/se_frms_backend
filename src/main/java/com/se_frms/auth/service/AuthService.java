@@ -1,5 +1,6 @@
 package com.se_frms.auth.service;
 
+import com.se_frms.admin.dto.CreateEmployeeRequest;
 import com.se_frms.auth.dto.LoginRequestDTO;
 import com.se_frms.auth.dto.LoginResponseDTO;
 import com.se_frms.auth.dto.ForgotPasswordRequest;
@@ -33,5 +34,9 @@ public interface AuthService {
 
     LoginResponseDTO verifyOtp(
             VerifyOtpRequestDTO request
+    );
+
+    RegistrationResponseDTO createEmployee(
+            CreateEmployeeRequest request
     );
 }

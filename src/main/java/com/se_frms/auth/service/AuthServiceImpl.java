@@ -1,5 +1,6 @@
 package com.se_frms.auth.service;
 
+import com.se_frms.admin.dto.CreateEmployeeRequest;
 import com.se_frms.auth.dto.LoginRequestDTO;
 import com.se_frms.auth.dto.LoginResponseDTO;
 
@@ -483,6 +484,68 @@ public class AuthServiceImpl
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .token(token)
+                .build();
+    }
+
+    @Override
+    public RegistrationResponseDTO createEmployee(
+            CreateEmployeeRequest request
+    ) {
+
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase(Locale.ROOT);
+
+        String phoneNumber =
+                request.getPhoneNumber()
+                        .trim();
+
+        validateDuplicateEmail(email);
+
+        validateDuplicatePhone(phoneNumber);
+
+        String generatedPassword =
+                PasswordGeneratorUtil
+                        .generateSecurePassword();
+
+        String encryptedPassword =
+                passwordEncoder.encode(
+                        generatedPassword
+                );
+
+        User employee =
+                User.builder()
+                        .firstName(
+                                request.getFirstName().trim()
+                        )
+                        .lastName(
+                                request.getLastName().trim()
+                        )
+                        .email(email)
+                        .phoneNumber(phoneNumber)
+                        .passwordHash(
+                                encryptedPassword
+                        )
+                        .role(Role.EMPLOYEE)
+                        .build();
+
+        User savedEmployee =
+                userRepository.save(
+                        employee
+                );
+
+        mailService.sendLoginCredentials(
+                savedEmployee.getEmail(),
+                savedEmployee.getFirstName(),
+                generatedPassword
+        );
+
+        return RegistrationResponseDTO
+                .builder()
+                .userId(
+                        savedEmployee.getId()
+                )
                 .build();
     }
 }
