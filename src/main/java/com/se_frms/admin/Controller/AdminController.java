@@ -3,6 +3,9 @@ package com.se_frms.admin.Controller;
 
 
 import com.se_frms.admin.dto.CreateEmployeeRequest;
+import com.se_frms.admin.dto.EmployeeResponseDTO;
+import com.se_frms.admin.dto.EmployeeSummaryDTO;
+import com.se_frms.admin.service.AdminService;
 import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.service.AuthService;
@@ -15,12 +18,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final AuthService authService;
+    private final AdminService adminService;
 
     @PostMapping("/employees")
     public ResponseEntity<
@@ -32,9 +38,7 @@ public class AdminController {
     ) {
 
         RegistrationResponseDTO responseData =
-                authService.createEmployee(
-                        request
-                );
+                adminService.createEmployee(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -49,5 +53,73 @@ public class AdminController {
                                 .responseData(responseData)
                                 .build()
                 );
+    }
+
+    @GetMapping("/employees")
+    public ResponseEntity<
+            AuthResponseDTO<List<EmployeeSummaryDTO>>>
+    getAllEmployees() {
+
+        List<EmployeeSummaryDTO> responseData =
+                adminService.getAllEmployees();
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<List<EmployeeSummaryDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Employees fetched successfully"
+                        )
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @GetMapping("/employees/{employeeId}")
+    public ResponseEntity<
+            AuthResponseDTO<EmployeeResponseDTO>>
+    getEmployeeById(
+            @PathVariable
+            UUID employeeId
+    ) {
+
+        EmployeeResponseDTO responseData =
+                adminService.getEmployeeById(employeeId);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<EmployeeResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Employee fetched successfully"
+                        )
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/employees/{employeeId}")
+    public ResponseEntity<
+            AuthResponseDTO<Void>>
+    deleteEmployee(
+            @PathVariable
+            UUID employeeId
+    ) {
+
+        adminService.deleteEmployee(employeeId);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<Void>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Employee deleted successfully"
+                        )
+                        .responseData(null)
+                        .build()
+        );
     }
 }

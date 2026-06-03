@@ -36,7 +36,5 @@ public interface AuthService {
             VerifyOtpRequestDTO request
     );
 
-    RegistrationResponseDTO createEmployee(
-            CreateEmployeeRequest request
-    );
+
 }
