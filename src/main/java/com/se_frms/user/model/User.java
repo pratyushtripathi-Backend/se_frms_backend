@@ -95,6 +95,8 @@ public class User {
             nullable = false
     )
     private LocalDateTime updatedAt;
+    @Column(name = "last_activity")
+    private LocalDateTime lastActivity;
 
     @PrePersist
     public void prePersist() {

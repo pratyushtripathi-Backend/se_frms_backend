@@ -37,7 +37,9 @@ import com.se_frms.auth.dto.SendOtpRequestDTO;
 import com.se_frms.auth.dto.VerifyOtpRequestDTO;
 import com.se_frms.auth.model.EmailOtp;
 import com.se_frms.auth.repository.EmailOtpRepository;
-
+import com.se_frms.common.security.XssUtil;
+import com.se_frms.auth.model.BlacklistedToken;
+import com.se_frms.auth.repository.BlacklistedTokenRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -63,6 +65,7 @@ public class AuthServiceImpl
     private final JavaMailSender mailSender;
 
     private final MailService mailService;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
@@ -93,10 +96,22 @@ public class AuthServiceImpl
                 passwordEncoder.encode(generatedPassword);
 
         User user = User.builder()
-                .firstName(request.getFirstName().trim())
-                .lastName(request.getLastName().trim())
-                .email(email)
-                .phoneNumber(phoneNumber)
+                .firstName(
+                        XssUtil.clean(
+                                request.getFirstName().trim()
+                        )
+                )
+                .lastName(
+                        XssUtil.clean(
+                                request.getLastName().trim()
+                        )
+                )
+                .email(
+                        XssUtil.clean(email)
+                )
+                .phoneNumber(
+                        XssUtil.clean(phoneNumber)
+                )
                 .passwordHash(encryptedPassword)
                 .role(role)
                 .build();
@@ -288,6 +303,9 @@ public class AuthServiceImpl
                     "Invalid email or password"
             );
         }
+        user.setLastActivity(LocalDateTime.now());
+
+        userRepository.save(user);
 
         String token = jwtUtil.generateToken(
                 user.getEmail(),
@@ -302,62 +320,6 @@ public class AuthServiceImpl
                 .token(token)
                 .build();
     }
-
-
-//    @Override
-//    public void sendOtp(
-//            SendOtpRequestDTO request
-//    ) {
-//
-//        User user =
-//                userRepository
-//                        .findByEmail(
-//                                request.getEmail()
-//                                        .trim()
-//                                        .toLowerCase()
-//                        )
-//                        .orElseThrow(
-//                                () -> new InvalidCredentialsException(
-//                                        "Email not registered"
-//                                )
-//                        );
-//
-//        String otp =
-//                String.valueOf(
-//                        100000 +
-//                                new Random().nextInt(900000)
-//                );
-//
-//        EmailOtp emailOtp =
-//                EmailOtp.builder()
-//                        .email(user.getEmail())
-//                        .otp(otp)
-//                        .expiryTime(
-//                                LocalDateTime.now()
-//                                        .plusMinutes(5)
-//                        )
-//                        .verified(false)
-//                        .build();
-//
-//        emailOtpRepository.save(emailOtp);
-//
-//        SimpleMailMessage message =
-//                new SimpleMailMessage();
-//
-//        message.setTo(
-//                user.getEmail()
-//        );
-//
-//        message.setSubject(
-//                "FRMS Login OTP"
-//        );
-//
-//        message.setText(
-//                "Your OTP is : " + otp
-//        );
-//
-//        mailSender.send(message);
-//    }
 
     @Override
     public void sendOtp(
@@ -466,6 +428,9 @@ public class AuthServiceImpl
                                         "User not found"
                                 )
                         );
+        user.setLastActivity(LocalDateTime.now());
+
+        userRepository.save(user);
 
         String token = jwtUtil.generateToken(
                 user.getEmail(),
@@ -485,6 +450,21 @@ public class AuthServiceImpl
                 .role(user.getRole().name())
                 .token(token)
                 .build();
+    }
+    @Override
+    public void logout(String token) {
+
+        BlacklistedToken blacklistedToken =
+                BlacklistedToken.builder()
+                        .token(token)
+                        .blacklistedAt(
+                                LocalDateTime.now()
+                        )
+                        .build();
+
+        blacklistedTokenRepository.save(
+                blacklistedToken
+        );
     }
 
 

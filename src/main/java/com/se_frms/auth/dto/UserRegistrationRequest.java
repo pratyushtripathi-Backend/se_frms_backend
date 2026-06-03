@@ -20,10 +20,10 @@ public class UserRegistrationRequest {
             max = 50,
             message = "First name must be between 2 and 50 characters"
     )
-    @Pattern(
-            regexp = "^[A-Za-z]+(?: [A-Za-z]+)*$",
-            message = "Invalid first name"
-    )
+//    @Pattern(
+//            regexp = "^[A-Za-z]+(?: [A-Za-z]+)*$",
+//            message = "Invalid first name"
+//    )
     private String firstName;
 
     @NotBlank(

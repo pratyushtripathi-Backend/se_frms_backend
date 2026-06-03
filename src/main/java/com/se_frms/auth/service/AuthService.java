@@ -35,6 +35,7 @@ public interface AuthService {
     LoginResponseDTO verifyOtp(
             VerifyOtpRequestDTO request
     );
+    void logout(String token);
 
 
 }

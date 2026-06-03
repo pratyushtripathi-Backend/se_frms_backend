@@ -8,7 +8,7 @@ import com.se_frms.auth.service.AuthService;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -160,6 +160,40 @@ public class AuthController {
         System.out.println(authentication);
 
         return "Authenticated User";
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponseDTO<Object>>
+    logout(
+            HttpServletRequest request
+    ) {
+
+        String authHeader =
+                request.getHeader("Authorization");
+
+        if (authHeader == null
+                || !authHeader.startsWith("Bearer ")) {
+
+            throw new RuntimeException(
+                    "Token not found"
+            );
+        }
+
+        String token =
+                authHeader.substring(7);
+
+        authService.logout(token);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO.builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Logout successful"
+                        )
+                        .responseData(null)
+                        .build()
+        );
     }
 }
 
