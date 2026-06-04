@@ -1,14 +1,13 @@
 package com.se_frms.admin.service;
 
-import com.se_frms.admin.dto.CreateEmployeeRequest;
-import com.se_frms.admin.dto.EmployeeResponseDTO;
-import com.se_frms.admin.dto.EmployeeSummaryDTO;
+import com.se_frms.admin.dto.*;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.auth.util.PasswordGeneratorUtil;
 import com.se_frms.mail.service.MailService;
+import com.se_frms.user.dto.UserResponseDTO;
 import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
@@ -148,5 +147,187 @@ public class AdminServiceImpl implements AdminService {
         }
 
         userRepository.delete(employee);
+    }
+
+    @Override
+    public EmployeeResponseDTO updateEmployee(
+            UUID employeeId,
+            UpdateEmployeeRequest request
+    ) {
+
+        User user =
+                userRepository
+                        .findById(employeeId)
+                        .orElseThrow(
+                                () ->
+                                        new InvalidRequestException(
+                                                "Employee not found"
+                                        )
+                        );
+
+        if (
+                user.getRole()
+                        != Role.EMPLOYEE
+        ) {
+
+            throw new InvalidRequestException(
+                    "Only employee can be updated"
+            );
+        }
+
+        if (
+                !user.getEmail()
+                        .equals(
+                                request.getEmail()
+                        )
+                        &&
+                        userRepository.existsByEmail(
+                                request.getEmail()
+                        )
+        ) {
+
+            throw new DuplicateEmailException(
+                    "Email already exists"
+            );
+        }
+
+        if (
+                !user.getPhoneNumber()
+                        .equals(
+                                request.getPhoneNumber()
+                        )
+                        &&
+                        userRepository.existsByPhoneNumber(
+                                request.getPhoneNumber()
+                        )
+        ) {
+
+            throw new DuplicatePhoneException(
+                    "Phone already exists"
+            );
+        }
+
+        user.setFirstName(
+                request.getFirstName()
+        );
+
+        user.setLastName(
+                request.getLastName()
+        );
+
+        user.setEmail(
+                request.getEmail()
+        );
+
+        user.setPhoneNumber(
+                request.getPhoneNumber()
+        );
+
+        user.setIsActive(
+                request.getIsActive()
+        );
+
+        userRepository.save(
+                user
+        );
+
+         return EmployeeResponseDTO.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
+    }
+
+    @Override
+    public EmployeeResponseDTO patchEmployee(
+            UUID employeeId,
+            UpdateEmployeePatchRequest request
+    ) {
+
+        User user =
+                userRepository
+                        .findById(employeeId)
+                        .orElseThrow(
+                                () ->
+                                        new InvalidRequestException(
+                                                "Employee not found"
+                                        )
+                        );
+
+        if (user.getRole() != Role.EMPLOYEE) {
+
+            throw new InvalidRequestException(
+                    "Only employee can be updated"
+            );
+        }
+
+        if (
+                request.getEmail() != null
+                        &&
+                        !request.getEmail()
+                                .equals(user.getEmail())
+                        &&
+                        userRepository.existsByEmail(
+                                request.getEmail()
+                        )
+        ) {
+
+            throw new DuplicateEmailException(
+                    "Email already exists"
+            );
+        }
+
+        if (
+                request.getPhoneNumber() != null
+                        &&
+                        !request.getPhoneNumber()
+                                .equals(user.getPhoneNumber())
+                        &&
+                        userRepository.existsByPhoneNumber(
+                                request.getPhoneNumber()
+                        )
+        ) {
+
+            throw new DuplicatePhoneException(
+                    "Phone already exists"
+            );
+        }
+
+        if (request.getFirstName() != null)
+            user.setFirstName(
+                    request.getFirstName()
+            );
+
+        if (request.getLastName() != null)
+            user.setLastName(
+                    request.getLastName()
+            );
+
+        if (request.getEmail() != null)
+            user.setEmail(
+                    request.getEmail()
+            );
+
+        if (request.getPhoneNumber() != null)
+            user.setPhoneNumber(
+                    request.getPhoneNumber()
+            );
+
+        if (request.getIsActive() != null)
+            user.setIsActive(
+                    request.getIsActive()
+            );
+
+        userRepository.save(user);
+
+        return EmployeeResponseDTO.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
     }
 }

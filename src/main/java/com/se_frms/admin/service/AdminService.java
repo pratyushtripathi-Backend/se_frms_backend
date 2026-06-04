@@ -1,9 +1,8 @@
 package com.se_frms.admin.service;
 
-import com.se_frms.admin.dto.CreateEmployeeRequest;
-import com.se_frms.admin.dto.EmployeeResponseDTO;
-import com.se_frms.admin.dto.EmployeeSummaryDTO;
+import com.se_frms.admin.dto.*;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
+import com.se_frms.user.dto.UserResponseDTO;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -23,5 +22,15 @@ public interface AdminService {
 
     void deleteEmployee(
             UUID employeeId
+    );
+
+    EmployeeResponseDTO updateEmployee(
+            UUID employeeId,
+            UpdateEmployeeRequest request
+    );
+
+    EmployeeResponseDTO patchEmployee(
+            UUID employeeId,
+            UpdateEmployeePatchRequest request
     );
 }

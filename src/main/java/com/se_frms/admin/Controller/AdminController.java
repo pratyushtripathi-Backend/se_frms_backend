@@ -2,14 +2,13 @@ package com.se_frms.admin.Controller;
 
 
 
-import com.se_frms.admin.dto.CreateEmployeeRequest;
-import com.se_frms.admin.dto.EmployeeResponseDTO;
-import com.se_frms.admin.dto.EmployeeSummaryDTO;
+import com.se_frms.admin.dto.*;
 import com.se_frms.admin.service.AdminService;
 import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.service.AuthService;
 
+import com.se_frms.user.dto.UserResponseDTO;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -96,6 +95,69 @@ public class AdminController {
                                 "Employee fetched successfully"
                         )
                         .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @PutMapping("/employees/{employeeId}")
+    public ResponseEntity<AuthResponseDTO<EmployeeResponseDTO>>
+    updateEmployee(
+
+            @PathVariable
+            UUID employeeId,
+
+            @Valid
+            @RequestBody
+            UpdateEmployeeRequest request
+    ) {
+
+        EmployeeResponseDTO response =
+                adminService.updateEmployee(
+                        employeeId,
+                        request
+                );
+
+        return ResponseEntity.ok(
+
+                AuthResponseDTO
+                        .<EmployeeResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Employee updated successfully"
+                        )
+                        .responseData(response)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/employees/{employeeId}")
+    public ResponseEntity<AuthResponseDTO<EmployeeResponseDTO>>
+    patchEmployee(
+
+            @PathVariable
+            UUID employeeId,
+
+            @RequestBody
+            UpdateEmployeePatchRequest request
+    ) {
+
+        EmployeeResponseDTO response =
+                adminService.patchEmployee(
+                        employeeId,
+                        request
+                );
+
+        return ResponseEntity.ok(
+
+                AuthResponseDTO
+                        .<EmployeeResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Employee updated successfully"
+                        )
+                        .responseData(response)
                         .build()
         );
     }
