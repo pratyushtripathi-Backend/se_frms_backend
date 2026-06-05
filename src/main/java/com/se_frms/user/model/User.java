@@ -1,10 +1,12 @@
 package com.se_frms.user.model;
 
+import com.se_frms.permission.model.UserPermission;
 import com.se_frms.user.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -97,6 +99,14 @@ public class User {
     private LocalDateTime updatedAt;
     @Column(name = "last_activity")
     private LocalDateTime lastActivity;
+
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL
+    )
+    private List<UserPermission>
+            permissions;
 
     @PrePersist
     public void prePersist() {
