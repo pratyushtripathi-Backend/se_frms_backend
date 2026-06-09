@@ -49,7 +49,42 @@ public class JwtAuthenticationFilter
         if (authHeader == null
                 || !authHeader.startsWith("Bearer ")) {
 
-            filterChain.doFilter(request, response);
+            String uri =
+                    request.getRequestURI();
+
+            if (
+                    uri.startsWith(
+                            "/api/v1/auth"
+                    )
+            ) {
+
+                filterChain.doFilter(
+                        request,
+                        response
+                );
+
+                return;
+            }
+
+            response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                    "application/json"
+            );
+
+            response.getWriter().write(
+                    """
+                    {
+                      "status": false,
+                      "responseCode": 401,
+                      "responseMessage": "Authentication required. Please login.",
+                      "responseData": null
+                    }
+                    """
+            );
+
             return;
         }
 
@@ -82,11 +117,31 @@ public class JwtAuthenticationFilter
         }
 
         boolean valid =
-                jwtUtil.validateToken(token);
+                jwtUtil.validateToken(
+                        token
+                );
 
         if (!valid) {
 
-            filterChain.doFilter(request, response);
+            response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                    "application/json"
+            );
+
+            response.getWriter().write(
+                    """
+                    {
+                      "status": false,
+                      "responseCode": 401,
+                      "responseMessage": "Invalid or expired token. Please login again.",
+                      "responseData": null
+                    }
+                    """
+            );
+
             return;
         }
 

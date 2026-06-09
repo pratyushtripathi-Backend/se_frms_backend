@@ -9,6 +9,10 @@ import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.dto.*;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface AuthService {
 
@@ -25,8 +29,15 @@ public interface AuthService {
 
 
     LoginResponseDTO login(
-            LoginRequestDTO request
+
+            LoginRequestDTO request,
+
+            HttpServletRequest httpRequest
+
     );
+
+
+
 
     void sendOtp(
             SendOtpRequestDTO request
@@ -36,6 +47,17 @@ public interface AuthService {
             VerifyOtpRequestDTO request
     );
     void logout(String token);
+
+    List<LoginHistoryResponseDTO>
+    getLoginHistory();
+
+
+    List<LoginHistoryResponseDTO>
+    getLoginHistoryByUserId(
+
+            UUID userId
+
+    );
 
 
 }

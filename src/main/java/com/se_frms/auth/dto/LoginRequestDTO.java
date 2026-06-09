@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class LoginRequestDTO {
 
@@ -13,4 +15,9 @@ public class LoginRequestDTO {
 
     @NotBlank(message = "Password is required")
     private String password;
+
+
+    private BigDecimal latitude;
+
+    private BigDecimal longitude;
 }

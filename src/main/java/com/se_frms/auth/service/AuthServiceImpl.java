@@ -1,20 +1,12 @@
 package com.se_frms.auth.service;
 
-import com.se_frms.admin.dto.CreateEmployeeRequest;
-import com.se_frms.auth.dto.LoginRequestDTO;
-import com.se_frms.auth.dto.LoginResponseDTO;
+import com.se_frms.auth.dto.*;
 
-import com.se_frms.auth.dto.ResetPasswordRequest;
-import com.se_frms.auth.dto.UserRegistrationRequest;
-import com.se_frms.auth.dto.RegistrationResponseDTO;
-import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRoleException;
 
 import com.se_frms.auth.exception.*;
-
-import com.se_frms.auth.service.AuthService;
 
 import com.se_frms.auth.util.PasswordGeneratorUtil;
 
@@ -24,17 +16,16 @@ import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 
-import com.se_frms.auth.dto.ForgotPasswordRequest;
 import com.se_frms.passwordreset.repository.PasswordResetTokenRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.user.exception.InvalidCredentialsException;
 import com.se_frms.common.security.JwtUtil;
-import com.se_frms.auth.dto.SendOtpRequestDTO;
-import com.se_frms.auth.dto.VerifyOtpRequestDTO;
 import com.se_frms.auth.model.EmailOtp;
 import com.se_frms.auth.repository.EmailOtpRepository;
 import com.se_frms.common.security.XssUtil;
@@ -44,9 +35,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -68,6 +59,12 @@ public class AuthServiceImpl
     private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    private final LoginHistoryService
+            loginHistoryService;
+
+    private final LoginAttemptService
+            loginAttemptService;
 
     @Override
     public RegistrationResponseDTO registerUser(
@@ -275,7 +272,9 @@ public class AuthServiceImpl
 
     @Override
     public LoginResponseDTO login(
-            LoginRequestDTO request
+            LoginRequestDTO request,
+
+            HttpServletRequest httpRequest
     ) {
 
         User user =
@@ -285,17 +284,103 @@ public class AuthServiceImpl
                                         .trim()
                                         .toLowerCase()
                         )
-                        .orElseThrow(
-                                () -> new InvalidCredentialsException(
-                                        "Invalid email or password"
-                                )
-                        );
+                        .orElse(null);
 
+//        boolean passwordMatches =
+//                passwordEncoder.matches(
+//                        request.getPassword(),
+//                        user.getPasswordHash()
+//                );
+
+        // USER NOT FOUND
+        // STEP 1
+        if (user == null) {
+
+            loginAttemptService
+                    .saveAttempt(
+
+                            null,
+
+                            request.getEmail(),
+
+                            false,
+
+                            "USER_NOT_FOUND",
+
+                            request.getLatitude(),
+
+                            request.getLongitude(),
+
+                            httpRequest
+                    );
+
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
+        }
+
+        // STEP 2
         boolean passwordMatches =
+
                 passwordEncoder.matches(
+
                         request.getPassword(),
+
                         user.getPasswordHash()
+
                 );
+
+        if (!passwordMatches) {
+
+            loginAttemptService
+                    .saveAttempt(
+
+                            user,
+
+                            request.getEmail(),
+
+                            false,
+
+                            "INVALID_PASSWORD",
+
+                            request.getLatitude(),
+
+                            request.getLongitude(),
+
+                            httpRequest
+                    );
+
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
+        }
+        user.setLastActivity(
+                LocalDateTime.now()
+        );
+
+        userRepository.save(
+                user
+        );
+
+        // SUCCESS LOGIN ATTEMPT
+        loginAttemptService
+                .saveAttempt(
+
+                        user,
+
+                        request.getEmail(),
+
+                        true,
+
+                        "LOGIN_SUCCESS",
+
+                        request.getLatitude(),
+
+                        request.getLongitude(),
+
+                        httpRequest
+                );
+
 
         if (!passwordMatches) {
 
@@ -312,6 +397,17 @@ public class AuthServiceImpl
                 user.getRole().name()
         );
 
+        loginHistoryService
+                .saveLoginHistory(
+
+                        user,
+
+                        httpRequest,
+
+                        true
+
+                );
+
         return LoginResponseDTO
                 .builder()
                 .userId(user.getId())
@@ -320,6 +416,8 @@ public class AuthServiceImpl
                 .token(token)
                 .build();
     }
+
+
 
     @Override
     public void sendOtp(
@@ -466,6 +564,53 @@ public class AuthServiceImpl
                 blacklistedToken
         );
     }
+
+    @Override
+    public List<LoginHistoryResponseDTO>
+    getLoginHistory() {
+
+        String email =
+
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        User user =
+
+                userRepository
+                        .findByEmail(
+                                email
+                        )
+
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "User not found"
+                                        )
+                        );
+
+        return loginHistoryService
+                .getLoginHistory(
+                        user
+                );
+    }
+
+    @Override
+    public List<LoginHistoryResponseDTO>
+    getLoginHistoryByUserId(
+
+            UUID userId
+
+    ) {
+
+        return loginHistoryService
+                .getLoginHistoryByUserId(
+                        userId
+                );
+    }
+
+
 
 
 }

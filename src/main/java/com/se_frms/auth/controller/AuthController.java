@@ -3,8 +3,12 @@ package com.se_frms.auth.controller;
 
 import com.se_frms.auth.dto.*;
 
+import com.se_frms.auth.repository.LoginAttemptRepository;
 import com.se_frms.auth.service.AuthService;
 
+import com.se_frms.auth.service.LoginAttemptService;
+import com.se_frms.user.model.User;
+import com.se_frms.user.repository.UserRepository;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -15,8 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import com.se_frms.auth.dto.SendOtpRequestDTO;
 import com.se_frms.auth.dto.VerifyOtpRequestDTO;
 import org.springframework.security.core.Authentication;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -24,6 +32,9 @@ import java.time.Instant;
 public class AuthController {
 
     private final AuthService authService;
+
+    private final LoginAttemptService loginAttemptService;
+
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO<RegistrationResponseDTO>>
@@ -52,24 +63,154 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO<LoginResponseDTO>>
     login(
+
             @Valid
             @RequestBody
-            LoginRequestDTO request
+            LoginRequestDTO request,
+
+            HttpServletRequest httpRequest
+
     ) {
 
         LoginResponseDTO responseData =
-                authService.login(request);
+
+                authService.login(
+
+                        request,
+
+                        httpRequest
+
+                );
 
         AuthResponseDTO<LoginResponseDTO> response =
+
                 AuthResponseDTO
                         .<LoginResponseDTO>builder()
+
                         .status(true)
+
                         .responseCode(200)
-                        .responseMessage("Login successful")
-                        .responseData(responseData)
+
+                        .responseMessage(
+                                "Login successful"
+                        )
+
+                        .responseData(
+                                responseData
+                        )
+
                         .build();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                response
+        );
+    }
+
+    @GetMapping(
+            "/login-history"
+    )
+    public ResponseEntity<
+            AuthResponseDTO<
+                    List<LoginHistoryResponseDTO>
+                    >
+            >
+
+    getLoginHistory() {
+
+        return ResponseEntity.ok(
+
+                AuthResponseDTO
+
+                        .<List<LoginHistoryResponseDTO>>
+                                builder()
+
+                        .status(
+                                true
+                        )
+
+                        .responseCode(
+                                200
+                        )
+
+                        .responseMessage(
+                                "Login history fetched successfully"
+                        )
+
+                        .responseData(
+
+                                authService
+                                        .getLoginHistory()
+
+                        )
+
+                        .build()
+        );
+    }
+
+    @GetMapping(
+            "/login-history/{userId}"
+    )
+    public ResponseEntity<
+            AuthResponseDTO<
+                    List<LoginHistoryResponseDTO>
+                    >
+            >
+
+    getLoginHistoryByUserId(
+
+            @PathVariable
+            UUID userId
+
+    ) {
+
+        return ResponseEntity.ok(
+
+                AuthResponseDTO
+
+                        .<List<LoginHistoryResponseDTO>>
+                                builder()
+
+                        .status(
+                                true
+                        )
+
+                        .responseCode(
+                                200
+                        )
+
+                        .responseMessage(
+                                "Login history fetched successfully"
+                        )
+
+                        .responseData(
+
+                                authService
+                                        .getLoginHistoryByUserId(
+                                                userId
+                                        )
+
+                        )
+
+                        .build()
+        );
+    }
+
+    @GetMapping("/login-attempt")
+    public ResponseEntity<AuthResponseDTO<List<LoginAttemptResponseDTO>>> getAllLoginAttempts() {
+
+        List<LoginAttemptResponseDTO> response =
+                loginAttemptService.getAllLoginAttempts();
+
+        return ResponseEntity.ok(
+
+                AuthResponseDTO.<List<LoginAttemptResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Login attempts fetched successfully")
+                        .responseData(response)
+                        .build()
+
+        );
     }
 
     @PostMapping("/reset-password")
@@ -193,6 +334,52 @@ public class AuthController {
                         )
                         .responseData(null)
                         .build()
+        );
+    }
+
+    @GetMapping(
+            "/login-attempt/{userId}"
+    )
+    public ResponseEntity<?> getLoginAttemptsByUserId(
+
+            @PathVariable
+            UUID userId
+
+    ) {
+
+        List<LoginAttemptResponseDTO> response =
+
+                loginAttemptService
+                        .getLoginAttemptsByUserId(
+                                userId
+                        );
+
+        return ResponseEntity.ok(
+
+                Map.of(
+
+                        "success", true,
+
+                        "message",
+
+                        response.isEmpty()
+
+                                ?
+
+                                "No login attempts found"
+
+                                :
+
+                                "Login attempts fetched successfully",
+
+                        "count",
+
+                        response.size(),
+
+                        "data",
+
+                        response
+                )
         );
     }
 }

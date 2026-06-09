@@ -43,6 +43,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/auth/**"
                         ).permitAll()
+                        .requestMatchers(
+
+                                "/api/v1/access/**"
+
+                        )
+                        .permitAll()
 
                         .requestMatchers(
                                 "/api/v1/admin/**"
@@ -60,9 +66,19 @@ public class SecurityConfig {
                                 "ADMIN",
                                 "EMPLOYEE"
                         )
+                        .requestMatchers(
+                                "/api/v1/auth/login-history/**"
+                        )
+                        .hasRole(
+                                "ADMIN"
+                        )
+
 
                         .anyRequest()
                         .authenticated()
+
+
+
                 )
 
                 .addFilterBefore(
