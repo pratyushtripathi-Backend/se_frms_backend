@@ -31,8 +31,7 @@ import com.se_frms.auth.repository.EmailOtpRepository;
 import com.se_frms.common.security.XssUtil;
 import com.se_frms.auth.model.BlacklistedToken;
 import com.se_frms.auth.repository.BlacklistedTokenRepository;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,8 +51,9 @@ public class AuthServiceImpl
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailOtpRepository emailOtpRepository;
+    private final SessionStoreService sessionStoreService;
 
-    private final JavaMailSender mailSender;
+
 
     private final MailService mailService;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
@@ -408,6 +408,7 @@ public class AuthServiceImpl
 
                 );
 
+        sessionStoreService.createSession(user, token);
         return LoginResponseDTO
                 .builder()
                 .userId(user.getId())
@@ -456,25 +457,10 @@ public class AuthServiceImpl
 
         emailOtpRepository.save(emailOtp);
 
-        System.out.println("OTP SAVED IN DB");
-
-        SimpleMailMessage message =
-                new SimpleMailMessage();
-
-        message.setTo(user.getEmail());
-        message.setSubject("FRMS Login OTP");
-        message.setText("Your OTP is : " + otp);
-
-        System.out.println("BEFORE MAIL SEND");
-
-        try {
-            mailSender.send(message);
-            System.out.println("MAIL SENT SUCCESSFULLY");
-        } catch (Exception e) {
-            System.out.println("MAIL ERROR");
-            e.printStackTrace();
-            throw e;
-        }
+        mailService.sendLoginOtp(
+                user.getEmail(),
+                otp
+        );
     }
     @Override
     public LoginResponseDTO verifyOtp(
@@ -534,7 +520,7 @@ public class AuthServiceImpl
                 user.getEmail(),
                 user.getRole().name()
         );
-
+        sessionStoreService.createSession(user, token);
         emailOtp.setVerified(true);
 
         emailOtpRepository.save(
@@ -551,6 +537,8 @@ public class AuthServiceImpl
     }
     @Override
     public void logout(String token) {
+
+        sessionStoreService.deactivateSession(token);
 
         BlacklistedToken blacklistedToken =
                 BlacklistedToken.builder()

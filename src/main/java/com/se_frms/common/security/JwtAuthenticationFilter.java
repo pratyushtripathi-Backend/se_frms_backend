@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.se_frms.auth.repository.SessionStoreRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,7 @@ public class JwtAuthenticationFilter
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final SessionStoreRepository sessionStoreRepository;
 
     private final CustomUserDetailsService userDetailsService;
 
@@ -120,6 +122,29 @@ public class JwtAuthenticationFilter
                 jwtUtil.validateToken(
                         token
                 );
+                jwtUtil.validateToken(token);
+        if (!sessionStoreRepository.existsByTokenAndStatus(token, true)) {
+
+            response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                    "application/json"
+            );
+
+            response.getWriter().write(
+                    """
+                    {
+                      "status": false,
+                      "responseCode": 401,
+                      "responseMessage": "Session inactive. Please login again."
+                    }
+                    """
+            );
+
+            return;
+        }
 
         if (!valid) {
 

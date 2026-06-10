@@ -13,6 +13,10 @@ public interface MailService {
             String firstName,
             String resetLink
     );
+    void sendLoginOtp(
+            String email,
+            String otp
+    );
 }
 
 

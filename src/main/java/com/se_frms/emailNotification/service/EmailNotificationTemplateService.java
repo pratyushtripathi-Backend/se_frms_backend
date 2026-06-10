@@ -1,0 +1,32 @@
+package com.se_frms.emailNotification.service;
+
+import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
+import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
+
+import java.util.List;
+import java.util.Map;
+
+public interface EmailNotificationTemplateService {
+
+    EmailNotificationTemplateResponseDTO createTemplate(
+            EmailNotificationTemplateRequestDTO request
+    );
+
+    EmailNotificationTemplateResponseDTO updateTemplate(
+            String templateCode,
+            EmailNotificationTemplateRequestDTO request
+    );
+
+    EmailNotificationTemplateResponseDTO getTemplateByCode(
+            String templateCode
+    );
+
+    List<EmailNotificationTemplateResponseDTO> getAllTemplates();
+
+    String getSubject(String templateCode);
+
+    String renderTemplate(
+            String templateCode,
+            Map<String, String> values
+    );
+}

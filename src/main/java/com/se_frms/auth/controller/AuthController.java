@@ -20,6 +20,8 @@ import com.se_frms.auth.dto.SendOtpRequestDTO;
 import com.se_frms.auth.dto.VerifyOtpRequestDTO;
 import org.springframework.security.core.Authentication;
 import jakarta.servlet.http.HttpServletRequest;
+import com.se_frms.auth.service.SessionStoreService;
+import com.se_frms.auth.dto.SessionStatusResponseDTO;
 
 import java.time.Instant;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final AuthService authService;
+    private final SessionStoreService sessionStoreService;
 
     private final LoginAttemptService loginAttemptService;
 
@@ -335,6 +338,40 @@ public class AuthController {
                         .responseData(null)
                         .build()
         );
+    }
+    @GetMapping("/session/status")
+    public ResponseEntity<AuthResponseDTO<SessionStatusResponseDTO>>
+    getSessionStatus(
+            HttpServletRequest request
+    ) {
+
+        String authHeader =
+                request.getHeader("Authorization");
+
+        if (authHeader == null
+                || !authHeader.startsWith("Bearer ")) {
+
+            throw new RuntimeException(
+                    "Token not found"
+            );
+        }
+
+        String token =
+                authHeader.substring(7);
+
+        SessionStatusResponseDTO responseData =
+                sessionStoreService.getSessionStatus(token);
+
+        AuthResponseDTO<SessionStatusResponseDTO> response =
+                AuthResponseDTO
+                        .<SessionStatusResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Session status fetched successfully")
+                        .responseData(responseData)
+                        .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(

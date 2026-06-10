@@ -1,5 +1,6 @@
 package com.se_frms.mail.service;
 
+import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.mail.SimpleMailMessage;
@@ -8,12 +9,25 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class MailServiceImpl
         implements MailService {
 
+    private static final String LOGIN_CREDENTIALS_TEMPLATE =
+            "LOGIN_CREDENTIALS";
+
+    private static final String PASSWORD_RESET_TEMPLATE =
+            "PASSWORD_RESET";
+
+    private static final String LOGIN_OTP_TEMPLATE =
+            "LOGIN_OTP";
+
     private final JavaMailSender mailSender;
+
+    private final EmailNotificationTemplateService emailNotificationTemplateService;
 
     @Async
     @Override
@@ -23,26 +37,20 @@ public class MailServiceImpl
             String password
     ) {
 
-        SimpleMailMessage message =
-                new SimpleMailMessage();
-
-        message.setTo(email);
-
-        message.setSubject(
-                "FRMS Login Credentials"
+        sendMail(
+                email,
+                emailNotificationTemplateService.getSubject(
+                        LOGIN_CREDENTIALS_TEMPLATE
+                ),
+                emailNotificationTemplateService.renderTemplate(
+                        LOGIN_CREDENTIALS_TEMPLATE,
+                        Map.of(
+                                "firstName", firstName,
+                                "email", email,
+                                "password", password
+                        )
+                )
         );
-
-        message.setText(
-                "Hello " + firstName + ",\n\n" +
-                        "Your FRMS account has been created successfully.\n\n" +
-                        "Email: " + email + "\n" +
-                        "Password: " + password + "\n\n" +
-                        "Please change your password after your first login.\n\n" +
-                        "Regards,\n" +
-                        "FRMS Team"
-        );
-
-        mailSender.send(message);
     }
 
     @Async
@@ -53,26 +61,56 @@ public class MailServiceImpl
             String resetLink
     ) {
 
+        sendMail(
+                email,
+                emailNotificationTemplateService.getSubject(
+                        PASSWORD_RESET_TEMPLATE
+                ),
+                emailNotificationTemplateService.renderTemplate(
+                        PASSWORD_RESET_TEMPLATE,
+                        Map.of(
+                                "firstName", firstName,
+                                "resetLink", resetLink,
+                                "minutes", "15"
+                        )
+                )
+        );
+    }
+
+    @Async
+    @Override
+    public void sendLoginOtp(
+            String email,
+            String otp
+    ) {
+
+        sendMail(
+                email,
+                emailNotificationTemplateService.getSubject(
+                        LOGIN_OTP_TEMPLATE
+                ),
+                emailNotificationTemplateService.renderTemplate(
+                        LOGIN_OTP_TEMPLATE,
+                        Map.of(
+                                "otp", otp,
+                                "minutes", "5"
+                        )
+                )
+        );
+    }
+
+    private void sendMail(
+            String to,
+            String subject,
+            String body
+    ) {
+
         SimpleMailMessage message =
                 new SimpleMailMessage();
 
-        message.setTo(email);
-
-        message.setSubject(
-                "FRMS Password Reset Request"
-        );
-
-        message.setText(
-                "Hello " + firstName + ",\n\n" +
-                        "We received a request to reset your password.\n\n" +
-                        "Please use the link below to set a new password:\n\n" +
-                        resetLink + "\n\n" +
-                        "This link will expire in 15 minutes.\n\n" +
-                        "If you did not request this password reset, " +
-                        "please ignore this email.\n\n" +
-                        "Regards,\n" +
-                        "FRMS Team"
-        );
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
 
         mailSender.send(message);
     }
