@@ -4,7 +4,6 @@ import com.se_frms.auth.dto.*;
 
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
-import com.se_frms.auth.exception.InvalidRoleException;
 
 import com.se_frms.auth.exception.*;
 
@@ -12,7 +11,6 @@ import com.se_frms.auth.util.PasswordGeneratorUtil;
 
 import com.se_frms.mail.service.MailService;
 import com.se_frms.passwordreset.model.PasswordResetToken;
-import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 
@@ -38,7 +36,7 @@ import java.util.List;
 import java.util.Random;
 
 import java.util.Locale;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +82,7 @@ public class AuthServiceImpl
 
         validateDuplicatePhone(phoneNumber);
 
-        Role role = validateAndAssignRole();
+       // String role = validateAndAssignRole();
 
         String generatedPassword =
                 PasswordGeneratorUtil.generateSecurePassword();
@@ -110,7 +108,7 @@ public class AuthServiceImpl
                         XssUtil.clean(phoneNumber)
                 )
                 .passwordHash(encryptedPassword)
-                .role(role)
+                .userType("EMPLOYEE")
                 .build();
 
         User savedUser =
@@ -124,6 +122,13 @@ public class AuthServiceImpl
         return RegistrationResponseDTO
                 .builder()
                 .userId(savedUser.getId())
+                .firstName(savedUser.getFirstName())
+                .lastName(savedUser.getLastName())
+                .email(savedUser.getEmail())
+                .phoneNumber(savedUser.getPhoneNumber())
+                .role(savedUser.getUserType())
+                .status(savedUser.getStatus())
+                .createdDate(savedUser.getCreatedDate())
                 .build();
     }
 
@@ -151,19 +156,19 @@ public class AuthServiceImpl
         }
     }
 
-    private Role validateAndAssignRole() {
-
-        Role role = Role.EMPLOYEE;
-
-        if (role == Role.ADMIN) {
-
-            throw new InvalidRoleException(
-                    "Public ADMIN registration is not allowed"
-            );
-        }
-
-        return role;
-    }
+//    private Role validateAndAssignRole() {
+//
+//        Role role = Role.EMPLOYEE;
+//
+//        if (role == Role.ADMIN) {
+//
+//            throw new InvalidRoleException(
+//                    "Public ADMIN registration is not allowed"
+//            );
+//        }
+//
+//        return role;
+//    }
 
     @Override
     public void forgotPassword(
@@ -180,7 +185,7 @@ public class AuthServiceImpl
                 );
 
         String token =
-                UUID.randomUUID().toString();
+                String.valueOf(Math.random());
 
         String resetLink =
                 "http://localhost:3000/reset-password?token="
@@ -271,6 +276,59 @@ public class AuthServiceImpl
     }
 
     @Override
+    public void changePassword(
+            ChangePasswordRequest request
+    ) {
+
+        String email =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new InvalidRequestException(
+                                        "User not found"
+                                )
+                        );
+
+        if (
+                !passwordEncoder.matches(
+                        request.getOldPassword(),
+                        user.getPasswordHash()
+                )
+        ) {
+
+            throw new InvalidRequestException(
+                    "Old password is incorrect"
+            );
+        }
+
+        if (
+                passwordEncoder.matches(
+                        request.getNewPassword(),
+                        user.getPasswordHash()
+                )
+        ) {
+
+            throw new InvalidRequestException(
+                    "New password must be different from old password"
+            );
+        }
+
+        user.setPasswordHash(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        userRepository.save(user);
+    }
+
+    @Override
     public LoginResponseDTO login(
             LoginRequestDTO request,
 
@@ -354,9 +412,9 @@ public class AuthServiceImpl
                     "Invalid email or password"
             );
         }
-        user.setLastActivity(
-                LocalDateTime.now()
-        );
+//        user.setLastActivity(
+//                LocalDateTime.now()
+//        );
 
         userRepository.save(
                 user
@@ -388,13 +446,13 @@ public class AuthServiceImpl
                     "Invalid email or password"
             );
         }
-        user.setLastActivity(LocalDateTime.now());
+        //user.setLastActivity(LocalDateTime.now());
 
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(
                 user.getEmail(),
-                user.getRole().name()
+                user.getUserType()
         );
 
         loginHistoryService
@@ -413,7 +471,7 @@ public class AuthServiceImpl
                 .builder()
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .role(user.getUserType())
                 .token(token)
                 .build();
     }
@@ -512,13 +570,13 @@ public class AuthServiceImpl
                                         "User not found"
                                 )
                         );
-        user.setLastActivity(LocalDateTime.now());
+      //  user.setLastActivity(LocalDateTime.now());
 
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(
                 user.getEmail(),
-                user.getRole().name()
+                user.getUserType()
         );
         sessionStoreService.createSession(user, token);
         emailOtp.setVerified(true);
@@ -531,7 +589,7 @@ public class AuthServiceImpl
                 .builder()
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .role(user.getUserType())
                 .token(token)
                 .build();
     }
@@ -588,7 +646,7 @@ public class AuthServiceImpl
     public List<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
 
-            UUID userId
+            Integer userId
 
     ) {
 

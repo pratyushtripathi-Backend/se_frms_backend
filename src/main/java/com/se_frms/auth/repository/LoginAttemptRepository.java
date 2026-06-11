@@ -7,18 +7,18 @@ import com.se_frms.auth.model.LoginAttempt;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Integer;
 
 public interface LoginAttemptRepository
         extends JpaRepository
         <
                 LoginAttempt,
-                UUID
+                Integer
                 > {
 
 
 
-    List<LoginAttempt> findByUserIdOrderByAttemptedAtDesc(UUID userId);
+    List<LoginAttempt> findByUserIdOrderByAttemptedAtDesc(Integer userId);
 
 
 }

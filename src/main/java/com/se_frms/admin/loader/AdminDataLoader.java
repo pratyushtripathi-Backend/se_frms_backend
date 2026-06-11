@@ -1,6 +1,5 @@
 package com.se_frms.admin.loader;
 
-import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,7 @@ public class AdminDataLoader
                                         "Admin@123"
                                 )
                         )
-                        .role(Role.ADMIN)
+                        .userType("ADMIN")
                         .build();
 
         userRepository.save(admin);

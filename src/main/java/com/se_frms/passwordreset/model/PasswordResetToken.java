@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Entity
 @Table(name = "password_reset_tokens")
@@ -19,8 +19,8 @@ import java.util.UUID;
 public class PasswordResetToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(
             nullable = false,

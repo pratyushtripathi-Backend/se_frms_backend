@@ -34,7 +34,7 @@ public class CustomUserDetailsService
                 user.getPasswordHash(),
                 List.of(
                         new SimpleGrantedAuthority(
-                                "ROLE_" + user.getRole().name()
+                                "ROLE_" + user.getUserType()
                         )
                 )
         );

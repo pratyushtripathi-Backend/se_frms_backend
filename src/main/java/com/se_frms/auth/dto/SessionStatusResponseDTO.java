@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Data
 @Builder
@@ -13,7 +13,7 @@ public class SessionStatusResponseDTO {
 
     private Boolean active;
 
-    private UUID userId;
+    private Integer userId;
 
     private String email;
 

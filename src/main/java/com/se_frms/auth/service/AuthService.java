@@ -12,7 +12,7 @@ import com.se_frms.auth.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Integer;
 
 public interface AuthService {
 
@@ -25,6 +25,10 @@ public interface AuthService {
 
     void resetPassword(
             ResetPasswordRequest request
+    );
+
+    void changePassword(
+            ChangePasswordRequest request
     );
 
 
@@ -55,7 +59,7 @@ public interface AuthService {
     List<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
 
-            UUID userId
+            Integer userId
 
     );
 

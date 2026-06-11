@@ -9,7 +9,7 @@ import com.se_frms.user.model.User;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Integer;
 
 public interface LoginHistoryService {
 
@@ -29,6 +29,6 @@ public interface LoginHistoryService {
 
     List<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
-            UUID userId
+            Integer userId
     );
 }

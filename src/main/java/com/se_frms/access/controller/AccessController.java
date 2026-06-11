@@ -58,7 +58,7 @@ public class AccessController {
 
     }
 
-    @GetMapping("get-specific-access/{id}")
+    @GetMapping("/get-specific-access/{id}")
     public ResponseEntity<AccessResponseDTO>
     getById(
 

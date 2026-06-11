@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -80,7 +80,7 @@ public class AdminController {
             AuthResponseDTO<EmployeeResponseDTO>>
     getEmployeeById(
             @PathVariable
-            UUID employeeId
+            Integer employeeId
     ) {
 
         EmployeeResponseDTO responseData =
@@ -104,7 +104,7 @@ public class AdminController {
     updateEmployee(
 
             @PathVariable
-            UUID employeeId,
+            Integer employeeId,
 
             @Valid
             @RequestBody
@@ -136,7 +136,7 @@ public class AdminController {
     patchEmployee(
 
             @PathVariable
-            UUID employeeId,
+            Integer employeeId,
 
             @RequestBody
             UpdateEmployeePatchRequest request
@@ -167,7 +167,7 @@ public class AdminController {
             AuthResponseDTO<Void>>
     deleteEmployee(
             @PathVariable
-            UUID employeeId
+            Integer employeeId
     ) {
 
         adminService.deleteEmployee(employeeId);

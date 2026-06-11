@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
+import java.lang.Integer;
 
 public interface LoginAttemptService {
 
@@ -35,5 +35,5 @@ public interface LoginAttemptService {
 
 
     List<LoginAttemptResponseDTO>
-    getLoginAttemptsByUserId(UUID userId);
+    getLoginAttemptsByUserId(Integer userId);
 }

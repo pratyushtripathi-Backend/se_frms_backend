@@ -6,9 +6,8 @@ import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.auth.util.PasswordGeneratorUtil;
+import com.se_frms.common.security.XssUtil;
 import com.se_frms.mail.service.MailService;
-import com.se_frms.user.dto.UserResponseDTO;
-import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +17,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import java.lang.Integer;
+
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AdminServiceImpl implements AdminService {
+public class AdminServiceImpl
+        implements AdminService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+
     private final MailService mailService;
 
     @Override
@@ -34,178 +37,297 @@ public class AdminServiceImpl implements AdminService {
             CreateEmployeeRequest request
     ) {
 
-        String email = request.getEmail()
-                .trim()
-                .toLowerCase(Locale.ROOT);
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase(
+                                Locale.ROOT
+                        );
 
-        String phoneNumber = request.getPhoneNumber()
-                .trim();
+        String phone =
+                request.getPhoneNumber()
+                        .trim();
 
-        if (userRepository.existsByEmail(email)) {
+        if (
+                userRepository.existsByEmail(
+                        email
+                )
+        ) {
+
             throw new DuplicateEmailException(
                     "Email already registered"
             );
+
         }
 
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+        if (
+                userRepository.existsByPhoneNumber(
+                        phone
+                )
+        ) {
+
             throw new DuplicatePhoneException(
-                    "Phone number already registered"
+                    "Phone already registered"
             );
+
         }
 
         String generatedPassword =
-                PasswordGeneratorUtil.generateSecurePassword();
+                PasswordGeneratorUtil
+                        .generateSecurePassword();
 
         String encryptedPassword =
-                passwordEncoder.encode(generatedPassword);
+                passwordEncoder.encode(
+                        generatedPassword
+                );
 
         User employee = User.builder()
-                .firstName(request.getFirstName().trim())
-                .lastName(request.getLastName().trim())
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .passwordHash(encryptedPassword)
-                .role(Role.EMPLOYEE)
-                .build();
 
-        User savedEmployee =
-                userRepository.save(employee);
+                .firstName(
+                        XssUtil.clean(
+                                request.getFirstName().trim()
+                        )
+                )
+
+                .lastName(
+                        XssUtil.clean(
+                                request.getLastName().trim()
+                        )
+                )
+
+                .email(
+                        XssUtil.clean(
+                                email
+                        )
+                )
+
+                .phoneNumber(
+                        XssUtil.clean(
+                                phone
+                        )
+                )
+
+                .passwordHash(
+                        encryptedPassword
+                )
+
+                .userType(
+                        request.getRole()
+                )
+
+                .status(
+                        true
+                )
+
+                .build();
+        User saved =
+                userRepository.save(
+                        employee
+                );
 
         mailService.sendLoginCredentials(
-                savedEmployee.getEmail(),
-                savedEmployee.getFirstName(),
+
+                saved.getEmail(),
+
+                saved.getFirstName(),
+
                 generatedPassword
+
         );
 
-        return RegistrationResponseDTO.builder()
-                .userId(savedEmployee.getId())
-                .build();
-    }
+        return RegistrationResponseDTO
+                .builder()
 
-    @Transactional(readOnly = true)
-    @Override
-    public EmployeeResponseDTO getEmployeeById(
-            UUID employeeId
-    ) {
-
-        User employee = userRepository.findById(employeeId)
-                .orElseThrow(
-                        () -> new InvalidRequestException(
-                                "Employee not found"
-                        )
-                );
-
-        if (employee.getRole() != Role.EMPLOYEE) {
-            throw new InvalidRequestException(
-                    "User is not an employee"
-            );
-        }
-
-        return EmployeeResponseDTO.builder()
-                .id(employee.getId())
-                .firstName(employee.getFirstName())
-                .lastName(employee.getLastName())
-                .email(employee.getEmail())
-                .phoneNumber(employee.getPhoneNumber())
-                .role(employee.getRole().name())
-                .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<EmployeeSummaryDTO> getAllEmployees() {
-
-        return userRepository.findByRole(Role.EMPLOYEE)
-                .stream()
-                .map(employee ->
-                        EmployeeSummaryDTO.builder()
-                                .id(employee.getId())
-                                .firstName(employee.getFirstName())
-                                .lastName(employee.getLastName())
-                                .email(employee.getEmail())
-                                .build()
+                .userId(
+                        saved.getId()
                 )
-                .toList();
+
+                .firstName(
+                        saved.getFirstName()
+                )
+
+                .lastName(
+                        saved.getLastName()
+                )
+
+                .email(
+                        saved.getEmail()
+                )
+
+                .phoneNumber(
+                        saved.getPhoneNumber()
+                )
+
+                .role(
+                        saved.getUserType()
+                )
+
+                .status(
+                        saved.getStatus()
+                )
+
+                .createdDate(
+                        saved.getCreatedDate()
+                )
+
+                .build();
+
     }
 
     @Override
-    public void deleteEmployee(
-            UUID employeeId
-    ) {
-
-        User employee = userRepository.findById(employeeId)
-                .orElseThrow(
-                        () -> new InvalidRequestException(
-                                "Employee not found"
-                        )
-                );
-
-        if (employee.getRole() != Role.EMPLOYEE) {
-            throw new InvalidRequestException(
-                    "Only employees can be deleted"
-            );
-        }
-
-        userRepository.delete(employee);
-    }
-
-    @Override
-    public EmployeeResponseDTO updateEmployee(
-            UUID employeeId,
-            UpdateEmployeeRequest request
+    @Transactional(readOnly = true)
+    public EmployeeResponseDTO getEmployeeById(
+            Integer employeeId
     ) {
 
         User user =
+
                 userRepository
-                        .findById(employeeId)
+
+                        .findById(
+                                employeeId
+                        )
+
                         .orElseThrow(
+
                                 () ->
                                         new InvalidRequestException(
                                                 "Employee not found"
                                         )
+
                         );
 
         if (
-                user.getRole()
-                        != Role.EMPLOYEE
+
+                !"EMPLOYEE".equals(
+                        user.getUserType()
+                )
+
         ) {
 
             throw new InvalidRequestException(
-                    "Only employee can be updated"
+                    "User is not employee"
             );
+
         }
+
+        return map(
+                user
+        );
+
+    }
+
+    @Override
+    public List<EmployeeSummaryDTO> getAllEmployees() {
+
+        return userRepository
+                .findByUserType(
+                        "EMPlOYEE"
+                )
+
+                .stream()
+
+                .map(
+
+                        user ->
+
+                                EmployeeSummaryDTO
+
+                                        .builder()
+
+                                        .id(
+                                                user.getId()
+                                        )
+
+                                        .firstName(
+                                                user.getFirstName()
+                                        )
+
+                                        .lastName(
+                                                user.getLastName()
+                                        )
+
+                                        .email(
+                                                user.getEmail()
+                                        )
+
+                                        .build()
+
+                )
+
+                .toList();
+
+    }
+
+    @Override
+    public void deleteEmployee(
+            Integer employeeId
+    ) {
+
+        User user =
+
+                userRepository
+
+                        .findById(
+                                employeeId
+                        )
+
+                        .orElseThrow(
+
+                                () ->
+
+                                        new InvalidRequestException(
+                                                "Employee not found"
+                                        )
+
+                        );
 
         if (
-                !user.getEmail()
-                        .equals(
-                                request.getEmail()
-                        )
-                        &&
-                        userRepository.existsByEmail(
-                                request.getEmail()
-                        )
+
+                !"EMP".equals(
+                        user.getUserType()
+                )
+
         ) {
 
-            throw new DuplicateEmailException(
-                    "Email already exists"
+            throw new InvalidRequestException(
+                    "Only employee can be deleted"
             );
+
         }
 
-        if (
-                !user.getPhoneNumber()
-                        .equals(
-                                request.getPhoneNumber()
-                        )
-                        &&
-                        userRepository.existsByPhoneNumber(
-                                request.getPhoneNumber()
-                        )
-        ) {
+        user.setStatus(
+                false
+        );
 
-            throw new DuplicatePhoneException(
-                    "Phone already exists"
-            );
-        }
+        userRepository.save(
+                user
+        );
+
+    }
+
+    @Override
+    public EmployeeResponseDTO updateEmployee(
+            Integer employeeId,
+            UpdateEmployeeRequest request
+    ) {
+
+        User user =
+
+                userRepository
+
+                        .findById(
+                                employeeId
+                        )
+
+                        .orElseThrow(
+
+                                () ->
+                                        new InvalidRequestException(
+                                                "Employee not found"
+                                        )
+
+                        );
 
         user.setFirstName(
                 request.getFirstName()
@@ -223,77 +345,42 @@ public class AdminServiceImpl implements AdminService {
                 request.getPhoneNumber()
         );
 
-        user.setIsActive(
+        user.setStatus(
                 request.getIsActive()
         );
 
-        userRepository.save(
-                user
+        return map(
+
+                userRepository.save(
+                        user
+                )
+
         );
 
-         return EmployeeResponseDTO.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .build();
     }
 
     @Override
     public EmployeeResponseDTO patchEmployee(
-            UUID employeeId,
+            Integer employeeId,
             UpdateEmployeePatchRequest request
     ) {
 
         User user =
+
                 userRepository
-                        .findById(employeeId)
+
+                        .findById(
+                                employeeId
+                        )
+
                         .orElseThrow(
+
                                 () ->
                                         new InvalidRequestException(
                                                 "Employee not found"
                                         )
+
                         );
-
-        if (user.getRole() != Role.EMPLOYEE) {
-
-            throw new InvalidRequestException(
-                    "Only employee can be updated"
-            );
-        }
-
-        if (
-                request.getEmail() != null
-                        &&
-                        !request.getEmail()
-                                .equals(user.getEmail())
-                        &&
-                        userRepository.existsByEmail(
-                                request.getEmail()
-                        )
-        ) {
-
-            throw new DuplicateEmailException(
-                    "Email already exists"
-            );
-        }
-
-        if (
-                request.getPhoneNumber() != null
-                        &&
-                        !request.getPhoneNumber()
-                                .equals(user.getPhoneNumber())
-                        &&
-                        userRepository.existsByPhoneNumber(
-                                request.getPhoneNumber()
-                        )
-        ) {
-
-            throw new DuplicatePhoneException(
-                    "Phone already exists"
-            );
-        }
 
         if (request.getFirstName() != null)
             user.setFirstName(
@@ -316,18 +403,53 @@ public class AdminServiceImpl implements AdminService {
             );
 
         if (request.getIsActive() != null)
-            user.setIsActive(
+            user.setStatus(
                     request.getIsActive()
             );
 
-        userRepository.save(user);
+        return map(
 
-        return EmployeeResponseDTO.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .build();
+                userRepository.save(
+                        user
+                )
+
+        );
+
     }
+
+    private EmployeeResponseDTO map(
+            User user
+    ) {
+
+        return EmployeeResponseDTO
+                .builder()
+
+                .id(
+                        user.getId()
+                )
+
+                .firstName(
+                        user.getFirstName()
+                )
+
+                .lastName(
+                        user.getLastName()
+                )
+
+                .email(
+                        user.getEmail()
+                )
+
+                .phoneNumber(
+                        user.getPhoneNumber()
+                )
+
+                .role(
+                        user.getUserType()
+                )
+
+                .build();
+
+    }
+
 }

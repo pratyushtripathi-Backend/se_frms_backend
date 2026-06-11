@@ -10,7 +10,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Entity
 @Table(
@@ -26,7 +26,7 @@ public class LoginAttempt {
 
     @Id
     @GeneratedValue
-    private UUID id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(

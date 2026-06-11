@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.lang.Integer;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class UserServiceImpl
 
     @Override
     public UserResponseDTO getUserById(
-            UUID id
+            Integer id
     ) {
 
         if (id == null) {
@@ -60,7 +60,7 @@ public class UserServiceImpl
 
                 .phoneNumber(user.getPhoneNumber())
 
-                .role(user.getRole())
+                .role(user.getUserType())
 
                 .build();
     }

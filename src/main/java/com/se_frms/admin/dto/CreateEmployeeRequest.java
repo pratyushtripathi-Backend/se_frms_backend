@@ -22,4 +22,6 @@ public class CreateEmployeeRequest {
 
     @NotBlank
     private String phoneNumber;
+
+    private String role;
 }

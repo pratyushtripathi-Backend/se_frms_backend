@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Service
 @RequiredArgsConstructor
@@ -212,7 +212,7 @@ public class LoginHistoryServiceImpl
     public List<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
 
-            UUID userId
+            Integer userId
 
     ) {
 

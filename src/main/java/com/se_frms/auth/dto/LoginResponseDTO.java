@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.lang.Integer;
 
 @Data
 @Builder
@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class LoginResponseDTO {
 
-    private UUID userId;
+    private Integer userId;
 
     private String email;
 

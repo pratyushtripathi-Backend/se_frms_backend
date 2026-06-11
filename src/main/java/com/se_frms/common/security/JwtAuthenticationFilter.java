@@ -181,36 +181,36 @@ public class JwtAuthenticationFilter
                                 )
                         );
 
-        if (
-                user.getLastActivity() != null
-                        &&
-                        user.getLastActivity()
-                                .plusMinutes(10)
-                                .isBefore(
-                                        LocalDateTime.now()
-                                )
-        ) {
-
-            response.setStatus(
-                    HttpServletResponse.SC_UNAUTHORIZED
-            );
-
-            response.setContentType(
-                    "application/json"
-            );
-
-            response.getWriter().write(
-                    """
-                    {
-                      "status": false,
-                      "responseCode": 401,
-                      "responseMessage": "Session expired due to inactivity"
-                    }
-                    """
-            );
-
-            return;
-        }
+//        if (
+//                user.getLastActivity() != null
+//                        &&
+//                        user.getLastActivity()
+//                                .plusMinutes(10)
+//                                .isBefore(
+//                                        LocalDateTime.now()
+//                                )
+//        ) {
+//
+//            response.setStatus(
+//                    HttpServletResponse.SC_UNAUTHORIZED
+//            );
+//
+//            response.setContentType(
+//                    "application/json"
+//            );
+//
+//            response.getWriter().write(
+//                    """
+//                    {
+//                      "status": false,
+//                      "responseCode": 401,
+//                      "responseMessage": "Session expired due to inactivity"
+//                    }
+//                    """
+//            );
+//
+//            return;
+//        }
         UserDetails userDetails =
                 userDetailsService
                         .loadUserByUsername(email);
@@ -227,9 +227,9 @@ public class JwtAuthenticationFilter
                 new WebAuthenticationDetailsSource()
                         .buildDetails(request)
         );
-        user.setLastActivity(
-                LocalDateTime.now()
-        );
+//        user.setLastActivity(
+//                LocalDateTime.now()
+//        );
 
         userRepository.save(user);
         SecurityContextHolder

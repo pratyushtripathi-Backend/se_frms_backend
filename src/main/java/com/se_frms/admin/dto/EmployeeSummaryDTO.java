@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.UUID;
+import java.lang.Integer;
 
 @Getter
 @Builder
 public class EmployeeSummaryDTO {
 
-    private UUID id;
+    private Integer id;
 
     private String firstName;
 

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.MediaType;
+
 import org.springframework.security.config.Customizer;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,11 +40,83 @@ public class SecurityConfig {
                                 )
                 )
 
+                .exceptionHandling(exception -> exception
+
+                        .authenticationEntryPoint(
+                                (request, response, authException) -> {
+
+                                    response.setStatus(
+                                            401
+                                    );
+                                    response.setContentType(
+                                            MediaType.APPLICATION_JSON_VALUE
+                                    );
+                                    response.setCharacterEncoding(
+                                            "UTF-8"
+                                    );
+                                    response.getWriter().write(
+                                            """
+                                            {
+                                              "status": false,
+                                              "responseCode": 401,
+                                              "responseMessage": "Authentication required. Please login.",
+                                              "responseData": null
+                                            }
+                                            """
+                                    );
+                                }
+                        )
+
+                        .accessDeniedHandler(
+                                (request, response, accessDeniedException) -> {
+
+                                    response.setStatus(
+                                            403
+                                    );
+                                    response.setContentType(
+                                            MediaType.APPLICATION_JSON_VALUE
+                                    );
+                                    response.setCharacterEncoding(
+                                            "UTF-8"
+                                    );
+                                    response.getWriter().write(
+                                            """
+                                            {
+                                              "status": false,
+                                              "responseCode": 403,
+                                              "responseMessage": "Access denied. Admin role required.",
+                                              "responseData": null
+                                            }
+                                            """
+                                    );
+                                }
+                        )
+                )
+
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
+                                "/api/v1/auth/login-history",
+                                "/api/v1/auth/login-history/**",
+                                "/api/v1/auth/login-attempt",
+                                "/api/v1/auth/login-attempt/**"
+                        )
+                        .hasRole(
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                "/api/v1/auth/change-password"
+                        )
+                        .authenticated()
+
+                        .requestMatchers(
+
                                 "/api/v1/auth/**"
-                        ).permitAll()
+
+                        )
+                        .permitAll()
+
                         .requestMatchers(
 
                                 "/api/v1/access/**"
@@ -65,12 +139,6 @@ public class SecurityConfig {
                         ).hasAnyRole(
                                 "ADMIN",
                                 "EMPLOYEE"
-                        )
-                        .requestMatchers(
-                                "/api/v1/auth/login-history/**"
-                        )
-                        .hasRole(
-                                "ADMIN"
                         )
 
 

@@ -61,7 +61,7 @@ public class SessionStoreServiceImpl
                 .active(sessionStore.getStatus())
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .role(user.getUserType())
                 .sessionActiveDate(
                         sessionStore.getSessionActiveDate()
                 )

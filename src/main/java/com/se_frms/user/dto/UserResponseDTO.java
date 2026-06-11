@@ -2,18 +2,16 @@ package com.se_frms.user.dto;
 
 
 
-import com.se_frms.user.enums.Role;
-
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
+import java.lang.Integer;
 
 @Data
 @Builder
 public class UserResponseDTO {
 
-    private UUID id;
+    private Integer id;
 
     private String firstName;
 
@@ -23,5 +21,5 @@ public class UserResponseDTO {
 
     private String phoneNumber;
 
-    private Role role;
+    private String role;
 }

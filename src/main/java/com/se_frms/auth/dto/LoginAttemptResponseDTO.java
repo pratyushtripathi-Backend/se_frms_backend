@@ -4,7 +4,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Getter
 @Setter
@@ -13,9 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class LoginAttemptResponseDTO {
 
-    private UUID id;
+    private Integer id;
 
-    private UUID userId;
+    private Integer userId;
 
     private String email;
 

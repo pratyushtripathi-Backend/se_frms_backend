@@ -23,7 +23,7 @@ import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
+import java.lang.Integer;
 
 @Service
 @RequiredArgsConstructor
@@ -202,7 +202,7 @@ public class LoginAttemptServiceImpl
     public List<LoginAttemptResponseDTO>
     getLoginAttemptsByUserId(
 
-            UUID userId
+            Integer userId
 
     ) {
 

@@ -1,0 +1,35 @@
+package com.se_frms.roleAccess.repository;
+
+import com.se_frms.roleAccess.model.RoleAccess;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface RoleAccessRepository
+        extends JpaRepository<RoleAccess,Integer> {
+    List<RoleAccess>
+
+    findByRoleRoleIdAndStatusTrue(
+
+            Integer roleId
+
+    );
+    boolean existsByRoleRoleIdAndAccessId(
+            Integer roleId,
+            Integer accessId
+    );
+
+    Optional<RoleAccess>
+
+    findByRoleRoleIdAndAccessId(
+
+            Integer roleId,
+
+            Integer accessId
+
+    );
+
+}

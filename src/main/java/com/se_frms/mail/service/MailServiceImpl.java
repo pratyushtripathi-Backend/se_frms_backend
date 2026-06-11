@@ -1,5 +1,6 @@
 package com.se_frms.mail.service;
 
+import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
 import lombok.RequiredArgsConstructor;
 
@@ -37,18 +38,27 @@ public class MailServiceImpl
             String password
     ) {
 
+        Map<String, String> values =
+                Map.of(
+                        "firstName", firstName,
+                        "email", email,
+                        "password", password
+                );
+
         sendMail(
                 email,
-                emailNotificationTemplateService.getSubject(
-                        LOGIN_CREDENTIALS_TEMPLATE
-                ),
-                emailNotificationTemplateService.renderTemplate(
+                getSubjectOrDefault(
                         LOGIN_CREDENTIALS_TEMPLATE,
-                        Map.of(
-                                "firstName", firstName,
-                                "email", email,
-                                "password", password
-                        )
+                        "Your FRMS login credentials"
+                ),
+                renderTemplateOrDefault(
+                        LOGIN_CREDENTIALS_TEMPLATE,
+                        values,
+                        "Hello {{firstName}},\n\n"
+                                + "Your FRMS account has been created.\n"
+                                + "Email: {{email}}\n"
+                                + "Password: {{password}}\n\n"
+                                + "Please log in and change your password."
                 )
         );
     }
@@ -61,18 +71,26 @@ public class MailServiceImpl
             String resetLink
     ) {
 
+        Map<String, String> values =
+                Map.of(
+                        "firstName", firstName,
+                        "resetLink", resetLink,
+                        "minutes", "15"
+                );
+
         sendMail(
                 email,
-                emailNotificationTemplateService.getSubject(
-                        PASSWORD_RESET_TEMPLATE
-                ),
-                emailNotificationTemplateService.renderTemplate(
+                getSubjectOrDefault(
                         PASSWORD_RESET_TEMPLATE,
-                        Map.of(
-                                "firstName", firstName,
-                                "resetLink", resetLink,
-                                "minutes", "15"
-                        )
+                        "Reset your FRMS password"
+                ),
+                renderTemplateOrDefault(
+                        PASSWORD_RESET_TEMPLATE,
+                        values,
+                        "Hello {{firstName}},\n\n"
+                                + "Use this link to reset your password:\n"
+                                + "{{resetLink}}\n\n"
+                                + "This link expires in {{minutes}} minutes."
                 )
         );
     }
@@ -84,19 +102,80 @@ public class MailServiceImpl
             String otp
     ) {
 
+        Map<String, String> values =
+                Map.of(
+                        "otp", otp,
+                        "minutes", "5"
+                );
+
         sendMail(
                 email,
-                emailNotificationTemplateService.getSubject(
-                        LOGIN_OTP_TEMPLATE
-                ),
-                emailNotificationTemplateService.renderTemplate(
+                getSubjectOrDefault(
                         LOGIN_OTP_TEMPLATE,
-                        Map.of(
-                                "otp", otp,
-                                "minutes", "5"
-                        )
+                        "Your FRMS login OTP"
+                ),
+                renderTemplateOrDefault(
+                        LOGIN_OTP_TEMPLATE,
+                        values,
+                        "Your login OTP is {{otp}}.\n\n"
+                                + "This OTP expires in {{minutes}} minutes."
                 )
         );
+    }
+
+    private String getSubjectOrDefault(
+            String templateCode,
+            String defaultSubject
+    ) {
+
+        try {
+            String subject =
+                    emailNotificationTemplateService.getSubject(
+                            templateCode
+                    );
+
+            if (subject == null || subject.isBlank()) {
+                return defaultSubject;
+            }
+
+            return subject;
+        } catch (InvalidRequestException ex) {
+            return defaultSubject;
+        }
+    }
+
+    private String renderTemplateOrDefault(
+            String templateCode,
+            Map<String, String> values,
+            String defaultBody
+    ) {
+
+        try {
+            return emailNotificationTemplateService.renderTemplate(
+                    templateCode,
+                    values
+            );
+        } catch (InvalidRequestException ex) {
+            return replacePlaceholders(
+                    defaultBody,
+                    values
+            );
+        }
+    }
+
+    private String replacePlaceholders(
+            String body,
+            Map<String, String> values
+    ) {
+
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            body = body.replace(
+                    "{{" + entry.getKey() + "}}",
+                    entry.getValue()
+            );
+        }
+
+        return body;
     }
 
     private void sendMail(

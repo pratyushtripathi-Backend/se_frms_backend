@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.UUID;
+import java.lang.Integer;
 
 
 @Getter
 @Builder
 public class EmployeeResponseDTO {
 
-    private UUID id;
+    private Integer id;
 
     private String firstName;
 

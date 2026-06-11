@@ -26,7 +26,7 @@ import com.se_frms.auth.dto.SessionStatusResponseDTO;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.lang.Integer;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -162,7 +162,7 @@ public class AuthController {
     getLoginHistoryByUserId(
 
             @PathVariable
-            UUID userId
+            Integer userId
 
     ) {
 
@@ -254,6 +254,28 @@ public class AuthController {
                         .responseCode(200)
                         .responseMessage(
                                 "Password reset link sent"
+                        )
+                        .responseData(null)
+                        .build()
+        );
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<AuthResponseDTO<Object>>
+    changePassword(
+            @Valid
+            @RequestBody
+            ChangePasswordRequest request
+    ) {
+
+        authService.changePassword(request);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO.builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Password changed successfully"
                         )
                         .responseData(null)
                         .build()
@@ -380,7 +402,7 @@ public class AuthController {
     public ResponseEntity<?> getLoginAttemptsByUserId(
 
             @PathVariable
-            UUID userId
+            Integer userId
 
     ) {
 
