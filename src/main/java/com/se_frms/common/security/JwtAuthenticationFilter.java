@@ -1,6 +1,10 @@
 package com.se_frms.common.security;
 
+import com.se_frms.auth.repository.BlacklistedTokenRepository;
+import com.se_frms.auth.repository.SessionStoreRepository;
+import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.se_frms.auth.repository.SessionStoreRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +30,7 @@ import com.se_frms.user.model.User;
 import java.time.LocalDateTime;
 import com.se_frms.auth.repository.BlacklistedTokenRepository;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter
@@ -45,20 +51,20 @@ public class JwtAuthenticationFilter
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String uri = request.getRequestURI();
+
         String authHeader =
                 request.getHeader("Authorization");
 
         if (authHeader == null
                 || !authHeader.startsWith("Bearer ")) {
 
-            String uri =
-                    request.getRequestURI();
+            if (uri.startsWith("/api/v1/auth")) {
 
-            if (
-                    uri.startsWith(
-                            "/api/v1/auth"
-                    )
-            ) {
+                log.debug(
+                        "Authentication skipped for public auth endpoint, uri={}",
+                        uri
+                );
 
                 filterChain.doFilter(
                         request,
@@ -67,6 +73,11 @@ public class JwtAuthenticationFilter
 
                 return;
             }
+
+            log.warn(
+                    "Authentication failed because token was missing, uri={}",
+                    uri
+            );
 
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
@@ -92,10 +103,13 @@ public class JwtAuthenticationFilter
 
         String token =
                 authHeader.substring(7);
-        if (
-                blacklistedTokenRepository
-                        .existsByToken(token)
-        ) {
+
+        if (blacklistedTokenRepository.existsByToken(token)) {
+
+            log.warn(
+                    "Authentication failed because token is blacklisted, uri={}",
+                    uri
+            );
 
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
@@ -119,11 +133,14 @@ public class JwtAuthenticationFilter
         }
 
         boolean valid =
-                jwtUtil.validateToken(
-                        token
-                );
                 jwtUtil.validateToken(token);
+
         if (!sessionStoreRepository.existsByTokenAndStatus(token, true)) {
+
+            log.warn(
+                    "Authentication failed because session is inactive, uri={}",
+                    uri
+            );
 
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
@@ -147,6 +164,11 @@ public class JwtAuthenticationFilter
         }
 
         if (!valid) {
+
+            log.warn(
+                    "Authentication failed because token is invalid or expired, uri={}",
+                    uri
+            );
 
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
@@ -172,13 +194,21 @@ public class JwtAuthenticationFilter
 
         String email =
                 jwtUtil.extractEmail(token);
+
         User user =
                 userRepository
                         .findByEmail(email)
                         .orElseThrow(
-                                () -> new RuntimeException(
-                                        "User not found"
-                                )
+                                () -> {
+                                    log.warn(
+                                            "Authentication failed because user was not found, uri={}",
+                                            uri
+                                    );
+
+                                    return new RuntimeException(
+                                            "User not found"
+                                    );
+                                }
                         );
 
 //        if (
@@ -232,9 +262,16 @@ public class JwtAuthenticationFilter
 //        );
 
         userRepository.save(user);
+
         SecurityContextHolder
                 .getContext()
                 .setAuthentication(authentication);
+
+        log.debug(
+                "Authentication successful, userId={}, uri={}",
+                user.getId(),
+                uri
+        );
 
         filterChain.doFilter(
                 request,

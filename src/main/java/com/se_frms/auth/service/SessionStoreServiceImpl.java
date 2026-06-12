@@ -4,10 +4,14 @@ import com.se_frms.auth.dto.SessionStatusResponseDTO;
 import com.se_frms.auth.model.SessionStore;
 import com.se_frms.auth.repository.SessionStoreRepository;
 import com.se_frms.user.model.User;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SessionStoreServiceImpl
@@ -17,7 +21,15 @@ public class SessionStoreServiceImpl
 
     @Override
     @Transactional
-    public void createSession(User user, String token) {
+    public void createSession(
+            User user,
+            String token
+    ) {
+
+        log.info(
+                "Create session service started, userId={}",
+                user.getId()
+        );
 
         SessionStore sessionStore =
                 SessionStore.builder()
@@ -28,33 +40,67 @@ public class SessionStoreServiceImpl
                         .build();
 
         sessionStoreRepository.save(sessionStore);
+
+        log.info(
+                "Session created successfully, userId={}",
+                user.getId()
+        );
     }
 
     @Override
     @Transactional
-    public void deactivateSession(String token) {
+    public void deactivateSession(
+            String token
+    ) {
+
+        log.info("Deactivate session service started");
 
         sessionStoreRepository
                 .findByTokenAndStatus(token, true)
-                .ifPresent(sessionStore -> {
-                    sessionStore.setStatus(false);
-                    sessionStoreRepository.save(sessionStore);
-                });
+                .ifPresentOrElse(
+                        sessionStore -> {
+                            sessionStore.setStatus(false);
+                            sessionStoreRepository.save(sessionStore);
+
+                            log.info(
+                                    "Session deactivated successfully, userId={}",
+                                    sessionStore.getUser().getId()
+                            );
+                        },
+                        () -> log.warn(
+                                "Deactivate session skipped because active session was not found"
+                        )
+                );
     }
+
     @Override
     @Transactional(readOnly = true)
-    public SessionStatusResponseDTO getSessionStatus(String token) {
+    public SessionStatusResponseDTO getSessionStatus(
+            String token
+    ) {
+
+        log.info("Get session status service started");
 
         SessionStore sessionStore =
                 sessionStoreRepository
                         .findByToken(token)
                         .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Session not found"
-                                )
+                                () -> {
+                                    log.warn("Session status fetch failed because session was not found");
+
+                                    return new RuntimeException(
+                                            "Session not found"
+                                    );
+                                }
                         );
 
         User user = sessionStore.getUser();
+
+        log.info(
+                "Session status fetched successfully, userId={}, active={}",
+                user.getId(),
+                sessionStore.getStatus()
+        );
 
         return SessionStatusResponseDTO
                 .builder()

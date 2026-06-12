@@ -5,13 +5,17 @@ import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
 import com.se_frms.emailNotification.model.EmailNotificationTemplate;
 import com.se_frms.emailNotification.repository.EmailNotificationTemplateRepository;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,12 +29,19 @@ public class EmailNotificationTemplateServiceImpl
             EmailNotificationTemplateRequestDTO request
     ) {
 
+        log.info("Create email notification template service started");
+
         String templateCode =
                 request.getTemplateCode()
                         .trim()
                         .toUpperCase();
 
         if (repository.existsByTemplateCode(templateCode)) {
+            log.warn(
+                    "Create email template failed because template code already exists, templateCode={}",
+                    templateCode
+            );
+
             throw new InvalidRequestException(
                     "Template code already exists"
             );
@@ -54,8 +65,16 @@ public class EmailNotificationTemplateServiceImpl
                         .createdBy(request.getCreatedBy())
                         .build();
 
+        EmailNotificationTemplate savedTemplate =
+                repository.save(template);
+
+        log.info(
+                "Email notification template created successfully, templateCode={}",
+                savedTemplate.getTemplateCode()
+        );
+
         return mapToResponse(
-                repository.save(template)
+                savedTemplate
         );
     }
 
@@ -65,15 +84,30 @@ public class EmailNotificationTemplateServiceImpl
             EmailNotificationTemplateRequestDTO request
     ) {
 
+        String normalizedTemplateCode =
+                templateCode.trim().toUpperCase();
+
+        log.info(
+                "Update email notification template service started, templateCode={}",
+                normalizedTemplateCode
+        );
+
         EmailNotificationTemplate template =
                 repository
                         .findByTemplateCode(
-                                templateCode.trim().toUpperCase()
+                                normalizedTemplateCode
                         )
                         .orElseThrow(
-                                () -> new InvalidRequestException(
-                                        "Template not found"
-                                )
+                                () -> {
+                                    log.warn(
+                                            "Update email template failed because template was not found, templateCode={}",
+                                            normalizedTemplateCode
+                                    );
+
+                                    return new InvalidRequestException(
+                                            "Template not found"
+                                    );
+                                }
                         );
 
         template.setChannel(
@@ -88,8 +122,16 @@ public class EmailNotificationTemplateServiceImpl
             template.setStatus(request.getStatus());
         }
 
+        EmailNotificationTemplate savedTemplate =
+                repository.save(template);
+
+        log.info(
+                "Email notification template updated successfully, templateCode={}",
+                savedTemplate.getTemplateCode()
+        );
+
         return mapToResponse(
-                repository.save(template)
+                savedTemplate
         );
     }
 
@@ -99,16 +141,36 @@ public class EmailNotificationTemplateServiceImpl
             String templateCode
     ) {
 
+        String normalizedTemplateCode =
+                templateCode.trim().toUpperCase();
+
+        log.info(
+                "Fetch email notification template service started, templateCode={}",
+                normalizedTemplateCode
+        );
+
         EmailNotificationTemplate template =
                 repository
                         .findByTemplateCode(
-                                templateCode.trim().toUpperCase()
+                                normalizedTemplateCode
                         )
                         .orElseThrow(
-                                () -> new InvalidRequestException(
-                                        "Template not found"
-                                )
+                                () -> {
+                                    log.warn(
+                                            "Fetch email template failed because template was not found, templateCode={}",
+                                            normalizedTemplateCode
+                                    );
+
+                                    return new InvalidRequestException(
+                                            "Template not found"
+                                    );
+                                }
                         );
+
+        log.info(
+                "Email notification template fetched successfully, templateCode={}",
+                normalizedTemplateCode
+        );
 
         return mapToResponse(template);
     }
@@ -117,17 +179,35 @@ public class EmailNotificationTemplateServiceImpl
     @Transactional(readOnly = true)
     public List<EmailNotificationTemplateResponseDTO> getAllTemplates() {
 
-        return repository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        log.info("Fetch all email notification templates service started");
+
+        List<EmailNotificationTemplateResponseDTO> response =
+                repository.findAll()
+                        .stream()
+                        .map(this::mapToResponse)
+                        .toList();
+
+        log.info(
+                "Email notification templates fetched successfully, count={}",
+                response.size()
+        );
+
+        return response;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public String getSubject(String templateCode) {
+    public String getSubject(
+            String templateCode
+    ) {
 
-        return getActiveTemplate(templateCode).getSubject();
+        log.debug(
+                "Fetch email template subject started, templateCode={}",
+                templateCode
+        );
+
+        return getActiveTemplate(templateCode)
+                .getSubject();
     }
 
     @Override
@@ -136,6 +216,11 @@ public class EmailNotificationTemplateServiceImpl
             String templateCode,
             Map<String, String> values
     ) {
+
+        log.debug(
+                "Render email template started, templateCode={}",
+                templateCode
+        );
 
         String body =
                 getActiveTemplate(templateCode).getBody();
@@ -147,6 +232,11 @@ public class EmailNotificationTemplateServiceImpl
             );
         }
 
+        log.debug(
+                "Email template rendered successfully, templateCode={}",
+                templateCode
+        );
+
         return body;
     }
 
@@ -154,15 +244,25 @@ public class EmailNotificationTemplateServiceImpl
             String templateCode
     ) {
 
+        String normalizedTemplateCode =
+                templateCode.trim().toUpperCase();
+
         return repository
                 .findByTemplateCodeAndStatus(
-                        templateCode.trim().toUpperCase(),
+                        normalizedTemplateCode,
                         true
                 )
                 .orElseThrow(
-                        () -> new InvalidRequestException(
-                                "Active email notification template not found"
-                        )
+                        () -> {
+                            log.warn(
+                                    "Active email template lookup failed, templateCode={}",
+                                    normalizedTemplateCode
+                            );
+
+                            return new InvalidRequestException(
+                                    "Active email notification template not found"
+                            );
+                        }
                 );
     }
 

@@ -6,12 +6,14 @@ import com.se_frms.access.model.AccessMaster;
 import com.se_frms.access.repository.AccessMasterRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccessServiceImpl
@@ -24,12 +26,16 @@ public class AccessServiceImpl
             AccessRequestDTO request
     ) {
 
+        log.info("Create access service started, accessName={}", request.getAccessName());
+
         repository
                 .findByAccessName(
                         request.getAccessName()
                 )
 
                 .ifPresent(v -> {
+
+                    log.warn("Create access failed because access already exists, accessName={}", request.getAccessName());
 
                     throw new RuntimeException(
                             "Access already exists"
@@ -51,27 +57,39 @@ public class AccessServiceImpl
 
                         .build();
 
-        return map(
+        AccessResponseDTO response =
+                map(
 
-                repository.save(
-                        entity
-                )
+                        repository.save(
+                                entity
+                        )
 
-        );
+                );
+
+        log.info("Access created successfully, accessName={}", request.getAccessName());
+
+        return response;
 
     }
 
     @Override
     public List<AccessResponseDTO> getAll() {
 
-        return repository
-                .findAll()
+        log.info("Fetch all access service started");
 
-                .stream()
+        List<AccessResponseDTO> response =
+                repository
+                        .findAll()
 
-                .map(this::map)
+                        .stream()
 
-                .toList();
+                        .map(this::map)
+
+                        .toList();
+
+        log.info("Access list fetched successfully, count={}", response.size());
+
+        return response;
 
     }
 
@@ -80,19 +98,30 @@ public class AccessServiceImpl
             Integer id
     ) {
 
-        return map(
+        log.info("Fetch access by id service started, id={}", id);
 
-                repository
-                        .findById(id)
+        AccessResponseDTO response =
+                map(
 
-                        .orElseThrow(
+                        repository
+                                .findById(id)
 
-                                () -> new RuntimeException(
-                                        "Access not found"
+                                .orElseThrow(
+
+                                        () -> {
+                                            log.warn("Fetch access failed because access was not found, id={}", id);
+
+                                            return new RuntimeException(
+                                                    "Access not found"
+                                            );
+                                        }
                                 )
-                        )
 
-        );
+                );
+
+        log.info("Access fetched successfully, id={}", id);
+
+        return response;
 
     }
 
@@ -102,15 +131,21 @@ public class AccessServiceImpl
             AccessRequestDTO request
     ) {
 
+        log.info("Update access service started, id={}", id);
+
         AccessMaster entity =
                 repository
                         .findById(id)
 
                         .orElseThrow(
 
-                                () -> new RuntimeException(
-                                        "Access not found"
-                                )
+                                () -> {
+                                    log.warn("Update access failed because access was not found, id={}", id);
+
+                                    return new RuntimeException(
+                                            "Access not found"
+                                    );
+                                }
 
                         );
 
@@ -122,6 +157,8 @@ public class AccessServiceImpl
                 .ifPresent(access -> {
 
                     if (!access.getId().equals(id)) {
+
+                        log.warn("Update access failed because access already exists, id={}, accessName={}", id, request.getAccessName());
 
                         throw new RuntimeException(
                                 "Access already exists"
@@ -143,13 +180,18 @@ public class AccessServiceImpl
                 LocalDateTime.now()
         );
 
-        return map(
+        AccessResponseDTO response =
+                map(
 
-                repository.save(
-                        entity
-                )
+                        repository.save(
+                                entity
+                        )
 
-        );
+                );
+
+        log.info("Access updated successfully, id={}", id);
+
+        return response;
 
     }
 
@@ -159,15 +201,21 @@ public class AccessServiceImpl
             Boolean status
     ) {
 
+        log.info("Update access status service started, id={}, status={}", id, status);
+
         AccessMaster entity =
                 repository
                         .findById(id)
 
                         .orElseThrow(
 
-                                () -> new RuntimeException(
-                                        "Access not found"
-                                )
+                                () -> {
+                                    log.warn("Update access status failed because access was not found, id={}", id);
+
+                                    return new RuntimeException(
+                                            "Access not found"
+                                    );
+                                }
 
                         );
 
@@ -182,6 +230,8 @@ public class AccessServiceImpl
         repository.save(
                 entity
         );
+
+        log.info("Access status updated successfully, id={}, status={}", id, status);
 
         return status
 
@@ -200,15 +250,21 @@ public class AccessServiceImpl
             Integer id
     ) {
 
+        log.info("Delete access service started, id={}", id);
+
         AccessMaster entity =
                 repository
                         .findById(id)
 
                         .orElseThrow(
 
-                                () -> new RuntimeException(
-                                        "Access not found"
-                                )
+                                () -> {
+                                    log.warn("Delete access failed because access was not found, id={}", id);
+
+                                    return new RuntimeException(
+                                            "Access not found"
+                                    );
+                                }
 
                         );
 
@@ -223,6 +279,8 @@ public class AccessServiceImpl
         repository.save(
                 entity
         );
+
+        log.info("Access deleted successfully, id={}", id);
 
         return "Access deleted successfully";
 

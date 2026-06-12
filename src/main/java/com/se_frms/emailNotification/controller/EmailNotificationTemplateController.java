@@ -4,14 +4,19 @@ import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
 import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/email-notification-templates")
 @RequiredArgsConstructor
@@ -27,8 +32,12 @@ public class EmailNotificationTemplateController {
             EmailNotificationTemplateRequestDTO request
     ) {
 
+        log.info("Create email notification template request received");
+
         EmailNotificationTemplateResponseDTO responseData =
                 emailNotificationTemplateService.createTemplate(request);
+
+        log.info("Email notification template created successfully");
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -49,8 +58,15 @@ public class EmailNotificationTemplateController {
     public ResponseEntity<AuthResponseDTO<List<EmailNotificationTemplateResponseDTO>>>
     getAllEmailNotificationTemplates() {
 
+        log.info("Fetch all email notification templates request received");
+
         List<EmailNotificationTemplateResponseDTO> responseData =
                 emailNotificationTemplateService.getAllTemplates();
+
+        log.info(
+                "Email notification templates fetched successfully, count={}",
+                responseData.size()
+        );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
@@ -72,8 +88,18 @@ public class EmailNotificationTemplateController {
             String templateCode
     ) {
 
+        log.info(
+                "Fetch email notification template request received, templateCode={}",
+                templateCode
+        );
+
         EmailNotificationTemplateResponseDTO responseData =
                 emailNotificationTemplateService.getTemplateByCode(templateCode);
+
+        log.info(
+                "Email notification template fetched successfully, templateCode={}",
+                templateCode
+        );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
@@ -99,11 +125,21 @@ public class EmailNotificationTemplateController {
             EmailNotificationTemplateRequestDTO request
     ) {
 
+        log.info(
+                "Update email notification template request received, templateCode={}",
+                templateCode
+        );
+
         EmailNotificationTemplateResponseDTO responseData =
                 emailNotificationTemplateService.updateTemplate(
                         templateCode,
                         request
                 );
+
+        log.info(
+                "Email notification template updated successfully, templateCode={}",
+                templateCode
+        );
 
         return ResponseEntity.ok(
                 AuthResponseDTO

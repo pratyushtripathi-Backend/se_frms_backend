@@ -1,7 +1,5 @@
 package com.se_frms.admin.dto;
 
-
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -18,10 +16,12 @@ public class CreateEmployeeRequest {
     private String lastName;
 
     @Email
+    @NotBlank
     private String email;
 
     @NotBlank
     private String phoneNumber;
 
-    private String role;
+//    @NotBlank(message = "Role name is required")
+    private String roleName;
 }

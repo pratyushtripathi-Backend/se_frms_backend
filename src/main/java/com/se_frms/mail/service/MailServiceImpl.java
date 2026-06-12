@@ -2,20 +2,21 @@ package com.se_frms.mail.service;
 
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class MailServiceImpl
-        implements MailService {
+public class MailServiceImpl implements MailService {
 
     private static final String LOGIN_CREDENTIALS_TEMPLATE =
             "LOGIN_CREDENTIALS";
@@ -38,27 +39,20 @@ public class MailServiceImpl
             String password
     ) {
 
-        Map<String, String> values =
-                Map.of(
-                        "firstName", firstName,
-                        "email", email,
-                        "password", password
-                );
+        log.info("Login credentials mail request received, email={}", email);
 
         sendMail(
                 email,
-                getSubjectOrDefault(
-                        LOGIN_CREDENTIALS_TEMPLATE,
-                        "Your FRMS login credentials"
+                emailNotificationTemplateService.getSubject(
+                        LOGIN_CREDENTIALS_TEMPLATE
                 ),
-                renderTemplateOrDefault(
+                emailNotificationTemplateService.renderTemplate(
                         LOGIN_CREDENTIALS_TEMPLATE,
-                        values,
-                        "Hello {{firstName}},\n\n"
-                                + "Your FRMS account has been created.\n"
-                                + "Email: {{email}}\n"
-                                + "Password: {{password}}\n\n"
-                                + "Please log in and change your password."
+                        Map.of(
+                                "firstName", firstName,
+                                "email", email,
+                                "password", password
+                        )
                 )
         );
     }
@@ -71,26 +65,20 @@ public class MailServiceImpl
             String resetLink
     ) {
 
-        Map<String, String> values =
-                Map.of(
-                        "firstName", firstName,
-                        "resetLink", resetLink,
-                        "minutes", "15"
-                );
+        log.info("Password reset mail request received, email={}", email);
 
         sendMail(
                 email,
-                getSubjectOrDefault(
-                        PASSWORD_RESET_TEMPLATE,
-                        "Reset your FRMS password"
+                emailNotificationTemplateService.getSubject(
+                        PASSWORD_RESET_TEMPLATE
                 ),
-                renderTemplateOrDefault(
+                emailNotificationTemplateService.renderTemplate(
                         PASSWORD_RESET_TEMPLATE,
-                        values,
-                        "Hello {{firstName}},\n\n"
-                                + "Use this link to reset your password:\n"
-                                + "{{resetLink}}\n\n"
-                                + "This link expires in {{minutes}} minutes."
+                        Map.of(
+                                "firstName", firstName,
+                                "resetLink", resetLink,
+                                "minutes", "15"
+                        )
                 )
         );
     }
@@ -102,80 +90,21 @@ public class MailServiceImpl
             String otp
     ) {
 
-        Map<String, String> values =
-                Map.of(
-                        "otp", otp,
-                        "minutes", "5"
-                );
+        log.info("Login OTP mail request received, email={}", email);
 
         sendMail(
                 email,
-                getSubjectOrDefault(
-                        LOGIN_OTP_TEMPLATE,
-                        "Your FRMS login OTP"
+                emailNotificationTemplateService.getSubject(
+                        LOGIN_OTP_TEMPLATE
                 ),
-                renderTemplateOrDefault(
+                emailNotificationTemplateService.renderTemplate(
                         LOGIN_OTP_TEMPLATE,
-                        values,
-                        "Your login OTP is {{otp}}.\n\n"
-                                + "This OTP expires in {{minutes}} minutes."
+                        Map.of(
+                                "otp", otp,
+                                "minutes", "5"
+                        )
                 )
         );
-    }
-
-    private String getSubjectOrDefault(
-            String templateCode,
-            String defaultSubject
-    ) {
-
-        try {
-            String subject =
-                    emailNotificationTemplateService.getSubject(
-                            templateCode
-                    );
-
-            if (subject == null || subject.isBlank()) {
-                return defaultSubject;
-            }
-
-            return subject;
-        } catch (InvalidRequestException ex) {
-            return defaultSubject;
-        }
-    }
-
-    private String renderTemplateOrDefault(
-            String templateCode,
-            Map<String, String> values,
-            String defaultBody
-    ) {
-
-        try {
-            return emailNotificationTemplateService.renderTemplate(
-                    templateCode,
-                    values
-            );
-        } catch (InvalidRequestException ex) {
-            return replacePlaceholders(
-                    defaultBody,
-                    values
-            );
-        }
-    }
-
-    private String replacePlaceholders(
-            String body,
-            Map<String, String> values
-    ) {
-
-        for (Map.Entry<String, String> entry : values.entrySet()) {
-            body = body.replace(
-                    "{{" + entry.getKey() + "}}",
-                    entry.getValue()
-            );
-        }
-
-        return body;
     }
 
     private void sendMail(
@@ -184,13 +113,25 @@ public class MailServiceImpl
             String body
     ) {
 
-        SimpleMailMessage message =
-                new SimpleMailMessage();
+        try {
+            log.info("Sending mail, to={}, subject={}", to, subject);
 
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
+            SimpleMailMessage message =
+                    new SimpleMailMessage();
 
-        mailSender.send(message);
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(body);
+
+            mailSender.send(message);
+
+            log.info("Mail sent successfully, to={}", to);
+
+        } catch (Exception ex) {
+
+            log.error("Failed to send mail, to={}", to, ex);
+
+            throw ex;
+        }
     }
 }

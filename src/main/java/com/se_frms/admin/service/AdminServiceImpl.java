@@ -1,6 +1,10 @@
 package com.se_frms.admin.service;
 
-import com.se_frms.admin.dto.*;
+import com.se_frms.admin.dto.CreateEmployeeRequest;
+import com.se_frms.admin.dto.EmployeeResponseDTO;
+import com.se_frms.admin.dto.EmployeeSummaryDTO;
+import com.se_frms.admin.dto.UpdateEmployeePatchRequest;
+import com.se_frms.admin.dto.UpdateEmployeeRequest;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
@@ -8,448 +12,316 @@ import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.auth.util.PasswordGeneratorUtil;
 import com.se_frms.common.security.XssUtil;
 import com.se_frms.mail.service.MailService;
+import com.se_frms.roleMaster.model.RoleMaster;
+import com.se_frms.roleMaster.repository.RoleMasterRepository;
+import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
+import com.se_frms.userRole.model.UserRole;
+import com.se_frms.userRole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
-import java.lang.Integer;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AdminServiceImpl
-        implements AdminService {
+public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final MailService mailService;
+    private final RoleMasterRepository roleMasterRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Override
-    public RegistrationResponseDTO createEmployee(
-            CreateEmployeeRequest request
-    ) {
+    public RegistrationResponseDTO createEmployee(CreateEmployeeRequest request) {
+        log.info("Create employee service started");
 
-        String email =
-                request.getEmail()
-                        .trim()
-                        .toLowerCase(
-                                Locale.ROOT
-                        );
+        String email = request.getEmail()
+                .trim()
+                .toLowerCase(Locale.ROOT);
+        String phoneNumber = request.getPhoneNumber().trim();
 
-        String phone =
-                request.getPhoneNumber()
-                        .trim();
-
-        if (
-                userRepository.existsByEmail(
-                        email
-                )
-        ) {
-
-            throw new DuplicateEmailException(
-                    "Email already registered"
-            );
-
+        if (userRepository.existsByEmail(email)) {
+            log.warn("Create employee failed because email already exists");
+            throw new DuplicateEmailException("Email already registered");
         }
 
-        if (
-                userRepository.existsByPhoneNumber(
-                        phone
-                )
-        ) {
-
-            throw new DuplicatePhoneException(
-                    "Phone already registered"
-            );
-
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            log.warn("Create employee failed because phone number already exists");
+            throw new DuplicatePhoneException("Phone already registered");
         }
 
-        String generatedPassword =
-                PasswordGeneratorUtil
-                        .generateSecurePassword();
+        RoleMaster roleMaster = getRoleMasterForCreateUser(request.getRoleName());
+        Role selectedRole = convertRoleMasterToEnum(roleMaster);
 
-        String encryptedPassword =
-                passwordEncoder.encode(
-                        generatedPassword
-                );
+        String generatedPassword = PasswordGeneratorUtil.generateSecurePassword();
+        String encryptedPassword = passwordEncoder.encode(generatedPassword);
 
         User employee = User.builder()
-
-                .firstName(
-                        XssUtil.clean(
-                                request.getFirstName().trim()
-                        )
-                )
-
-                .lastName(
-                        XssUtil.clean(
-                                request.getLastName().trim()
-                        )
-                )
-
-                .email(
-                        XssUtil.clean(
-                                email
-                        )
-                )
-
-                .phoneNumber(
-                        XssUtil.clean(
-                                phone
-                        )
-                )
-
-                .passwordHash(
-                        encryptedPassword
-                )
-
-                .userType(
-                        request.getRole()
-                )
-
-                .status(
-                        true
-                )
-
+                .firstName(XssUtil.clean(request.getFirstName().trim()))
+                .lastName(XssUtil.clean(request.getLastName().trim()))
+                .email(XssUtil.clean(email))
+                .phoneNumber(XssUtil.clean(phoneNumber))
+                .passwordHash(encryptedPassword)
+                .userType(selectedRole.name())
+                .status(true)
                 .build();
-        User saved =
-                userRepository.save(
-                        employee
-                );
 
-        mailService.sendLoginCredentials(
+        User savedEmployee = userRepository.save(employee);
 
-                saved.getEmail(),
-
-                saved.getFirstName(),
-
-                generatedPassword
-
+        log.info(
+                "Employee saved successfully, employeeId={}, role={}",
+                savedEmployee.getId(),
+                savedEmployee.getUserType()
         );
 
-        return RegistrationResponseDTO
-                .builder()
+        saveUserRole(savedEmployee, roleMaster);
+        log.info("Employee role mapping saved, employeeId={}", savedEmployee.getId());
 
-                .userId(
-                        saved.getId()
-                )
+        mailService.sendLoginCredentials(
+                savedEmployee.getEmail(),
+                savedEmployee.getFirstName(),
+                generatedPassword
+        );
+        log.info("Employee login credentials mail triggered, employeeId={}", savedEmployee.getId());
 
-                .firstName(
-                        saved.getFirstName()
-                )
-
-                .lastName(
-                        saved.getLastName()
-                )
-
-                .email(
-                        saved.getEmail()
-                )
-
-                .phoneNumber(
-                        saved.getPhoneNumber()
-                )
-
-                .role(
-                        saved.getUserType()
-                )
-
-                .status(
-                        saved.getStatus()
-                )
-
-                .createdDate(
-                        saved.getCreatedDate()
-                )
-
+        return RegistrationResponseDTO.builder()
+                .userId(savedEmployee.getId())
+                .firstName(savedEmployee.getFirstName())
+                .lastName(savedEmployee.getLastName())
+                .email(savedEmployee.getEmail())
+                .phoneNumber(savedEmployee.getPhoneNumber())
+                .role(savedEmployee.getUserType())
+                .status(savedEmployee.getStatus())
+                .createdDate(savedEmployee.getCreatedDate())
                 .build();
-
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EmployeeResponseDTO getEmployeeById(
-            Integer employeeId
-    ) {
+    public EmployeeResponseDTO getEmployeeById(Integer employeeId) {
+        log.info("Get employee by id service started, employeeId={}", employeeId);
 
-        User user =
+        User employee = getEmployeeOrThrow(employeeId);
 
-                userRepository
-
-                        .findById(
-                                employeeId
-                        )
-
-                        .orElseThrow(
-
-                                () ->
-                                        new InvalidRequestException(
-                                                "Employee not found"
-                                        )
-
-                        );
-
-        if (
-
-                !"EMPLOYEE".equals(
-                        user.getUserType()
-                )
-
-        ) {
-
-            throw new InvalidRequestException(
-                    "User is not employee"
-            );
-
+        if (!isEmployee(employee)) {
+            log.warn("User is not an employee, userId={}, role={}", employeeId, employee.getUserType());
+            throw new InvalidRequestException("User is not employee");
         }
 
-        return map(
-                user
-        );
-
+        log.info("Employee fetched successfully, employeeId={}", employeeId);
+        return map(employee);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EmployeeSummaryDTO> getAllEmployees() {
+        log.info("Get all employees service started");
 
-        return userRepository
-                .findByUserType(
-                        "EMPlOYEE"
-                )
-
+        List<EmployeeSummaryDTO> employees = userRepository
+                .findByUserType(Role.EMPLOYEE.name())
                 .stream()
-
-                .map(
-
-                        user ->
-
-                                EmployeeSummaryDTO
-
-                                        .builder()
-
-                                        .id(
-                                                user.getId()
-                                        )
-
-                                        .firstName(
-                                                user.getFirstName()
-                                        )
-
-                                        .lastName(
-                                                user.getLastName()
-                                        )
-
-                                        .email(
-                                                user.getEmail()
-                                        )
-
-                                        .build()
-
+                .map(user -> EmployeeSummaryDTO.builder()
+                        .id(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(user.getEmail())
+                        .build()
                 )
-
                 .toList();
 
+        log.info("Employees fetched successfully, count={}", employees.size());
+        return employees;
     }
 
     @Override
-    public void deleteEmployee(
-            Integer employeeId
-    ) {
+    public void deleteEmployee(Integer employeeId) {
+        log.info("Delete employee service started, employeeId={}", employeeId);
 
-        User user =
+        User employee = getEmployeeOrThrow(employeeId);
 
-                userRepository
-
-                        .findById(
-                                employeeId
-                        )
-
-                        .orElseThrow(
-
-                                () ->
-
-                                        new InvalidRequestException(
-                                                "Employee not found"
-                                        )
-
-                        );
-
-        if (
-
-                !"EMP".equals(
-                        user.getUserType()
-                )
-
-        ) {
-
-            throw new InvalidRequestException(
-                    "Only employee can be deleted"
-            );
-
+        if (!isEmployee(employee)) {
+            log.warn("Delete employee failed because user is not employee, userId={}, role={}", employeeId, employee.getUserType());
+            throw new InvalidRequestException("Only employee can be deleted");
         }
 
-        user.setStatus(
-                false
-        );
+        employee.setStatus(false);
+        userRepository.save(employee);
 
-        userRepository.save(
-                user
-        );
-
+        log.info("Employee deleted successfully, employeeId={}", employeeId);
     }
 
     @Override
-    public EmployeeResponseDTO updateEmployee(
-            Integer employeeId,
-            UpdateEmployeeRequest request
-    ) {
+    public EmployeeResponseDTO updateEmployee(Integer employeeId, UpdateEmployeeRequest request) {
+        log.info("Update employee service started, employeeId={}", employeeId);
 
-        User user =
+        User user = getEmployeeOrThrow(employeeId);
 
-                userRepository
+        if (!isEmployee(user)) {
+            log.warn("Update employee failed because user is not employee, userId={}, role={}", employeeId, user.getUserType());
+            throw new InvalidRequestException("Only employee can be updated");
+        }
 
-                        .findById(
-                                employeeId
-                        )
+        validateUniqueEmailForUpdate(user, request.getEmail(), employeeId);
+        validateUniquePhoneForUpdate(user, request.getPhoneNumber(), employeeId);
 
-                        .orElseThrow(
+        user.setFirstName(XssUtil.clean(request.getFirstName()));
+        user.setLastName(XssUtil.clean(request.getLastName()));
+        user.setEmail(XssUtil.clean(request.getEmail()));
+        user.setPhoneNumber(XssUtil.clean(request.getPhoneNumber()));
+        user.setStatus(request.getIsActive());
 
-                                () ->
-                                        new InvalidRequestException(
-                                                "Employee not found"
-                                        )
+        User savedUser = userRepository.save(user);
 
-                        );
-
-        user.setFirstName(
-                request.getFirstName()
-        );
-
-        user.setLastName(
-                request.getLastName()
-        );
-
-        user.setEmail(
-                request.getEmail()
-        );
-
-        user.setPhoneNumber(
-                request.getPhoneNumber()
-        );
-
-        user.setStatus(
-                request.getIsActive()
-        );
-
-        return map(
-
-                userRepository.save(
-                        user
-                )
-
-        );
-
+        log.info("Employee updated successfully, employeeId={}", employeeId);
+        return map(savedUser);
     }
 
     @Override
-    public EmployeeResponseDTO patchEmployee(
-            Integer employeeId,
-            UpdateEmployeePatchRequest request
-    ) {
+    public EmployeeResponseDTO patchEmployee(Integer employeeId, UpdateEmployeePatchRequest request) {
+        log.info("Patch employee service started, employeeId={}", employeeId);
 
-        User user =
+        User user = getEmployeeOrThrow(employeeId);
 
-                userRepository
+        if (!isEmployee(user)) {
+            log.warn("Patch employee failed because user is not employee, userId={}, role={}", employeeId, user.getUserType());
+            throw new InvalidRequestException("Only employee can be updated");
+        }
 
-                        .findById(
-                                employeeId
-                        )
+        validateUniqueEmailForPatch(user, request.getEmail(), employeeId);
+        validateUniquePhoneForPatch(user, request.getPhoneNumber(), employeeId);
 
-                        .orElseThrow(
+        if (request.getFirstName() != null) {
+            user.setFirstName(XssUtil.clean(request.getFirstName()));
+        }
 
-                                () ->
-                                        new InvalidRequestException(
-                                                "Employee not found"
-                                        )
+        if (request.getLastName() != null) {
+            user.setLastName(XssUtil.clean(request.getLastName()));
+        }
 
-                        );
+        if (request.getEmail() != null) {
+            user.setEmail(XssUtil.clean(request.getEmail()));
+        }
 
-        if (request.getFirstName() != null)
-            user.setFirstName(
-                    request.getFirstName()
-            );
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(XssUtil.clean(request.getPhoneNumber()));
+        }
 
-        if (request.getLastName() != null)
-            user.setLastName(
-                    request.getLastName()
-            );
+        if (request.getIsActive() != null) {
+            user.setStatus(request.getIsActive());
+        }
 
-        if (request.getEmail() != null)
-            user.setEmail(
-                    request.getEmail()
-            );
+        User savedUser = userRepository.save(user);
 
-        if (request.getPhoneNumber() != null)
-            user.setPhoneNumber(
-                    request.getPhoneNumber()
-            );
-
-        if (request.getIsActive() != null)
-            user.setStatus(
-                    request.getIsActive()
-            );
-
-        return map(
-
-                userRepository.save(
-                        user
-                )
-
-        );
-
+        log.info("Employee patched successfully, employeeId={}", employeeId);
+        return map(savedUser);
     }
 
-    private EmployeeResponseDTO map(
-            User user
-    ) {
+    private User getEmployeeOrThrow(Integer employeeId) {
+        return userRepository
+                .findById(employeeId)
+                .orElseThrow(() -> {
+                    log.warn("Employee not found, employeeId={}", employeeId);
+                    return new InvalidRequestException("Employee not found");
+                });
+    }
 
-        return EmployeeResponseDTO
-                .builder()
+    private boolean isEmployee(User user) {
+        return Role.EMPLOYEE.name().equals(user.getUserType());
+    }
 
-                .id(
-                        user.getId()
-                )
+    private void validateUniqueEmailForUpdate(User user, String email, Integer employeeId) {
+        String normalizedEmail = email == null ? null : email.trim().toLowerCase(Locale.ROOT);
 
-                .firstName(
-                        user.getFirstName()
-                )
+        if (normalizedEmail != null
+                && !user.getEmail().equals(normalizedEmail)
+                && userRepository.existsByEmail(normalizedEmail)) {
+            log.warn("Update employee failed because email already exists, employeeId={}", employeeId);
+            throw new DuplicateEmailException("Email already exists");
+        }
+    }
 
-                .lastName(
-                        user.getLastName()
-                )
+    private void validateUniquePhoneForUpdate(User user, String phoneNumber, Integer employeeId) {
+        String normalizedPhoneNumber = phoneNumber == null ? null : phoneNumber.trim();
 
-                .email(
-                        user.getEmail()
-                )
+        if (normalizedPhoneNumber != null
+                && !user.getPhoneNumber().equals(normalizedPhoneNumber)
+                && userRepository.existsByPhoneNumber(normalizedPhoneNumber)) {
+            log.warn("Update employee failed because phone already exists, employeeId={}", employeeId);
+            throw new DuplicatePhoneException("Phone already exists");
+        }
+    }
 
-                .phoneNumber(
-                        user.getPhoneNumber()
-                )
+    private void validateUniqueEmailForPatch(User user, String email, Integer employeeId) {
+        if (email == null) {
+            return;
+        }
 
-                .role(
-                        user.getUserType()
-                )
+        validateUniqueEmailForUpdate(user, email, employeeId);
+    }
 
+    private void validateUniquePhoneForPatch(User user, String phoneNumber, Integer employeeId) {
+        if (phoneNumber == null) {
+            return;
+        }
+
+        validateUniquePhoneForUpdate(user, phoneNumber, employeeId);
+    }
+
+    private EmployeeResponseDTO map(User user) {
+        return EmployeeResponseDTO.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .role(user.getUserType())
                 .build();
-
     }
 
+    private RoleMaster getRoleMasterForCreateUser(String roleName) {
+        String finalRoleName = roleName == null || roleName.isBlank()
+                ? Role.EMPLOYEE.name()
+                : roleName.trim().toUpperCase(Locale.ROOT);
+
+        return roleMasterRepository
+                .findByRoleNameAndStatus(finalRoleName, true)
+                .orElseThrow(() -> {
+                    log.warn("Create employee failed because role is invalid or inactive, roleName={}", finalRoleName);
+                    return new InvalidRequestException("Invalid or inactive role");
+                });
+    }
+
+    private Role convertRoleMasterToEnum(RoleMaster roleMaster) {
+        try {
+            return Role.valueOf(roleMaster.getRoleName());
+        } catch (IllegalArgumentException ex) {
+            log.warn(
+                    "Role conversion failed because role is not configured in application, roleName={}",
+                    roleMaster.getRoleName()
+            );
+            throw new InvalidRequestException("Role is not configured in application");
+        }
+    }
+
+    private void saveUserRole(User user, RoleMaster roleMaster) {
+        UserRole userRole = userRoleRepository
+                .findByUserAndRole(user, roleMaster)
+                .orElse(UserRole.builder()
+                        .user(user)
+                        .role(roleMaster)
+                        .build()
+                );
+
+        userRole.setStatus(true);
+        userRoleRepository.save(userRole);
+    }
 }

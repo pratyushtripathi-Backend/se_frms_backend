@@ -1,13 +1,12 @@
 package com.se_frms.common.exception;
 
 import com.se_frms.auth.dto.AuthResponseDTO;
-import com.se_frms.user.exception.InvalidCredentialsException;
-
 import com.se_frms.auth.exception.DuplicateEmailException;
 import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.auth.exception.InvalidRoleException;
 import com.se_frms.auth.exception.UserAlreadyExistsException;
+import com.se_frms.user.exception.InvalidCredentialsException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +27,8 @@ public class GlobalExceptionHandler {
             DuplicateEmailException ex
     ) {
 
+        log.warn("Duplicate email exception handled: {}", ex.getMessage());
+
         return buildErrorResponse(
                 HttpStatus.CONFLICT,
                 ex.getMessage()
@@ -39,6 +40,8 @@ public class GlobalExceptionHandler {
     handleDuplicatePhoneException(
             DuplicatePhoneException ex
     ) {
+
+        log.warn("Duplicate phone exception handled: {}", ex.getMessage());
 
         return buildErrorResponse(
                 HttpStatus.CONFLICT,
@@ -52,6 +55,8 @@ public class GlobalExceptionHandler {
             InvalidRoleException ex
     ) {
 
+        log.warn("Invalid role exception handled: {}", ex.getMessage());
+
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
@@ -64,6 +69,8 @@ public class GlobalExceptionHandler {
             InvalidRequestException ex
     ) {
 
+        log.warn("Invalid request exception handled: {}", ex.getMessage());
+
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
@@ -75,6 +82,8 @@ public class GlobalExceptionHandler {
     handleUserAlreadyExistsException(
             UserAlreadyExistsException ex
     ) {
+
+        log.warn("User already exists exception handled: {}", ex.getMessage());
 
         return buildErrorResponse(
                 HttpStatus.CONFLICT,
@@ -96,18 +105,21 @@ public class GlobalExceptionHandler {
                         .map(error -> error.getDefaultMessage())
                         .orElse("Validation failed");
 
+        log.warn("Validation exception handled: {}", errorMessage);
+
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 errorMessage
         );
     }
-    @ExceptionHandler(
-            InvalidCredentialsException.class
-    )
+
+    @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<AuthResponseDTO<Object>>
     handleInvalidCredentialsException(
             InvalidCredentialsException ex
     ) {
+
+        log.warn("Invalid credentials exception handled: {}", ex.getMessage());
 
         return buildErrorResponse(
                 HttpStatus.UNAUTHORIZED,
@@ -122,13 +134,13 @@ public class GlobalExceptionHandler {
     ) {
 
         log.error(
-                "Unhandled Exception",
+                "Unhandled exception occurred",
                 ex
         );
 
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage()
+                "Something went wrong"
         );
     }
 
@@ -150,5 +162,4 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(response);
     }
-
 }

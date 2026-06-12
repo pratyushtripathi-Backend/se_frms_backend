@@ -13,5 +13,10 @@ public interface RoleMasterRepository
 
     Optional<RoleMaster> findByRoleName(String roleName);
 
+    Optional<RoleMaster> findByRoleNameAndStatus(
+            String roleName,
+            Boolean status
+    );
+
     List<RoleMaster> findByStatus(Boolean status);
 }

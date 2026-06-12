@@ -4,14 +4,19 @@ import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.roleMaster.dto.RoleMasterRequestDTO;
 import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import com.se_frms.roleMaster.service.RoleMasterService;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/roles")
 @RequiredArgsConstructor
@@ -27,8 +32,12 @@ public class RoleMasterController {
             RoleMasterRequestDTO request
     ) {
 
+        log.info("Create role request received");
+
         RoleMasterResponseDTO responseData =
                 roleMasterService.createRole(request);
+
+        log.info("Role created successfully");
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -47,8 +56,12 @@ public class RoleMasterController {
     public ResponseEntity<AuthResponseDTO<List<RoleMasterResponseDTO>>>
     getAllRoles() {
 
+        log.info("Fetch all roles request received");
+
         List<RoleMasterResponseDTO> responseData =
                 roleMasterService.getAllRoles();
+
+        log.info("Roles fetched successfully, count={}", responseData.size());
 
         return ResponseEntity.ok(
                 AuthResponseDTO
@@ -65,8 +78,12 @@ public class RoleMasterController {
     public ResponseEntity<AuthResponseDTO<List<RoleMasterResponseDTO>>>
     getActiveRoles() {
 
+        log.info("Fetch active roles request received");
+
         List<RoleMasterResponseDTO> responseData =
                 roleMasterService.getActiveRoles();
+
+        log.info("Active roles fetched successfully, count={}", responseData.size());
 
         return ResponseEntity.ok(
                 AuthResponseDTO
@@ -86,8 +103,12 @@ public class RoleMasterController {
             Integer roleId
     ) {
 
+        log.info("Fetch role request received, roleId={}", roleId);
+
         RoleMasterResponseDTO responseData =
                 roleMasterService.getRoleById(roleId);
+
+        log.info("Role fetched successfully, roleId={}", roleId);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
@@ -111,8 +132,12 @@ public class RoleMasterController {
             RoleMasterRequestDTO request
     ) {
 
+        log.info("Update role request received, roleId={}", roleId);
+
         RoleMasterResponseDTO responseData =
                 roleMasterService.updateRole(roleId, request);
+
+        log.info("Role updated successfully, roleId={}", roleId);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
