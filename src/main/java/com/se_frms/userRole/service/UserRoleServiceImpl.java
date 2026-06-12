@@ -10,7 +10,7 @@ import com.se_frms.userRole.dto.UserRoleRequestDTO;
 import com.se_frms.userRole.dto.UserRoleResponseDTO;
 import com.se_frms.userRole.model.UserRole;
 import com.se_frms.userRole.repository.UserRoleRepository;
-
+import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +28,7 @@ public class UserRoleServiceImpl
     private final UserRepository userRepository;
     private final RoleMasterRepository roleMasterRepository;
     private final UserRoleRepository userRoleRepository;
-
+    private final CurrentUserService currentUserService;
     @Override
     public UserRoleResponseDTO assignRole(
             UserRoleRequestDTO request
@@ -65,7 +65,8 @@ public class UserRoleServiceImpl
                     existingRole.setStatus(false);
                     userRoleRepository.save(existingRole);
                 });
-
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
         UserRole userRole =
                 userRoleRepository
                         .findByUserAndRole(user, roleMaster)
@@ -73,8 +74,12 @@ public class UserRoleServiceImpl
                                 UserRole.builder()
                                         .user(user)
                                         .role(roleMaster)
+                                        .createdBy(loggedInAdminId)
                                         .build()
                         );
+        if (userRole.getCreatedBy() == null) {
+            userRole.setCreatedBy(loggedInAdminId);
+        }
 
         userRole.setStatus(true);
 

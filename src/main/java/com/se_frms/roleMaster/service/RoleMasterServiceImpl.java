@@ -5,7 +5,7 @@ import com.se_frms.roleMaster.dto.RoleMasterRequestDTO;
 import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
-
+import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +21,7 @@ import java.util.Set;
 @Transactional
 public class RoleMasterServiceImpl
         implements RoleMasterService {
-
+    private final CurrentUserService currentUserService;
     private static final Set<String> ALLOWED_ROLES =
             Set.of("ADMIN", "EMPLOYEE", "USER");
 
@@ -42,7 +42,8 @@ public class RoleMasterServiceImpl
             log.warn("Create role failed because role already exists, roleName={}", roleName);
             throw new InvalidRequestException("Role already exists");
         }
-
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
         RoleMaster roleMaster =
                 RoleMaster.builder()
                         .roleName(roleName)
@@ -51,7 +52,7 @@ public class RoleMasterServiceImpl
                                         ? request.getStatus()
                                         : true
                         )
-                        .createdBy(request.getCreatedBy())
+                        .createdBy(loggedInAdminId)
                         .build();
 
         RoleMaster savedRole =

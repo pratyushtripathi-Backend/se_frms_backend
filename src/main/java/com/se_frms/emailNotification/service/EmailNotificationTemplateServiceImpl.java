@@ -5,7 +5,7 @@ import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
 import com.se_frms.emailNotification.model.EmailNotificationTemplate;
 import com.se_frms.emailNotification.repository.EmailNotificationTemplateRepository;
-
+import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +23,7 @@ public class EmailNotificationTemplateServiceImpl
         implements EmailNotificationTemplateService {
 
     private final EmailNotificationTemplateRepository repository;
+    private final CurrentUserService currentUserService;
 
     @Override
     public EmailNotificationTemplateResponseDTO createTemplate(
@@ -46,7 +47,8 @@ public class EmailNotificationTemplateServiceImpl
                     "Template code already exists"
             );
         }
-
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
         EmailNotificationTemplate template =
                 EmailNotificationTemplate.builder()
                         .templateCode(templateCode)
@@ -62,7 +64,7 @@ public class EmailNotificationTemplateServiceImpl
                                         ? request.getStatus()
                                         : true
                         )
-                        .createdBy(request.getCreatedBy())
+                        .createdBy(loggedInAdminId)
                         .build();
 
         EmailNotificationTemplate savedTemplate =

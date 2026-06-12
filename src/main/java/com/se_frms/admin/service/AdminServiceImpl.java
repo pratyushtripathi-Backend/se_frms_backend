@@ -1,5 +1,5 @@
 package com.se_frms.admin.service;
-
+import com.se_frms.common.security.CurrentUserService;
 import com.se_frms.admin.dto.CreateEmployeeRequest;
 import com.se_frms.admin.dto.EmployeeResponseDTO;
 import com.se_frms.admin.dto.EmployeeSummaryDTO;
@@ -39,6 +39,7 @@ public class AdminServiceImpl implements AdminService {
     private final MailService mailService;
     private final RoleMasterRepository roleMasterRepository;
     private final UserRoleRepository userRoleRepository;
+    private final CurrentUserService currentUserService;
 
     @Override
     public RegistrationResponseDTO createEmployee(CreateEmployeeRequest request) {
@@ -64,7 +65,8 @@ public class AdminServiceImpl implements AdminService {
 
         String generatedPassword = PasswordGeneratorUtil.generateSecurePassword();
         String encryptedPassword = passwordEncoder.encode(generatedPassword);
-
+        User loggedInAdmin =
+                currentUserService.getCurrentUser();
         User employee = User.builder()
                 .firstName(XssUtil.clean(request.getFirstName().trim()))
                 .lastName(XssUtil.clean(request.getLastName().trim()))
@@ -73,6 +75,7 @@ public class AdminServiceImpl implements AdminService {
                 .passwordHash(encryptedPassword)
                 .userType(selectedRole.name())
                 .status(true)
+                .createdBy(loggedInAdmin)
                 .build();
 
         User savedEmployee = userRepository.save(employee);
