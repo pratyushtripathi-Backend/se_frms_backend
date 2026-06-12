@@ -3,6 +3,7 @@ package com.se_frms.access.controller;
 import com.se_frms.access.dto.AccessRequestDTO;
 import com.se_frms.access.dto.AccessResponseDTO;
 import com.se_frms.access.service.AccessService;
+import com.se_frms.auth.dto.AuthResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class AccessController {
     private final AccessService accessService;
 
     @PostMapping("/access-name")
-    public ResponseEntity<AccessResponseDTO>
+    public ResponseEntity<AuthResponseDTO<AccessResponseDTO>>
     create(
             @RequestBody
             AccessRequestDTO request
@@ -43,12 +44,18 @@ public class AccessController {
                         HttpStatus.CREATED
                 )
                 .body(
-                        response
+                        AuthResponseDTO
+                                .<AccessResponseDTO>builder()
+                                .status(true)
+                                .responseCode(201)
+                                .responseMessage("Access created successfully")
+                                .responseData(response)
+                                .build()
                 );
     }
 
     @GetMapping("/get-access-list")
-    public ResponseEntity<List<AccessResponseDTO>>
+    public ResponseEntity<AuthResponseDTO<List<AccessResponseDTO>>>
     getAll() {
 
         log.info("Fetch all access request received");
@@ -62,12 +69,18 @@ public class AccessController {
         );
 
         return ResponseEntity.ok(
-                response
+                AuthResponseDTO
+                        .<List<AccessResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Access list fetched successfully")
+                        .responseData(response)
+                        .build()
         );
     }
 
     @GetMapping("/get-specific-access/{id}")
-    public ResponseEntity<AccessResponseDTO>
+    public ResponseEntity<AuthResponseDTO<AccessResponseDTO>>
     getById(
             @PathVariable
             Integer id
@@ -83,12 +96,18 @@ public class AccessController {
         log.info("Access fetched successfully, id={}", id);
 
         return ResponseEntity.ok(
-                response
+                AuthResponseDTO
+                        .<AccessResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Access fetched successfully")
+                        .responseData(response)
+                        .build()
         );
     }
 
     @PutMapping("update-access/{id}")
-    public ResponseEntity<AccessResponseDTO>
+    public ResponseEntity<AuthResponseDTO<AccessResponseDTO>>
     update(
             @PathVariable
             Integer id,
@@ -108,12 +127,18 @@ public class AccessController {
         log.info("Access updated successfully, id={}", id);
 
         return ResponseEntity.ok(
-                response
+                AuthResponseDTO
+                        .<AccessResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Access updated successfully")
+                        .responseData(response)
+                        .build()
         );
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<String>
+    public ResponseEntity<AuthResponseDTO<String>>
     updateStatus(
             @PathVariable
             Integer id,
@@ -141,12 +166,18 @@ public class AccessController {
         );
 
         return ResponseEntity.ok(
-                response
+                AuthResponseDTO
+                        .<String>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Access status updated successfully")
+                        .responseData(response)
+                        .build()
         );
     }
 
     @DeleteMapping("delete-acccess/{id}")
-    public ResponseEntity<String>
+    public ResponseEntity<AuthResponseDTO<String>>
     delete(
             @PathVariable
             Integer id
@@ -162,7 +193,13 @@ public class AccessController {
         log.info("Access deleted successfully, id={}", id);
 
         return ResponseEntity.ok(
-                response
+                AuthResponseDTO
+                        .<String>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Access deleted successfully")
+                        .responseData(response)
+                        .build()
         );
     }
 }

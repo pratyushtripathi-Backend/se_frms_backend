@@ -96,6 +96,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
+                                "/error"
+                        )
+                        .permitAll()
+
+                        .requestMatchers(
                                 "/api/v1/auth/login-history",
                                 "/api/v1/auth/login-history/**",
                                 "/api/v1/auth/login-attempt",

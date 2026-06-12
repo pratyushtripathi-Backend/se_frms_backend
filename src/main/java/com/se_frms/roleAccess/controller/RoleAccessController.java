@@ -1,81 +1,80 @@
 package com.se_frms.roleAccess.controller;
 
+import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.roleAccess.dto.RoleAccessRequestDTO;
+import com.se_frms.roleAccess.dto.RoleAccessResponseDTO;
 import com.se_frms.roleAccess.service.RoleAccessService;
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
-@RequestMapping(
-        "/api/v1/role-access"
-)
-
+@RequestMapping("/api/v1/role-access")
 @RequiredArgsConstructor
 public class RoleAccessController {
 
     private final RoleAccessService service;
 
     @PostMapping
-    public ResponseEntity<?> create(
-
+    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> create(
             @RequestBody
             RoleAccessRequestDTO request
-
     ) {
 
+        RoleAccessResponseDTO responseData =
+                service.create(request);
+
         return ResponseEntity.ok(
-
-                service.create(
-                        request
-                )
-
+                AuthResponseDTO
+                        .<RoleAccessResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role access created successfully")
+                        .responseData(responseData)
+                        .build()
         );
-
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<AuthResponseDTO<List<RoleAccessResponseDTO>>> getAll() {
+
+        List<RoleAccessResponseDTO> responseData =
+                service.getAll();
 
         return ResponseEntity.ok(
-
-                service.getAll()
-
+                AuthResponseDTO
+                        .<List<RoleAccessResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role access fetched successfully")
+                        .responseData(responseData)
+                        .build()
         );
-
     }
 
-    @GetMapping(
-            "/{roleId}"
-    )
-
-    public ResponseEntity<?> getByRole(
-
+    @GetMapping("/{roleId}")
+    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> getByRole(
             @PathVariable
             Integer roleId
-
     ) {
 
+        RoleAccessResponseDTO responseData =
+                service.getByRole(roleId);
+
         return ResponseEntity.ok(
-
-                service.getByRole(
-                        roleId
-                )
-
+                AuthResponseDTO
+                        .<RoleAccessResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role access fetched successfully")
+                        .responseData(responseData)
+                        .build()
         );
-
     }
 
-    @PatchMapping(
-            "/{roleId}/{accessId}/status"
-    )
-
-    public ResponseEntity<?> updateStatus(
-
+    @PatchMapping("/{roleId}/{accessId}/status")
+    public ResponseEntity<AuthResponseDTO<String>> updateStatus(
             @PathVariable
             Integer roleId,
 
@@ -84,23 +83,23 @@ public class RoleAccessController {
 
             @RequestParam
             Boolean status
-
     ) {
 
-        return ResponseEntity.ok(
-
+        String responseData =
                 service.updateAccessStatus(
-
                         roleId,
-
                         accessId,
-
                         status
+                );
 
-                )
-
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<String>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role access status updated successfully")
+                        .responseData(responseData)
+                        .build()
         );
-
     }
-
 }

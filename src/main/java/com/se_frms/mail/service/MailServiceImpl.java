@@ -43,10 +43,10 @@ public class MailServiceImpl implements MailService {
 
         sendMail(
                 email,
-                emailNotificationTemplateService.getSubject(
+                resolveSubject(
                         LOGIN_CREDENTIALS_TEMPLATE
                 ),
-                emailNotificationTemplateService.renderTemplate(
+                resolveBody(
                         LOGIN_CREDENTIALS_TEMPLATE,
                         Map.of(
                                 "firstName", firstName,
@@ -69,10 +69,10 @@ public class MailServiceImpl implements MailService {
 
         sendMail(
                 email,
-                emailNotificationTemplateService.getSubject(
+                resolveSubject(
                         PASSWORD_RESET_TEMPLATE
                 ),
-                emailNotificationTemplateService.renderTemplate(
+                resolveBody(
                         PASSWORD_RESET_TEMPLATE,
                         Map.of(
                                 "firstName", firstName,
@@ -94,16 +94,109 @@ public class MailServiceImpl implements MailService {
 
         sendMail(
                 email,
-                emailNotificationTemplateService.getSubject(
+                resolveSubject(
                         LOGIN_OTP_TEMPLATE
                 ),
-                emailNotificationTemplateService.renderTemplate(
+                resolveBody(
                         LOGIN_OTP_TEMPLATE,
                         Map.of(
                                 "otp", otp,
                                 "minutes", "5"
                         )
                 )
+        );
+    }
+
+    private String resolveSubject(
+            String templateCode
+    ) {
+
+        try {
+            return emailNotificationTemplateService.getSubject(templateCode);
+        } catch (InvalidRequestException ex) {
+            log.warn(
+                    "Active email template subject not found, using fallback, templateCode={}",
+                    templateCode
+            );
+
+            return fallbackSubject(templateCode);
+        }
+    }
+
+    private String resolveBody(
+            String templateCode,
+            Map<String, String> values
+    ) {
+
+        try {
+            return emailNotificationTemplateService.renderTemplate(
+                    templateCode,
+                    values
+            );
+        } catch (InvalidRequestException ex) {
+            log.warn(
+                    "Active email template body not found, using fallback, templateCode={}",
+                    templateCode
+            );
+
+            return fallbackBody(
+                    templateCode,
+                    values
+            );
+        }
+    }
+
+    private String fallbackSubject(
+            String templateCode
+    ) {
+
+        return switch (templateCode) {
+            case LOGIN_CREDENTIALS_TEMPLATE -> "FRMS Login Credentials";
+            case PASSWORD_RESET_TEMPLATE -> "FRMS Password Reset";
+            case LOGIN_OTP_TEMPLATE -> "FRMS Login OTP";
+            default -> "FRMS Notification";
+        };
+    }
+
+    private String fallbackBody(
+            String templateCode,
+            Map<String, String> values
+    ) {
+
+        return switch (templateCode) {
+            case LOGIN_CREDENTIALS_TEMPLATE ->
+                    "Hello "
+                            + value(values, "firstName")
+                            + ",\n\nYour FRMS account has been created.\nEmail: "
+                            + value(values, "email")
+                            + "\nPassword: "
+                            + value(values, "password")
+                            + "\n\nPlease login and change your password.";
+            case PASSWORD_RESET_TEMPLATE ->
+                    "Hello "
+                            + value(values, "firstName")
+                            + ",\n\nUse the link below to reset your FRMS password. This link is valid for "
+                            + value(values, "minutes")
+                            + " minutes.\n"
+                            + value(values, "resetLink");
+            case LOGIN_OTP_TEMPLATE ->
+                    "Your FRMS login OTP is "
+                            + value(values, "otp")
+                            + ". It is valid for "
+                            + value(values, "minutes")
+                            + " minutes.";
+            default -> "FRMS notification";
+        };
+    }
+
+    private String value(
+            Map<String, String> values,
+            String key
+    ) {
+
+        return values.getOrDefault(
+                key,
+                ""
         );
     }
 

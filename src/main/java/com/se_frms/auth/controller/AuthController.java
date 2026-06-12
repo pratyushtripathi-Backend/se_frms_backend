@@ -17,8 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -253,7 +251,7 @@ public class AuthController {
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<String>
+    public ResponseEntity<AuthResponseDTO<Object>>
     sendOtp(
             @Valid
             @RequestBody
@@ -266,7 +264,15 @@ public class AuthController {
 
         log.info("OTP sent successfully");
 
-        return ResponseEntity.ok("OTP sent successfully");
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("OTP sent successfully")
+                        .responseData(null)
+                        .build()
+        );
     }
 
     @PostMapping("/verify-otp")
@@ -297,7 +303,7 @@ public class AuthController {
     }
 
     @GetMapping("/test")
-    public String test(
+    public ResponseEntity<AuthResponseDTO<String>> test(
             Authentication authentication
     ) {
 
@@ -308,7 +314,15 @@ public class AuthController {
                         : "anonymous"
         );
 
-        return "Authenticated User";
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<String>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Authenticated User")
+                        .responseData("Authenticated User")
+                        .build()
+        );
     }
 
     @PostMapping("/logout")
@@ -388,7 +402,7 @@ public class AuthController {
     }
 
     @GetMapping("/login-attempt/{userId}")
-    public ResponseEntity<?>
+    public ResponseEntity<AuthResponseDTO<List<LoginAttemptResponseDTO>>>
     getLoginAttemptsByUserId(
             @PathVariable
             Integer userId
@@ -410,15 +424,17 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(
-                Map.of(
-                        "success", true,
-                        "message",
-                        response.isEmpty()
-                                ? "No login attempts found"
-                                : "Login attempts fetched successfully",
-                        "count", response.size(),
-                        "data", response
-                )
+                AuthResponseDTO
+                        .<List<LoginAttemptResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                response.isEmpty()
+                                        ? "No login attempts found"
+                                        : "Login attempts fetched successfully"
+                        )
+                        .responseData(response)
+                        .build()
         );
     }
 }
