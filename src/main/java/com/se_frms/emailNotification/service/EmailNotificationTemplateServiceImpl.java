@@ -8,7 +8,10 @@ import com.se_frms.emailNotification.repository.EmailNotificationTemplateReposit
 import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -177,24 +180,37 @@ public class EmailNotificationTemplateServiceImpl
         return mapToResponse(template);
     }
 
+
     @Override
-    @Transactional(readOnly = true)
-    public List<EmailNotificationTemplateResponseDTO> getAllTemplates() {
+    public Page<EmailNotificationTemplateResponseDTO> getAllTemplates(
+            int page,
+            int size
+    ) {
 
-        log.info("Fetch all email notification templates service started");
+        log.info(
+                "Fetch all email notification templates service started, page={}, size={}",
+                page,
+                size
+        );
 
-        List<EmailNotificationTemplateResponseDTO> response =
-                repository.findAll()
-                        .stream()
-                        .map(this::mapToResponse)
-                        .toList();
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("id").ascending()
+                );
+
+        Page<EmailNotificationTemplateResponseDTO> responseData =
+                repository
+                        .findAll(pageable)
+                        .map(this::mapToResponse);
 
         log.info(
                 "Email notification templates fetched successfully, count={}",
-                response.size()
+                responseData.getNumberOfElements()
         );
 
-        return response;
+        return responseData;
     }
 
     @Override

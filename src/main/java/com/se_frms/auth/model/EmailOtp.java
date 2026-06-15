@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "email_otp")
+@Table(name = "se_frms_email_otp")
 @Getter
 @Setter
 @NoArgsConstructor

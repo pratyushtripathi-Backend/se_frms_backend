@@ -4,7 +4,7 @@ import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.roleMaster.dto.RoleMasterRequestDTO;
 import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import com.se_frms.roleMaster.service.RoleMasterService;
-
+import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -53,19 +53,35 @@ public class RoleMasterController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<List<RoleMasterResponseDTO>>>
-    getAllRoles() {
+    public ResponseEntity<AuthResponseDTO<Page<RoleMasterResponseDTO>>>
+    getAllRoles(
+            @RequestParam(defaultValue = "0")
+            int page,
 
-        log.info("Fetch all roles request received");
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
 
-        List<RoleMasterResponseDTO> responseData =
-                roleMasterService.getAllRoles();
+        log.info(
+                "Fetch all roles request received, page={}, size={}",
+                page,
+                size
+        );
 
-        log.info("Roles fetched successfully, count={}", responseData.size());
+        Page<RoleMasterResponseDTO> responseData =
+                roleMasterService.getAllRoles(
+                        page,
+                        size
+                );
+
+        log.info(
+                "Roles fetched successfully, totalElements={}",
+                responseData.getTotalElements()
+        );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<List<RoleMasterResponseDTO>>builder()
+                        .<Page<RoleMasterResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Roles fetched successfully")

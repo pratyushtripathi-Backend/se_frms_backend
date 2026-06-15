@@ -13,7 +13,10 @@ import com.se_frms.userRole.repository.UserRoleRepository;
 import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,22 +102,36 @@ public class UserRoleServiceImpl
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<UserRoleResponseDTO> getAllUserRoles() {
+    public Page<UserRoleResponseDTO> getAllUserRoles(
+            int page,
+            int size
+    ) {
 
-        log.info("Fetch all user roles service started");
+        log.info(
+                "Fetch all user roles service started, page={}, size={}",
+                page,
+                size
+        );
 
-        List<UserRoleResponseDTO> response =
-                userRoleRepository.findAll()
-                        .stream()
-                        .map(this::mapToResponse)
-                        .toList();
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("id").ascending()
+                );
 
-        log.info("User roles fetched successfully, count={}", response.size());
+        Page<UserRoleResponseDTO> responseData =
+                userRoleRepository
+                        .findAll(pageable)
+                        .map(this::mapToResponse);
 
-        return response;
+        log.info(
+                "User roles fetched successfully, count={}",
+                responseData.getNumberOfElements()
+        );
+
+        return responseData;
     }
-
     @Override
     @Transactional(readOnly = true)
     public List<UserRoleResponseDTO> getActiveUserRoles() {

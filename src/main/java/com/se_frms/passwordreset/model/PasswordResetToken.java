@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.lang.Integer;
 
 @Entity
-@Table(name = "password_reset_tokens")
+@Table(name = "se_frms_password_reset_tokens")
 @Getter
 @Setter
 @Builder

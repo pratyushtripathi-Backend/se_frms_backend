@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "blacklisted_tokens")
+@Table(name = "se_frms_blacklisted_tokens")
 @Getter
 @Setter
 @NoArgsConstructor

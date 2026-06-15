@@ -4,7 +4,7 @@ import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
 import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
-
+import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -55,22 +54,32 @@ public class EmailNotificationTemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<List<EmailNotificationTemplateResponseDTO>>>
-    getAllEmailNotificationTemplates() {
+    public ResponseEntity<AuthResponseDTO<Page<EmailNotificationTemplateResponseDTO>>>
+    getAllEmailNotificationTemplates(
+            @RequestParam(defaultValue = "0")
+            int page,
 
-        log.info("Fetch all email notification templates request received");
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
 
-        List<EmailNotificationTemplateResponseDTO> responseData =
-                emailNotificationTemplateService.getAllTemplates();
+        log.info(
+                "Fetch all email notification templates request received, page={}, size={}",
+                page,
+                size
+        );
+
+        Page<EmailNotificationTemplateResponseDTO> responseData =
+                emailNotificationTemplateService.getAllTemplates(page, size);
 
         log.info(
                 "Email notification templates fetched successfully, count={}",
-                responseData.size()
+                responseData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<List<EmailNotificationTemplateResponseDTO>>builder()
+                        .<Page<EmailNotificationTemplateResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(

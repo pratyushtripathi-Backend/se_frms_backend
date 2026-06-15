@@ -8,6 +8,10 @@ import com.se_frms.roleMaster.repository.RoleMasterRepository;
 import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,19 +73,21 @@ public class RoleMasterServiceImpl
 
     @Override
     @Transactional(readOnly = true)
-    public List<RoleMasterResponseDTO> getAllRoles() {
+    public Page<RoleMasterResponseDTO> getAllRoles(
+            int page,
+            int size
+    ) {
 
-        log.info("Fetch all roles service started");
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("roleId").ascending()
+                );
 
-        List<RoleMasterResponseDTO> response =
-                roleMasterRepository.findAll()
-                        .stream()
-                        .map(this::mapToResponse)
-                        .toList();
-
-        log.info("Roles fetched successfully, count={}", response.size());
-
-        return response;
+        return roleMasterRepository
+                .findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     @Override

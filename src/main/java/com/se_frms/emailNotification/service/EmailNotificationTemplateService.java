@@ -2,7 +2,7 @@ package com.se_frms.emailNotification.service;
 
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +21,11 @@ public interface EmailNotificationTemplateService {
             String templateCode
     );
 
-    List<EmailNotificationTemplateResponseDTO> getAllTemplates();
+
+   Page<EmailNotificationTemplateResponseDTO> getAllTemplates(
+           int page,
+           int size
+   );
 
     String getSubject(String templateCode);
 
