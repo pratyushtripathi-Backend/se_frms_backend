@@ -7,7 +7,7 @@ import com.se_frms.userRole.dto.UserRoleStatusRequestDTO;
 import com.se_frms.userRole.service.UserRoleService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,32 +53,24 @@ public class UserRoleController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<Page<UserRoleResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<UserRoleResponseDTO>>>
     getAllUserRoles(
-            @RequestParam(defaultValue = "0")
-            int page,
+            @RequestParam(required = false)
+            Integer page,
 
-            @RequestParam(defaultValue = "10")
-            int size
+            @RequestParam(required = false)
+            Integer size
     ) {
 
-        log.info(
-                "Fetch all user roles request received, page={}, size={}",
-                page,
-                size
-        );
-
-        Page<UserRoleResponseDTO> responseData =
+        Page<UserRoleResponseDTO> pageData =
                 userRoleService.getAllUserRoles(page, size);
 
-        log.info(
-                "User roles fetched successfully, count={}",
-                responseData.getNumberOfElements()
-        );
+        PagedResponseDTO<UserRoleResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<UserRoleResponseDTO>>builder()
+                        .<PagedResponseDTO<UserRoleResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("User roles fetched successfully")

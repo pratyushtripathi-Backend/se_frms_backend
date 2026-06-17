@@ -9,7 +9,7 @@ import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.se_frms.common.util.PaginationUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -72,14 +72,13 @@ public class RoleMasterServiceImpl
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<RoleMasterResponseDTO> getAllRoles(
-            int page,
-            int size
+            Integer page,
+            Integer size
     ) {
 
         Pageable pageable =
-                PageRequest.of(
+                PaginationUtil.createPageable(
                         page,
                         size,
                         Sort.by("roleId").ascending()

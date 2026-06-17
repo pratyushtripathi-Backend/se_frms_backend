@@ -11,10 +11,9 @@ public interface RoleMasterService {
 
 
     Page<RoleMasterResponseDTO> getAllRoles(
-        int page,
-        int size
+            Integer page,
+            Integer size
     );
-
     List<RoleMasterResponseDTO> getActiveRoles();
 
     RoleMasterResponseDTO getRoleById(Integer roleId);

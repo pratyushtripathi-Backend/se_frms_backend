@@ -6,7 +6,7 @@ import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import com.se_frms.roleMaster.service.RoleMasterService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,35 +53,24 @@ public class RoleMasterController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<Page<RoleMasterResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<RoleMasterResponseDTO>>>
     getAllRoles(
-            @RequestParam(defaultValue = "0")
-            int page,
+            @RequestParam(required = false)
+            Integer page,
 
-            @RequestParam(defaultValue = "10")
-            int size
+            @RequestParam(required = false)
+            Integer size
     ) {
 
-        log.info(
-                "Fetch all roles request received, page={}, size={}",
-                page,
-                size
-        );
+        Page<RoleMasterResponseDTO> pageData =
+                roleMasterService.getAllRoles(page, size);
 
-        Page<RoleMasterResponseDTO> responseData =
-                roleMasterService.getAllRoles(
-                        page,
-                        size
-                );
-
-        log.info(
-                "Roles fetched successfully, totalElements={}",
-                responseData.getTotalElements()
-        );
+        PagedResponseDTO<RoleMasterResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<RoleMasterResponseDTO>>builder()
+                        .<PagedResponseDTO<RoleMasterResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Roles fetched successfully")
@@ -89,7 +78,6 @@ public class RoleMasterController {
                         .build()
         );
     }
-
     @GetMapping("/active")
     public ResponseEntity<AuthResponseDTO<List<RoleMasterResponseDTO>>>
     getActiveRoles() {

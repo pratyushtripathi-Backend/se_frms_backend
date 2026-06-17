@@ -1,23 +1,15 @@
 package com.se_frms.auth.service;
 
-import com.se_frms.admin.dto.CreateEmployeeRequest;
-import com.se_frms.auth.dto.LoginRequestDTO;
-import com.se_frms.auth.dto.LoginResponseDTO;
-import com.se_frms.auth.dto.ForgotPasswordRequest;
-import com.se_frms.auth.dto.ResetPasswordRequest;
-import com.se_frms.auth.dto.UserRegistrationRequest;
-import com.se_frms.auth.dto.RegistrationResponseDTO;
-import com.se_frms.auth.dto.UserRegistrationRequest;
 import com.se_frms.auth.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.lang.Integer;
 
 public interface AuthService {
 
     RegistrationResponseDTO registerUser(
-            UserRegistrationRequest request );
+            UserRegistrationRequest request
+    );
 
     void forgotPassword(
             ForgotPasswordRequest request
@@ -31,37 +23,23 @@ public interface AuthService {
             ChangePasswordRequest request
     );
 
-
-    LoginResponseDTO login(
-
+    LoginOtpResponseDTO login(
             LoginRequestDTO request,
-
             HttpServletRequest httpRequest
-
-    );
-
-
-
-
-    void sendOtp(
-            SendOtpRequestDTO request
     );
 
     LoginResponseDTO verifyOtp(
-            VerifyOtpRequestDTO request
+            VerifyOtpRequestDTO request,
+            HttpServletRequest httpRequest
     );
-    void logout(String token);
 
-    List<LoginHistoryResponseDTO>
-    getLoginHistory();
+    void logout(
+            String token
+    );
 
+    List<LoginHistoryResponseDTO> getLoginHistory();
 
-    List<LoginHistoryResponseDTO>
-    getLoginHistoryByUserId(
-
+    List<LoginHistoryResponseDTO> getLoginHistoryByUserId(
             Integer userId
-
     );
-
-
 }

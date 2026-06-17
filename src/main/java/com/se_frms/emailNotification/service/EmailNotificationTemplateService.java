@@ -22,10 +22,10 @@ public interface EmailNotificationTemplateService {
     );
 
 
-   Page<EmailNotificationTemplateResponseDTO> getAllTemplates(
-           int page,
-           int size
-   );
+    Page<EmailNotificationTemplateResponseDTO> getAllTemplates(
+            Integer page,
+            Integer size
+    );
 
     String getSubject(String templateCode);
 

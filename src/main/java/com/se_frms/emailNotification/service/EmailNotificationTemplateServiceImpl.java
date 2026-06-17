@@ -9,7 +9,7 @@ import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.se_frms.common.util.PaginationUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -183,34 +183,20 @@ public class EmailNotificationTemplateServiceImpl
 
     @Override
     public Page<EmailNotificationTemplateResponseDTO> getAllTemplates(
-            int page,
-            int size
+            Integer page,
+            Integer size
     ) {
 
-        log.info(
-                "Fetch all email notification templates service started, page={}, size={}",
-                page,
-                size
-        );
-
         Pageable pageable =
-                PageRequest.of(
+                PaginationUtil.createPageable(
                         page,
                         size,
                         Sort.by("id").ascending()
                 );
 
-        Page<EmailNotificationTemplateResponseDTO> responseData =
-                repository
-                        .findAll(pageable)
-                        .map(this::mapToResponse);
-
-        log.info(
-                "Email notification templates fetched successfully, count={}",
-                responseData.getNumberOfElements()
-        );
-
-        return responseData;
+        return repository
+                .findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     @Override

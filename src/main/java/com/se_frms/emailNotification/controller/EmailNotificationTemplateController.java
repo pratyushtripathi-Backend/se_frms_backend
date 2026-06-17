@@ -6,7 +6,7 @@ import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
 import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,37 +54,27 @@ public class EmailNotificationTemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<Page<EmailNotificationTemplateResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<EmailNotificationTemplateResponseDTO>>>
     getAllEmailNotificationTemplates(
-            @RequestParam(defaultValue = "0")
-            int page,
+            @RequestParam(required = false)
+            Integer page,
 
-            @RequestParam(defaultValue = "10")
-            int size
+            @RequestParam(required = false)
+            Integer size
     ) {
 
-        log.info(
-                "Fetch all email notification templates request received, page={}, size={}",
-                page,
-                size
-        );
-
-        Page<EmailNotificationTemplateResponseDTO> responseData =
+        Page<EmailNotificationTemplateResponseDTO> pageData =
                 emailNotificationTemplateService.getAllTemplates(page, size);
 
-        log.info(
-                "Email notification templates fetched successfully, count={}",
-                responseData.getNumberOfElements()
-        );
+        PagedResponseDTO<EmailNotificationTemplateResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<EmailNotificationTemplateResponseDTO>>builder()
+                        .<PagedResponseDTO<EmailNotificationTemplateResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
-                        .responseMessage(
-                                "Email notification templates fetched successfully"
-                        )
+                        .responseMessage("Email notification templates fetched successfully")
                         .responseData(responseData)
                         .build()
         );

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.se_frms.common.util.PaginationUtil;
 
 import java.util.List;
 @Slf4j
@@ -103,35 +104,22 @@ public class UserRoleServiceImpl
 
     @Override
     public Page<UserRoleResponseDTO> getAllUserRoles(
-            int page,
-            int size
+            Integer page,
+            Integer size
     ) {
 
-        log.info(
-                "Fetch all user roles service started, page={}, size={}",
-                page,
-                size
-        );
-
         Pageable pageable =
-                PageRequest.of(
+                PaginationUtil.createPageable(
                         page,
                         size,
                         Sort.by("id").ascending()
                 );
 
-        Page<UserRoleResponseDTO> responseData =
-                userRoleRepository
-                        .findAll(pageable)
-                        .map(this::mapToResponse);
-
-        log.info(
-                "User roles fetched successfully, count={}",
-                responseData.getNumberOfElements()
-        );
-
-        return responseData;
+        return userRoleRepository
+                .findAll(pageable)
+                .map(this::mapToResponse);
     }
+
     @Override
     @Transactional(readOnly = true)
     public List<UserRoleResponseDTO> getActiveUserRoles() {

@@ -266,23 +266,31 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponseDTO login(
+    public LoginOtpResponseDTO login(
             LoginRequestDTO request,
             HttpServletRequest httpRequest
     ) {
 
-        log.info("Login service started, ip={}", httpRequest.getRemoteAddr());
+        log.info(
+                "Login service started, ip={}",
+                httpRequest.getRemoteAddr()
+        );
+
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase();
 
         User user =
                 userRepository
-                        .findByEmail(request.getEmail().trim().toLowerCase())
+                        .findByEmail(email)
                         .orElse(null);
 
         if (user == null) {
 
             loginAttemptService.saveAttempt(
                     null,
-                    request.getEmail(),
+                    email,
                     false,
                     "USER_NOT_FOUND",
                     request.getLatitude(),
@@ -290,9 +298,38 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            log.warn("Login failed because user was not found, ip={}", httpRequest.getRemoteAddr());
+            log.warn(
+                    "Login failed because user was not found, email={}, ip={}",
+                    email,
+                    httpRequest.getRemoteAddr()
+            );
 
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
+        }
+
+        if (!Boolean.TRUE.equals(user.getStatus())) {
+
+            loginAttemptService.saveAttempt(
+                    user,
+                    email,
+                    false,
+                    "USER_INACTIVE",
+                    request.getLatitude(),
+                    request.getLongitude(),
+                    httpRequest
+            );
+
+            log.warn(
+                    "Login failed because user is inactive, userId={}, email={}",
+                    user.getId(),
+                    email
+            );
+
+            throw new InvalidCredentialsException(
+                    "User account is inactive"
+            );
         }
 
         boolean passwordMatches =
@@ -305,7 +342,7 @@ public class AuthServiceImpl implements AuthService {
 
             loginAttemptService.saveAttempt(
                     user,
-                    request.getEmail(),
+                    email,
                     false,
                     "INVALID_PASSWORD",
                     request.getLatitude(),
@@ -313,71 +350,16 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            log.warn("Login failed because password was invalid, userId={}", user.getId());
-
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-
-        // SUCCESS LOGIN ATTEMPT
-
-
-        loginAttemptService.saveAttempt(
-                user,
-                request.getEmail(),
-                true,
-                "LOGIN_SUCCESS",
-                request.getLatitude(),
-                request.getLongitude(),
-                httpRequest
-        );
-
-
-        if (!passwordMatches) {
+            log.warn(
+                    "Login failed because password was invalid, userId={}, email={}",
+                    user.getId(),
+                    email
+            );
 
             throw new InvalidCredentialsException(
                     "Invalid email or password"
             );
         }
-        //user.setLastActivity(LocalDateTime.now());
-
-        userRepository.save(user);
-
-        String token = jwtUtil.generateToken(
-                user.getEmail(),
-                user.getUserType()
-        );
-
-        loginHistoryService.saveLoginHistory(
-                user,
-                httpRequest,
-                true
-        );
-
-        sessionStoreService.createSession(user, token);
-
-        log.info("Login successful, userId={}, role={}", user.getId(), user.getUserType());
-
-        return LoginResponseDTO
-                .builder()
-                .userId(user.getId())
-                .email(user.getEmail())
-                .role(user.getUserType())
-                .token(token)
-                .build();
-    }
-
-    @Override
-    public void sendOtp(SendOtpRequestDTO request) {
-
-        log.info("Send OTP service started");
-
-        User user =
-                userRepository
-                        .findByEmail(request.getEmail().trim().toLowerCase())
-                        .orElseThrow(() -> {
-                            log.warn("Send OTP failed because email was not registered");
-                            return new InvalidCredentialsException("Email not registered");
-                        });
 
         String otp =
                 String.valueOf(
@@ -388,65 +370,156 @@ public class AuthServiceImpl implements AuthService {
                 EmailOtp.builder()
                         .email(user.getEmail())
                         .otp(otp)
-                        .expiryTime(LocalDateTime.now().plusMinutes(5))
+                        .expiryTime(
+                                LocalDateTime
+                                        .now()
+                                        .plusMinutes(5)
+                        )
                         .verified(false)
                         .build();
 
         emailOtpRepository.save(emailOtp);
 
-        mailService.sendLoginOtp(
-                user.getEmail(),
-                otp
+        loginAttemptService.saveAttempt(
+                user,
+                email,
+                true,
+                "PASSWORD_VERIFIED_OTP_GENERATED",
+                request.getLatitude(),
+                request.getLongitude(),
+                httpRequest
         );
 
-        log.info("OTP generated and mail triggered, userId={}", user.getId());
+
+        // smsService.sendOtp(user.getPhoneNumber(), otp);
+
+        log.info(
+                "Password verified and OTP generated successfully, userId={}, email={}, phoneNumber={}",
+                user.getId(),
+                email,
+                user.getPhoneNumber()
+        );
+
+        return LoginOtpResponseDTO
+                .builder()
+                .email(user.getEmail())
+                .maskedPhoneNumber(
+                        maskPhoneNumber(user.getPhoneNumber())
+                )
+                .otp(otp)
+                .otpRequired(true)
+                .build();
     }
 
     @Override
-    public LoginResponseDTO verifyOtp(VerifyOtpRequestDTO request) {
+    public LoginResponseDTO verifyOtp(
+            VerifyOtpRequestDTO request,
+            HttpServletRequest httpRequest
+    ) {
 
-        log.info("Verify OTP service started");
-
-        EmailOtp emailOtp =
-                emailOtpRepository
-                        .findTopByEmailOrderByIdDesc(request.getEmail())
-                        .orElseThrow(() -> {
-                            log.warn("OTP verification failed because OTP was not found");
-                            return new RuntimeException("OTP not found");
-                        });
-
-        if (emailOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
-            log.warn("OTP verification failed because OTP was expired");
-            throw new RuntimeException("OTP expired");
-        }
-
-        if (!emailOtp.getOtp().equals(request.getOtp())) {
-            log.warn("OTP verification failed because OTP was invalid");
-            throw new RuntimeException("Invalid OTP");
-        }
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase();
 
         User user =
                 userRepository
-                        .findByEmail(request.getEmail())
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new InvalidCredentialsException(
+                                        "User not found"
+                                )
+                        );
+
+        EmailOtp emailOtp =
+                emailOtpRepository
+                        .findTopByEmailAndVerifiedFalseOrderByIdDesc(email)
                         .orElseThrow(() -> {
-                            log.warn("OTP verification failed because user was not found");
-                            return new RuntimeException("User not found");
+
+                            loginAttemptService.saveAttempt(
+                                    user,
+                                    email,
+                                    false,
+                                    "OTP_NOT_FOUND",
+                                    null,
+                                    null,
+                                    httpRequest
+                            );
+
+                            return new InvalidTokenException(
+                                    "OTP not found"
+                            );
                         });
 
-     //   user.setLastActivity(LocalDateTime.now());
-        userRepository.save(user);
+        if (
+                emailOtp.getExpiryTime()
+                        .isBefore(LocalDateTime.now())
+        ) {
 
-        String token = jwtUtil.generateToken(
-                user.getEmail(),
-                user.getUserType()
-        );
+            emailOtp.setVerified(true);
+            emailOtpRepository.save(emailOtp);
 
-        sessionStoreService.createSession(user, token);
+            loginAttemptService.saveAttempt(
+                    user,
+                    email,
+                    false,
+                    "OTP_EXPIRED",
+                    null,
+                    null,
+                    httpRequest
+            );
+
+            throw new TokenExpiredException(
+                    "OTP expired"
+            );
+        }
+
+        if (!emailOtp.getOtp().equals(request.getOtp())) {
+
+            loginAttemptService.saveAttempt(
+                    user,
+                    email,
+                    false,
+                    "INVALID_OTP",
+                    null,
+                    null,
+                    httpRequest
+            );
+
+            throw new InvalidTokenException(
+                    "Invalid OTP"
+            );
+        }
 
         emailOtp.setVerified(true);
         emailOtpRepository.save(emailOtp);
 
-        log.info("OTP verified successfully, userId={}, role={}", user.getId(), user.getUserType());
+        String token =
+                jwtUtil.generateToken(
+                        user.getEmail(),
+                        user.getUserType()
+                );
+
+        sessionStoreService.createSession(
+                user,
+                token
+        );
+
+        loginAttemptService.saveAttempt(
+                user,
+                email,
+                true,
+                "LOGIN_SUCCESS",
+                null,
+                null,
+                httpRequest
+        );
+
+        loginHistoryService.saveLoginHistory(
+                user,
+                httpRequest,
+                true
+        );
 
         return LoginResponseDTO
                 .builder()
@@ -514,5 +587,22 @@ public class AuthServiceImpl implements AuthService {
         log.info("Login history by userId fetched successfully, userId={}, count={}", userId, response.size());
 
         return response;
+    }
+
+    private String maskPhoneNumber(
+            String phoneNumber
+    ) {
+
+        if (
+                phoneNumber == null
+                        || phoneNumber.length() < 4
+        ) {
+            return phoneNumber;
+        }
+
+        return "******"
+                + phoneNumber.substring(
+                phoneNumber.length() - 4
+        );
     }
 }

@@ -58,7 +58,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO<LoginResponseDTO>>
+    public ResponseEntity<AuthResponseDTO<LoginOtpResponseDTO>>
     login(
             @Valid
             @RequestBody
@@ -72,27 +72,26 @@ public class AuthController {
                 httpRequest.getRemoteAddr()
         );
 
-        LoginResponseDTO responseData =
+        LoginOtpResponseDTO responseData =
                 authService.login(
                         request,
                         httpRequest
                 );
 
         log.info(
-                "Login successful, ip={}",
+                "Password verified and OTP generated, ip={}",
                 httpRequest.getRemoteAddr()
         );
 
-        AuthResponseDTO<LoginResponseDTO> response =
+        return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<LoginResponseDTO>builder()
+                        .<LoginOtpResponseDTO>builder()
                         .status(true)
                         .responseCode(200)
-                        .responseMessage("Login successful")
+                        .responseMessage("OTP sent to registered mobile number")
                         .responseData(responseData)
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
     @GetMapping("/login-history")
@@ -250,56 +249,36 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/send-otp")
-    public ResponseEntity<AuthResponseDTO<Object>>
-    sendOtp(
-            @Valid
-            @RequestBody
-            SendOtpRequestDTO request
-    ) {
-
-        log.info("Send OTP request received");
-
-        authService.sendOtp(request);
-
-        log.info("OTP sent successfully");
-
-        return ResponseEntity.ok(
-                AuthResponseDTO
-                        .builder()
-                        .status(true)
-                        .responseCode(200)
-                        .responseMessage("OTP sent successfully")
-                        .responseData(null)
-                        .build()
-        );
-    }
 
     @PostMapping("/verify-otp")
     public ResponseEntity<AuthResponseDTO<LoginResponseDTO>>
     verifyOtp(
             @Valid
             @RequestBody
-            VerifyOtpRequestDTO request
+            VerifyOtpRequestDTO request,
+
+            HttpServletRequest httpRequest
     ) {
 
         log.info("Verify OTP request received");
 
         LoginResponseDTO responseData =
-                authService.verifyOtp(request);
+                authService.verifyOtp(
+                        request,
+                        httpRequest
+                );
 
-        log.info("OTP verified successfully");
+        log.info("OTP verified and login successful");
 
-        AuthResponseDTO<LoginResponseDTO> response =
+        return ResponseEntity.ok(
                 AuthResponseDTO
                         .<LoginResponseDTO>builder()
                         .status(true)
                         .responseCode(200)
-                        .responseMessage("OTP Login successful")
+                        .responseMessage("Login successful")
                         .responseData(responseData)
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
     @GetMapping("/test")
