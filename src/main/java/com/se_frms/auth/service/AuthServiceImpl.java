@@ -271,15 +271,8 @@ public class AuthServiceImpl implements AuthService {
             HttpServletRequest httpRequest
     ) {
 
-        log.info(
-                "Login service started, ip={}",
-                httpRequest.getRemoteAddr()
-        );
-
         String email =
-                request.getEmail()
-                        .trim()
-                        .toLowerCase();
+                request.getEmail().trim().toLowerCase();
 
         User user =
                 userRepository
@@ -298,12 +291,6 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            log.warn(
-                    "Login failed because user was not found, email={}, ip={}",
-                    email,
-                    httpRequest.getRemoteAddr()
-            );
-
             throw new InvalidCredentialsException(
                     "Invalid email or password"
             );
@@ -319,12 +306,6 @@ public class AuthServiceImpl implements AuthService {
                     request.getLatitude(),
                     request.getLongitude(),
                     httpRequest
-            );
-
-            log.warn(
-                    "Login failed because user is inactive, userId={}, email={}",
-                    user.getId(),
-                    email
             );
 
             throw new InvalidCredentialsException(
@@ -350,12 +331,6 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            log.warn(
-                    "Login failed because password was invalid, userId={}, email={}",
-                    user.getId(),
-                    email
-            );
-
             throw new InvalidCredentialsException(
                     "Invalid email or password"
             );
@@ -370,11 +345,7 @@ public class AuthServiceImpl implements AuthService {
                 EmailOtp.builder()
                         .email(user.getEmail())
                         .otp(otp)
-                        .expiryTime(
-                                LocalDateTime
-                                        .now()
-                                        .plusMinutes(5)
-                        )
+                        .expiryTime(LocalDateTime.now().plusMinutes(5))
                         .verified(false)
                         .build();
 
@@ -393,19 +364,10 @@ public class AuthServiceImpl implements AuthService {
 
         // smsService.sendOtp(user.getPhoneNumber(), otp);
 
-        log.info(
-                "Password verified and OTP generated successfully, userId={}, email={}, phoneNumber={}",
-                user.getId(),
-                email,
-                user.getPhoneNumber()
-        );
-
         return LoginOtpResponseDTO
                 .builder()
                 .email(user.getEmail())
-                .maskedPhoneNumber(
-                        maskPhoneNumber(user.getPhoneNumber())
-                )
+                .maskedPhoneNumber(maskPhoneNumber(user.getPhoneNumber()))
                 .otp(otp)
                 .otpRequired(true)
                 .build();
@@ -418,9 +380,7 @@ public class AuthServiceImpl implements AuthService {
     ) {
 
         String email =
-                request.getEmail()
-                        .trim()
-                        .toLowerCase();
+                request.getEmail().trim().toLowerCase();
 
         User user =
                 userRepository
@@ -451,10 +411,7 @@ public class AuthServiceImpl implements AuthService {
                             );
                         });
 
-        if (
-                emailOtp.getExpiryTime()
-                        .isBefore(LocalDateTime.now())
-        ) {
+        if (emailOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
 
             emailOtp.setVerified(true);
             emailOtpRepository.save(emailOtp);
@@ -469,9 +426,7 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            throw new TokenExpiredException(
-                    "OTP expired"
-            );
+            throw new TokenExpiredException("OTP expired");
         }
 
         if (!emailOtp.getOtp().equals(request.getOtp())) {
@@ -486,9 +441,7 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            throw new InvalidTokenException(
-                    "Invalid OTP"
-            );
+            throw new InvalidTokenException("Invalid OTP");
         }
 
         emailOtp.setVerified(true);
@@ -500,10 +453,7 @@ public class AuthServiceImpl implements AuthService {
                         user.getUserType()
                 );
 
-        sessionStoreService.createSession(
-                user,
-                token
-        );
+        sessionStoreService.createSession(user, token);
 
         loginAttemptService.saveAttempt(
                 user,
