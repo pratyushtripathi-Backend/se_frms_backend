@@ -11,28 +11,49 @@ import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.auth.util.PasswordGeneratorUtil;
 import com.se_frms.common.security.XssUtil;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.mail.service.MailService;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
-import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 import com.se_frms.userRole.model.UserRole;
 import com.se_frms.userRole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class AdminServiceImpl implements AdminService {
+
+    private static final String EMPLOYEE_ROLE_NAME = "EMPLOYEE";
+
+    private static final Map<String, String> EMPLOYEE_FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("firstName", "firstName"),
+                    Map.entry("lastName", "lastName"),
+                    Map.entry("email", "email"),
+                    Map.entry("phoneNumber", "phoneNumber"),
+                    Map.entry("userType", "userType"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdById", "createdBy.id"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -61,7 +82,6 @@ public class AdminServiceImpl implements AdminService {
         }
 
         RoleMaster roleMaster = getRoleMasterForCreateUser(request.getRoleName());
-        Role selectedRole = convertRoleMasterToEnum(roleMaster);
 
         String generatedPassword = PasswordGeneratorUtil.generateSecurePassword();
         String encryptedPassword = passwordEncoder.encode(generatedPassword);
@@ -73,7 +93,7 @@ public class AdminServiceImpl implements AdminService {
                 .email(XssUtil.clean(email))
                 .phoneNumber(XssUtil.clean(phoneNumber))
                 .passwordHash(encryptedPassword)
-                .userType(selectedRole.name())
+                .userType(roleMaster.getRoleName())
                 .status(true)
                 .createdBy(loggedInAdmin)
                 .build();
@@ -120,6 +140,8 @@ public class AdminServiceImpl implements AdminService {
             throw new InvalidRequestException("User is not employee");
         }
 
+        validateActiveEmployee(employee, employeeId);
+
         log.info("Employee fetched successfully, employeeId={}", employeeId);
         return map(employee);
     }
@@ -130,7 +152,10 @@ public class AdminServiceImpl implements AdminService {
         log.info("Get all employees service started");
 
         List<EmployeeSummaryDTO> employees = userRepository
-                .findByUserType(Role.EMPLOYEE.name())
+                .findByUserTypeAndStatusOrderByFirstNameAscLastNameAsc(
+                        EMPLOYEE_ROLE_NAME,
+                        true
+                )
                 .stream()
                 .map(user -> EmployeeSummaryDTO.builder()
                         .id(user.getId())
@@ -146,6 +171,85 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<EmployeeSummaryDTO> getAllEmployees(
+            int page,
+            int size
+    ) {
+        return getAllEmployees(
+                page,
+                size,
+                Map.of()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EmployeeSummaryDTO> getAllEmployees(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
+        log.info(
+                "Get all employees service started, page={}, size={}",
+                page,
+                size
+        );
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        EMPLOYEE_FILTER_FIELDS,
+                        "firstName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<User> specification =
+                DynamicFilterSpecification
+                        .<User>equal(
+                                "userType",
+                                EMPLOYEE_ROLE_NAME
+                        )
+                        .and(
+                                DynamicFilterSpecification.equal(
+                                        "status",
+                                        true
+                                )
+                        )
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        filters,
+                                        EMPLOYEE_FILTER_FIELDS
+                                )
+                        );
+
+        Page<EmployeeSummaryDTO> employees =
+                userRepository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(user -> EmployeeSummaryDTO.builder()
+                                .id(user.getId())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .email(user.getEmail())
+                                .build()
+                        );
+
+        log.info(
+                "Employees fetched successfully, page={}, size={}, count={}",
+                employees.getNumber(),
+                employees.getSize(),
+                employees.getNumberOfElements()
+        );
+
+        return employees;
+    }
+
+    @Override
     public void deleteEmployee(Integer employeeId) {
         log.info("Delete employee service started, employeeId={}", employeeId);
 
@@ -154,6 +258,11 @@ public class AdminServiceImpl implements AdminService {
         if (!isEmployee(employee)) {
             log.warn("Delete employee failed because user is not employee, userId={}, role={}", employeeId, employee.getUserType());
             throw new InvalidRequestException("Only employee can be deleted");
+        }
+
+        if (Boolean.FALSE.equals(employee.getStatus())) {
+            log.warn("Delete employee failed because employee is already inactive, employeeId={}", employeeId);
+            throw new InvalidRequestException("Employee is already inactive");
         }
 
         employee.setStatus(false);
@@ -172,6 +281,8 @@ public class AdminServiceImpl implements AdminService {
             log.warn("Update employee failed because user is not employee, userId={}, role={}", employeeId, user.getUserType());
             throw new InvalidRequestException("Only employee can be updated");
         }
+
+        validateActiveEmployee(user, employeeId);
 
         validateUniqueEmailForUpdate(user, request.getEmail(), employeeId);
         validateUniquePhoneForUpdate(user, request.getPhoneNumber(), employeeId);
@@ -198,6 +309,8 @@ public class AdminServiceImpl implements AdminService {
             log.warn("Patch employee failed because user is not employee, userId={}, role={}", employeeId, user.getUserType());
             throw new InvalidRequestException("Only employee can be updated");
         }
+
+        validateActiveEmployee(user, employeeId);
 
         validateUniqueEmailForPatch(user, request.getEmail(), employeeId);
         validateUniquePhoneForPatch(user, request.getPhoneNumber(), employeeId);
@@ -238,7 +351,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private boolean isEmployee(User user) {
-        return Role.EMPLOYEE.name().equals(user.getUserType());
+        return EMPLOYEE_ROLE_NAME.equals(user.getUserType());
+    }
+
+    private void validateActiveEmployee(User employee, Integer employeeId) {
+        if (Boolean.FALSE.equals(employee.getStatus())) {
+            log.warn("Employee is inactive, employeeId={}", employeeId);
+            throw new InvalidRequestException("Employee is inactive");
+        }
     }
 
     private void validateUniqueEmailForUpdate(User user, String email, Integer employeeId) {
@@ -292,7 +412,7 @@ public class AdminServiceImpl implements AdminService {
 
     private RoleMaster getRoleMasterForCreateUser(String roleName) {
         String finalRoleName = roleName == null || roleName.isBlank()
-                ? Role.EMPLOYEE.name()
+                ? EMPLOYEE_ROLE_NAME
                 : roleName.trim().toUpperCase(Locale.ROOT);
 
         return roleMasterRepository
@@ -301,18 +421,6 @@ public class AdminServiceImpl implements AdminService {
                     log.warn("Create employee failed because role is invalid or inactive, roleName={}", finalRoleName);
                     return new InvalidRequestException("Invalid or inactive role");
                 });
-    }
-
-    private Role convertRoleMasterToEnum(RoleMaster roleMaster) {
-        try {
-            return Role.valueOf(roleMaster.getRoleName());
-        } catch (IllegalArgumentException ex) {
-            log.warn(
-                    "Role conversion failed because role is not configured in application, roleName={}",
-                    roleMaster.getRoleName()
-            );
-            throw new InvalidRequestException("Role is not configured in application");
-        }
     }
 
     private void saveUserRole(User user, RoleMaster roleMaster) {

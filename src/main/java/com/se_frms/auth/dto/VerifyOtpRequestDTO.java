@@ -15,4 +15,6 @@ public class VerifyOtpRequestDTO {
 
     @NotBlank
     private String otp;
+
+    private String macAddress;
 }

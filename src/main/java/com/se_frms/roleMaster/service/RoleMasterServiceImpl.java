@@ -6,18 +6,19 @@ import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
 import com.se_frms.common.security.CurrentUserService;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import com.se_frms.common.util.PaginationUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -26,8 +27,19 @@ import java.util.Set;
 public class RoleMasterServiceImpl
         implements RoleMasterService {
     private final CurrentUserService currentUserService;
-    private static final Set<String> ALLOWED_ROLES =
-            Set.of("ADMIN", "EMPLOYEE", "USER");
+
+    private static final String ROLE_NAME_PATTERN =
+            "^[A-Z][A-Z0-9_]*$";
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("roleId", "roleId"),
+                    Map.entry("roleName", "roleName"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final RoleMasterRepository roleMasterRepository;
 
@@ -40,7 +52,7 @@ public class RoleMasterServiceImpl
 
         String roleName = normalizeRoleName(request.getRoleName());
 
-        validateAllowedRole(roleName);
+        validateRoleName(roleName);
 
         if (roleMasterRepository.existsByRoleName(roleName)) {
             log.warn("Create role failed because role already exists, roleName={}", roleName);
@@ -72,20 +84,34 @@ public class RoleMasterServiceImpl
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<RoleMasterResponseDTO> getAllRoles(
-            Integer page,
-            Integer size
+            int page,
+            int size,
+            Map<String, String> filters
     ) {
 
         Pageable pageable =
-                PaginationUtil.createPageable(
+                DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        Sort.by("roleId").ascending()
+                        filters,
+                        FILTER_FIELDS,
+                        "roleName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<RoleMaster> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
                 );
 
         return roleMasterRepository
-                .findAll(pageable)
+                .findAll(
+                        specification,
+                        pageable
+                )
                 .map(this::mapToResponse);
     }
 
@@ -96,7 +122,8 @@ public class RoleMasterServiceImpl
         log.info("Fetch active roles service started");
 
         List<RoleMasterResponseDTO> response =
-                roleMasterRepository.findByStatus(true)
+                roleMasterRepository
+                        .findByStatusOrderByRoleNameAsc(true)
                         .stream()
                         .map(this::mapToResponse)
                         .toList();
@@ -151,7 +178,7 @@ public class RoleMasterServiceImpl
 
         String roleName = normalizeRoleName(request.getRoleName());
 
-        validateAllowedRole(roleName);
+        validateRoleName(roleName);
 
         roleMasterRepository.findByRoleName(roleName)
                 .ifPresent(existingRole -> {
@@ -193,15 +220,15 @@ public class RoleMasterServiceImpl
         return roleName.trim().toUpperCase();
     }
 
-    private void validateAllowedRole(
+    private void validateRoleName(
             String roleName
     ) {
 
-        if (!ALLOWED_ROLES.contains(roleName)) {
-            log.warn("Role validation failed because role is not allowed, roleName={}", roleName);
+        if (!roleName.matches(ROLE_NAME_PATTERN)) {
+            log.warn("Role validation failed because role name is invalid, roleName={}", roleName);
 
             throw new InvalidRequestException(
-                    "Only ADMIN, EMPLOYEE and USER roles are allowed"
+                    "Role name can contain only uppercase letters, numbers and underscores"
             );
         }
     }

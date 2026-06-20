@@ -2,12 +2,14 @@ package com.se_frms.roleMaster.repository;
 
 import com.se_frms.roleMaster.model.RoleMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RoleMasterRepository
-        extends JpaRepository<RoleMaster, Integer> {
+        extends JpaRepository<RoleMaster, Integer>,
+        JpaSpecificationExecutor<RoleMaster> {
 
     boolean existsByRoleName(String roleName);
 
@@ -18,5 +20,7 @@ public interface RoleMasterRepository
             Boolean status
     );
 
-    List<RoleMaster> findByStatus(Boolean status);
+    List<RoleMaster> findByStatusOrderByRoleNameAsc(
+            Boolean status
+    );
 }

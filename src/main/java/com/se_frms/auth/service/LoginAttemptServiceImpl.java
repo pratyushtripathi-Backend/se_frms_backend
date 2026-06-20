@@ -3,6 +3,7 @@ package com.se_frms.auth.service;
 import com.se_frms.auth.dto.LoginAttemptResponseDTO;
 import com.se_frms.auth.model.LoginAttempt;
 import com.se_frms.auth.repository.LoginAttemptRepository;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 
@@ -11,13 +12,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.lang.Integer;
 
 @Slf4j
@@ -25,6 +30,23 @@ import java.lang.Integer;
 @RequiredArgsConstructor
 public class LoginAttemptServiceImpl
         implements LoginAttemptService {
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("userId", "user.id"),
+                    Map.entry("email", "email"),
+                    Map.entry("attemptStatus", "attemptStatus"),
+                    Map.entry("status", "attemptStatus"),
+                    Map.entry("failureReason", "failureReason"),
+                    Map.entry("attemptReason", "failureReason"),
+                    Map.entry("ipAddress", "ipAddress"),
+                    Map.entry("latitude", "latitude"),
+                    Map.entry("longitude", "longitude"),
+                    Map.entry("url", "url"),
+                    Map.entry("attemptedAt", "attemptedAt"),
+                    Map.entry("createdBy", "createdBy.id")
+            );
 
     private final LoginAttemptRepository repository;
 
@@ -91,25 +113,41 @@ public class LoginAttemptServiceImpl
     }
 
     @Override
-    public List<LoginAttemptResponseDTO> getAllLoginAttempts() {
+    public Page<LoginAttemptResponseDTO> getAllLoginAttempts(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
 
         log.info("Fetch all login attempts service started");
 
-        List<LoginAttemptResponseDTO> response =
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "attemptedAt",
+                        Sort.Direction.DESC
+                );
+
+        Specification<LoginAttempt> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
+                );
+
+        Page<LoginAttemptResponseDTO> response =
                 repository
                         .findAll(
-                                Sort.by(
-                                        Sort.Direction.DESC,
-                                        "attemptedAt"
-                                )
+                                specification,
+                                pageable
                         )
-                        .stream()
-                        .map(this::mapToDTO)
-                        .toList();
+                        .map(this::mapToDTO);
 
         log.info(
                 "Login attempts fetched successfully, count={}",
-                response.size()
+                response.getNumberOfElements()
         );
 
         return response;
@@ -157,10 +195,13 @@ public class LoginAttemptServiceImpl
     }
 
     @Override
-    public List<LoginAttemptResponseDTO>
+    public Page<LoginAttemptResponseDTO>
     getLoginAttemptsByUserId(
 
-            Integer userId
+            Integer userId,
+            int page,
+            int size,
+            Map<String, String> filters
 
     ) {
 
@@ -184,19 +225,41 @@ public class LoginAttemptServiceImpl
                         }
                 );
 
-        List<LoginAttemptResponseDTO> response =
-                repository
-                        .findByUserIdOrderByAttemptedAtDesc(
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "attemptedAt",
+                        Sort.Direction.DESC
+                );
+
+        Specification<LoginAttempt> specification =
+                DynamicFilterSpecification
+                        .<LoginAttempt>equal(
+                                "user.id",
                                 user.getId()
                         )
-                        .stream()
-                        .map(this::mapToDTO)
-                        .toList();
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        filters,
+                                        FILTER_FIELDS
+                                )
+                        );
+
+        Page<LoginAttemptResponseDTO> response =
+                repository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::mapToDTO);
 
         log.info(
                 "Login attempts by userId fetched successfully, userId={}, count={}",
                 userId,
-                response.size()
+                response.getNumberOfElements()
         );
 
         return response;

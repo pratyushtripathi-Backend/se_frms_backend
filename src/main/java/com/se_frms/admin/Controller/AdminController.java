@@ -12,11 +12,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -57,15 +59,35 @@ public class AdminController {
 
     @GetMapping("/employees")
     public ResponseEntity<
-            AuthResponseDTO<List<EmployeeSummaryDTO>>>
-    getAllEmployees() {
-        log.info("Fetch all employees request received");
-        List<EmployeeSummaryDTO> responseData =
-                adminService.getAllEmployees();
-        log.info("Employees fetched successfully, count={}", responseData.size());
+            AuthResponseDTO<Page<EmployeeSummaryDTO>>>
+    getAllEmployees(
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
+    ) {
+        log.info(
+                "Fetch all employees request received, page={}, size={}",
+                page,
+                size
+        );
+        Page<EmployeeSummaryDTO> responseData =
+                adminService.getAllEmployees(
+                        page,
+                        size,
+                        filters
+                );
+        log.info(
+                "Employees fetched successfully, count={}",
+                responseData.getNumberOfElements()
+        );
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<List<EmployeeSummaryDTO>>builder()
+                        .<Page<EmployeeSummaryDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(

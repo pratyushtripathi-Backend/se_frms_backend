@@ -4,20 +4,35 @@ import com.se_frms.access.dto.AccessRequestDTO;
 import com.se_frms.access.dto.AccessResponseDTO;
 import com.se_frms.access.model.AccessMaster;
 import com.se_frms.access.repository.AccessMasterRepository;
+import com.se_frms.common.util.DynamicFilterSpecification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccessServiceImpl
         implements AccessService {
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("accessName", "accessName"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final AccessMasterRepository repository;
 
@@ -73,21 +88,46 @@ public class AccessServiceImpl
     }
 
     @Override
-    public List<AccessResponseDTO> getAll() {
+    public Page<AccessResponseDTO> getAll(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
 
-        log.info("Fetch all access service started");
+        log.info(
+                "Fetch all access service started, page={}, size={}",
+                page,
+                size
+        );
 
-        List<AccessResponseDTO> response =
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "accessName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<AccessMaster> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
+                );
+
+        Page<AccessResponseDTO> response =
                 repository
-                        .findAll()
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::map);
 
-                        .stream()
-
-                        .map(this::map)
-
-                        .toList();
-
-        log.info("Access list fetched successfully, count={}", response.size());
+        log.info(
+                "Access list fetched successfully, count={}",
+                response.getNumberOfElements()
+        );
 
         return response;
 

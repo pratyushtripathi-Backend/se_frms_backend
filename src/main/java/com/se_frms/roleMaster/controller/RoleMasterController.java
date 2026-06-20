@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -53,24 +54,35 @@ public class RoleMasterController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<RoleMasterResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<Page<RoleMasterResponseDTO>>>
     getAllRoles(
-            @RequestParam(required = false)
-            Integer page,
+            @RequestParam(defaultValue = "0")
+            int page,
 
-            @RequestParam(required = false)
-            Integer size
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
     ) {
 
-        Page<RoleMasterResponseDTO> pageData =
-                roleMasterService.getAllRoles(page, size);
 
-        PagedResponseDTO<RoleMasterResponseDTO> responseData =
-                PagedResponseDTO.from(pageData);
+
+        Page<RoleMasterResponseDTO> responseData =
+                roleMasterService.getAllRoles(
+                        page,
+                        size,
+                        filters
+                );
+
+        log.info(
+                "Roles fetched successfully, totalElements={}",
+                responseData.getTotalElements()
+        );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<PagedResponseDTO<RoleMasterResponseDTO>>builder()
+                        .<Page<RoleMasterResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Roles fetched successfully")

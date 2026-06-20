@@ -25,4 +25,7 @@ public class EmailOtp {
     private LocalDateTime expiryTime;
 
     private Boolean verified;
+
+    @Column(name = "mac_address", length = 50)
+    private String macAddress;
 }

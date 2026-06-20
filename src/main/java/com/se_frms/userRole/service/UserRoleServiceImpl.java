@@ -3,7 +3,7 @@ package com.se_frms.userRole.service;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
-import com.se_frms.user.enums.Role;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 import com.se_frms.userRole.dto.UserRoleRequestDTO;
@@ -14,20 +14,36 @@ import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.se_frms.common.util.PaginationUtil;
 
 import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class UserRoleServiceImpl
         implements UserRoleService {
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("userId", "user.id"),
+                    Map.entry("firstName", "user.firstName"),
+                    Map.entry("lastName", "user.lastName"),
+                    Map.entry("email", "user.email"),
+                    Map.entry("roleId", "role.roleId"),
+                    Map.entry("roleName", "role.roleName"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final UserRepository userRepository;
     private final RoleMasterRepository roleMasterRepository;
@@ -61,9 +77,6 @@ public class UserRoleServiceImpl
         RoleMaster roleMaster =
                 getActiveRoleMaster(request.getRoleName());
 
-        Role selectedRole =
-                convertRoleMasterToEnum(roleMaster);
-
         userRoleRepository.findByUserAndStatus(user, true)
                 .forEach(existingRole -> {
                     existingRole.setStatus(false);
@@ -90,7 +103,7 @@ public class UserRoleServiceImpl
         UserRole savedUserRole =
                 userRoleRepository.save(userRole);
 
-        user.setUserType(selectedRole.name());
+        user.setUserType(roleMaster.getRoleName());
         userRepository.save(user);
 
         log.info(
@@ -102,24 +115,50 @@ public class UserRoleServiceImpl
         return mapToResponse(savedUserRole);
     }
 
-//    @Override
-//    public Page<UserRoleResponseDTO> getAllUserRoles(
-//            Integer page,
-//            Integer size
-//    ) {
-//
-//        Pageable pageable =
-//                PaginationUtil.createPageable(
-//                        page,
-//                        size,
-//                        Sort.by("id").ascending()
-//                );
-//
-//        return userRoleRepository
-//                .findAll(pageable)
-//                .map(this::mapToResponse);
-//    }
+    @Override
+    public Page<UserRoleResponseDTO> getAllUserRoles(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
 
+        log.info(
+                "Fetch all user roles service started, page={}, size={}",
+                page,
+                size
+        );
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "user.firstName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<UserRole> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
+                );
+
+        Page<UserRoleResponseDTO> responseData =
+                userRoleRepository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::mapToResponse);
+
+        log.info(
+                "User roles fetched successfully, count={}",
+                responseData.getNumberOfElements()
+        );
+
+        return responseData;
+    }
     @Override
     @Transactional(readOnly = true)
     public List<UserRoleResponseDTO> getActiveUserRoles() {
@@ -127,7 +166,10 @@ public class UserRoleServiceImpl
         log.info("Fetch active user roles service started");
 
         List<UserRoleResponseDTO> response =
-                userRoleRepository.findByStatus(true)
+                userRoleRepository
+                        .findByStatusOrderByUserFirstNameAscUserLastNameAsc(
+                                true
+                        )
                         .stream()
                         .map(this::mapToResponse)
                         .toList();
@@ -164,7 +206,8 @@ public class UserRoleServiceImpl
                         );
 
         List<UserRoleResponseDTO> response =
-                userRoleRepository.findByUser(user)
+                userRoleRepository
+                        .findByUserOrderByRoleRoleNameAsc(user)
                         .stream()
                         .map(this::mapToResponse)
                         .toList();
@@ -243,24 +286,6 @@ public class UserRoleServiceImpl
                             );
                         }
                 );
-    }
-
-    private Role convertRoleMasterToEnum(
-            RoleMaster roleMaster
-    ) {
-
-        try {
-            return Role.valueOf(roleMaster.getRoleName());
-        } catch (IllegalArgumentException ex) {
-            log.warn(
-                    "Role conversion failed because role is not configured in application, roleName={}",
-                    roleMaster.getRoleName()
-            );
-
-            throw new InvalidRequestException(
-                    "Role is not configured in application"
-            );
-        }
     }
 
     private UserRoleResponseDTO mapToResponse(

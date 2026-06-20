@@ -64,6 +64,14 @@ public class LoginHistory {
     private String ipAddress;
 
     @Column(
+            name =
+                    "mac_address",
+            length =
+                    50
+    )
+    private String macAddress;
+
+    @Column(
             name = "latitude"
     )
     private Double latitude;

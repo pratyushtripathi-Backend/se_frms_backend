@@ -3,6 +3,8 @@ package com.se_frms.auth.service;
 import com.se_frms.auth.dto.LoginHistoryResponseDTO;
 import com.se_frms.auth.model.LoginHistory;
 import com.se_frms.auth.repository.LoginHistoryRepository;
+import com.se_frms.common.security.XssUtil;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,9 +12,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.lang.Integer;
 
 @Slf4j
@@ -21,13 +28,34 @@ import java.lang.Integer;
 public class LoginHistoryServiceImpl
         implements LoginHistoryService {
 
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("userId", "user.id"),
+                    Map.entry("email", "user.email"),
+                    Map.entry("firstName", "user.firstName"),
+                    Map.entry("lastName", "user.lastName"),
+                    Map.entry("loginDate", "loginDate"),
+                    Map.entry("loginTime", "loginTime"),
+                    Map.entry("ipAddress", "ipAddress"),
+                    Map.entry("macAddress", "macAddress"),
+                    Map.entry("latitude", "latitude"),
+                    Map.entry("longitude", "longitude"),
+                    Map.entry("url", "url"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy.id"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
+
     private final LoginHistoryRepository loginHistoryRepository;
 
     @Override
     public void saveLoginHistory(
             User user,
             HttpServletRequest request,
-            Boolean status
+            Boolean status,
+            String macAddress
     ) {
 
         log.info(
@@ -41,6 +69,12 @@ public class LoginHistoryServiceImpl
                         request
                 );
 
+        String resolvedMacAddress =
+                extractMacAddress(
+                        macAddress,
+                        request
+                );
+
         LoginHistory loginHistory =
                 LoginHistory
                         .builder()
@@ -49,6 +83,9 @@ public class LoginHistoryServiceImpl
                         )
                         .ipAddress(
                                 ipAddress
+                        )
+                        .macAddress(
+                                resolvedMacAddress
                         )
                         .latitude(
                                 null
@@ -81,6 +118,45 @@ public class LoginHistoryServiceImpl
         );
     }
 
+    private String extractMacAddress(
+            String macAddress,
+            HttpServletRequest request
+    ) {
+
+        String resolvedMacAddress =
+                macAddress;
+
+        if (resolvedMacAddress == null || resolvedMacAddress.isBlank()) {
+            resolvedMacAddress =
+                    request.getHeader(
+                            "X-Mac-Address"
+                    );
+        }
+
+        if (resolvedMacAddress == null || resolvedMacAddress.isBlank()) {
+            resolvedMacAddress =
+                    request.getHeader(
+                            "X-Device-Mac"
+                    );
+        }
+
+        if (resolvedMacAddress == null || resolvedMacAddress.isBlank()) {
+            resolvedMacAddress =
+                    request.getHeader(
+                            "Mac-Address"
+                    );
+        }
+
+        if (resolvedMacAddress == null || resolvedMacAddress.isBlank()) {
+            return null;
+        }
+
+        return XssUtil
+                .clean(
+                        resolvedMacAddress.trim()
+                );
+    }
+
     private String extractIpAddress(
             HttpServletRequest request
     ) {
@@ -110,9 +186,12 @@ public class LoginHistoryServiceImpl
     }
 
     @Override
-    public List<LoginHistoryResponseDTO>
+    public Page<LoginHistoryResponseDTO>
     getLoginHistory(
-            User user
+            User user,
+            int page,
+            int size,
+            Map<String, String> filters
     ) {
 
         log.info(
@@ -120,29 +199,54 @@ public class LoginHistoryServiceImpl
                 user.getId()
         );
 
-        List<LoginHistoryResponseDTO> response =
-                loginHistoryRepository
-                        .findByUserOrderByCreatedDateDesc(
-                                user
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "createdDate",
+                        Sort.Direction.DESC
+                );
+
+        Specification<LoginHistory> specification =
+                DynamicFilterSpecification
+                        .<LoginHistory>equal(
+                                "user.id",
+                                user.getId()
                         )
-                        .stream()
-                        .map(this::mapToDTO)
-                        .toList();
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        filters,
+                                        FILTER_FIELDS
+                                )
+                        );
+
+        Page<LoginHistoryResponseDTO> response =
+                loginHistoryRepository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::mapToDTO);
 
         log.info(
                 "Login history fetched successfully, userId={}, count={}",
                 user.getId(),
-                response.size()
+                response.getNumberOfElements()
         );
 
         return response;
     }
 
     @Override
-    public List<LoginHistoryResponseDTO>
+    public Page<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
 
-            Integer userId
+            Integer userId,
+            int page,
+            int size,
+            Map<String, String> filters
 
     ) {
 
@@ -151,19 +255,41 @@ public class LoginHistoryServiceImpl
                 userId
         );
 
-        List<LoginHistoryResponseDTO> response =
-                loginHistoryRepository
-                        .findByUserIdOrderByCreatedDateDesc(
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "createdDate",
+                        Sort.Direction.DESC
+                );
+
+        Specification<LoginHistory> specification =
+                DynamicFilterSpecification
+                        .<LoginHistory>equal(
+                                "user.id",
                                 userId
                         )
-                        .stream()
-                        .map(this::mapToDTO)
-                        .toList();
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        filters,
+                                        FILTER_FIELDS
+                                )
+                        );
+
+        Page<LoginHistoryResponseDTO> response =
+                loginHistoryRepository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::mapToDTO);
 
         log.info(
                 "Login history by userId fetched successfully, userId={}, count={}",
                 userId,
-                response.size()
+                response.getNumberOfElements()
         );
 
         return response;
@@ -193,6 +319,9 @@ public class LoginHistoryServiceImpl
                 )
                 .ipAddress(
                         history.getIpAddress()
+                )
+                .macAddress(
+                        history.getMacAddress()
                 )
                 .latitude(
                         history.getLatitude()

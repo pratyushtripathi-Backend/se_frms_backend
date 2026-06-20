@@ -16,15 +16,19 @@ import com.se_frms.common.security.XssUtil;
 import com.se_frms.mail.service.MailService;
 import com.se_frms.passwordreset.model.PasswordResetToken;
 import com.se_frms.passwordreset.repository.PasswordResetTokenRepository;
-import com.se_frms.user.enums.Role;
+import com.se_frms.roleMaster.model.RoleMaster;
+import com.se_frms.roleMaster.repository.RoleMasterRepository;
 import com.se_frms.user.exception.InvalidCredentialsException;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
+import com.se_frms.userRole.model.UserRole;
+import com.se_frms.userRole.repository.UserRoleRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.sms.service.SmsService;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.lang.Integer;
 import java.util.Random;
 
@@ -42,6 +46,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
+
+    private static final String EMPLOYEE_ROLE_NAME = "EMPLOYEE";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -53,6 +59,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final LoginHistoryService loginHistoryService;
     private final LoginAttemptService loginAttemptService;
+    private final RoleMasterRepository roleMasterRepository;
+    private final UserRoleRepository userRoleRepository;
     private final SmsService smsService;
 
     @Value("${sms.otp.return-in-response:false}")
@@ -68,7 +76,9 @@ public class AuthServiceImpl implements AuthService {
         validateDuplicateEmail(email);
         validateDuplicatePhone(phoneNumber);
 
-        Role role = validateAndAssignRole();
+        RoleMaster roleMaster = getDefaultEmployeeRoleMaster();
+        //Role role = validateAndAssignRole();
+
 
         String generatedPassword = PasswordGeneratorUtil.generateSecurePassword();
         String encryptedPassword = passwordEncoder.encode(generatedPassword);
@@ -79,12 +89,14 @@ public class AuthServiceImpl implements AuthService {
                 .email(XssUtil.clean(email))
                 .phoneNumber(XssUtil.clean(phoneNumber))
                 .passwordHash(encryptedPassword)
-                .userType("EMPLOYEE")
+                .userType(roleMaster.getRoleName())
                 .build();
 
         User savedUser = userRepository.save(user);
 
         log.info("User saved successfully, userId={}, role={}", savedUser.getId(), savedUser.getUserType());
+
+        saveUserRole(savedUser, roleMaster);
 
         mailService.sendLoginCredentials(
                 savedUser.getEmail(),
@@ -107,6 +119,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+
+
     private void validateDuplicateEmail(String email) {
 
         if (userRepository.existsByEmail(email)) {
@@ -123,16 +137,36 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private Role validateAndAssignRole() {
+    private RoleMaster getDefaultEmployeeRoleMaster() {
 
-        Role role = Role.EMPLOYEE;
+        return roleMasterRepository
+                .findByRoleNameAndStatus(
+                        EMPLOYEE_ROLE_NAME,
+                        true
+                )
+                .orElseThrow(() -> {
+                    log.warn("Registration failed because employee role is not configured or inactive");
+                    return new InvalidRoleException("Employee role is not configured");
+                });
+    }
 
-        if (role == Role.ADMIN) {
-            log.warn("Public ADMIN registration blocked");
-            throw new InvalidRoleException("Public ADMIN registration is not allowed");
-        }
+    private void saveUserRole(
+            User user,
+            RoleMaster roleMaster
+    ) {
 
-        return role;
+        UserRole userRole =
+                userRoleRepository
+                        .findByUserAndRole(user, roleMaster)
+                        .orElse(
+                                UserRole.builder()
+                                        .user(user)
+                                        .role(roleMaster)
+                                        .build()
+                        );
+
+        userRole.setStatus(true);
+        userRoleRepository.save(userRole);
     }
 
     @Override
@@ -305,19 +339,24 @@ public class AuthServiceImpl implements AuthService {
 
         if (!Boolean.TRUE.equals(user.getStatus())) {
 
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        if (Boolean.FALSE.equals(user.getStatus())) {
+
             loginAttemptService.saveAttempt(
                     user,
-                    email,
+                    request.getEmail(),
                     false,
-                    "USER_INACTIVE",
+                    "USER_BLOCKED",
                     request.getLatitude(),
                     request.getLongitude(),
                     httpRequest
             );
 
-            throw new InvalidCredentialsException(
-                    "User account is inactive"
-            );
+            log.warn("Login failed because user is blacklisted, userId={}", user.getId());
+
+            throw new InvalidCredentialsException("User is blocked. Please contact admin.");
         }
 
         boolean passwordMatches =
@@ -330,7 +369,7 @@ public class AuthServiceImpl implements AuthService {
 
             loginAttemptService.saveAttempt(
                     user,
-                    email,
+                    request.getEmail(),
                     false,
                     "INVALID_PASSWORD",
                     request.getLatitude(),
@@ -338,11 +377,12 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            throw new InvalidCredentialsException(
-                    "Invalid email or password"
-            );
+            log.warn("Login failed because password was invalid, userId={}", user.getId());
+
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
+        // SUCCESS LOGIN ATTEMPT
         String otp =
                 String.valueOf(
                         100000 + new Random().nextInt(900000)
@@ -354,25 +394,10 @@ public class AuthServiceImpl implements AuthService {
                         .otp(otp)
                         .expiryTime(LocalDateTime.now().plusMinutes(5))
                         .verified(false)
+                        .macAddress(cleanMacAddress(request.getMacAddress()))
                         .build();
 
         emailOtpRepository.save(emailOtp);
-
-        loginAttemptService.saveAttempt(
-                user,
-                email,
-                true,
-                "PASSWORD_VERIFIED_OTP_GENERATED",
-                request.getLatitude(),
-                request.getLongitude(),
-                httpRequest
-        );
-
-        log.info(
-                "Sending login OTP SMS, userId={}, mobile={}",
-                user.getId(),
-                maskPhoneNumber(user.getPhoneNumber())
-        );
 
         smsService.sendLoginOtp(
                 user.getPhoneNumber(),
@@ -391,114 +416,10 @@ public class AuthServiceImpl implements AuthService {
                 .otp(returnOtpInResponse ? otp : null)
                 .otpRequired(true)
                 .build();
+
     }
 
-//    @Override
-//    public LoginResponseDTO verifyOtp(
-//            VerifyOtpRequestDTO request,
-//            HttpServletRequest httpRequest
-//    ) {
-//
-//        String email =
-//                request.getEmail().trim().toLowerCase();
-//
-//        User user =
-//                userRepository
-//                        .findByEmail(email)
-//                        .orElseThrow(
-//                                () -> new InvalidCredentialsException(
-//                                        "User not found"
-//                                )
-//                        );
-//
-//        EmailOtp emailOtp =
-//                emailOtpRepository
-//                        .findTopByEmailAndVerifiedFalseOrderByIdDesc(email)
-//                        .orElseThrow(() -> {
-//
-//                            loginAttemptService.saveAttempt(
-//                                    user,
-//                                    email,
-//                                    false,
-//                                    "OTP_NOT_FOUND",
-//                                    null,
-//                                    null,
-//                                    httpRequest
-//                            );
-//
-//                            return new InvalidTokenException(
-//                                    "OTP not found"
-//                            );
-//                        });
-//
-//        if (emailOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
-//
-//            emailOtp.setVerified(true);
-//            emailOtpRepository.save(emailOtp);
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    email,
-//                    false,
-//                    "OTP_EXPIRED",
-//                    null,
-//                    null,
-//                    httpRequest
-//            );
-//
-//            throw new TokenExpiredException("OTP expired");
-//        }
-//
-//        if (!emailOtp.getOtp().equals(request.getOtp())) {
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    email,
-//                    false,
-//                    "INVALID_OTP",
-//                    null,
-//                    null,
-//                    httpRequest
-//            );
-//
-//            throw new InvalidTokenException("Invalid OTP");
-//        }
-//
-//        emailOtp.setVerified(true);
-//        emailOtpRepository.save(emailOtp);
-//
-//        String token =
-//                jwtUtil.generateToken(
-//                        user.getEmail(),
-//                        user.getUserType()
-//                );
-//
-//        sessionStoreService.createSession(user, token);
-//
-//        loginAttemptService.saveAttempt(
-//                user,
-//                email,
-//                true,
-//                "LOGIN_SUCCESS",
-//                null,
-//                null,
-//                httpRequest
-//        );
-//
-//        loginHistoryService.saveLoginHistory(
-//                user,
-//                httpRequest,
-//                true
-//        );
-//
-//        return LoginResponseDTO
-//                .builder()
-//                .userId(user.getId())
-//                .email(user.getEmail())
-//                .role(user.getUserType())
-//                .token(token)
-//                .build();
-//    }
+
 
     @Override
     public LoginResponseDTO verifyOtp(
@@ -595,11 +516,13 @@ public class AuthServiceImpl implements AuthService {
         emailOtp.setVerified(true);
         emailOtpRepository.save(emailOtp);
 
-        String token =
-                jwtUtil.generateToken(
-                        user.getEmail(),
-                        user.getUserType()
-                );
+
+
+
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getUserType()
+        );
 
         sessionStoreService.createSession(user, token);
 
@@ -616,8 +539,16 @@ public class AuthServiceImpl implements AuthService {
         loginHistoryService.saveLoginHistory(
                 user,
                 httpRequest,
-                true
+                true,
+                resolveMacAddress(
+                        request.getMacAddress(),
+                        emailOtp.getMacAddress()
+                )
         );
+
+
+
+
 
         return LoginResponseDTO
                 .builder()
@@ -627,6 +558,8 @@ public class AuthServiceImpl implements AuthService {
                 .token(token)
                 .build();
     }
+
+
 
 
     @Override
@@ -648,7 +581,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<LoginHistoryResponseDTO> getLoginHistory() {
+    public Page<LoginHistoryResponseDTO> getLoginHistory(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
 
         log.info("Get login history service started");
 
@@ -666,24 +603,39 @@ public class AuthServiceImpl implements AuthService {
                             return new RuntimeException("User not found");
                         });
 
-        List<LoginHistoryResponseDTO> response =
-                loginHistoryService.getLoginHistory(user);
+        Page<LoginHistoryResponseDTO> response =
+                loginHistoryService.getLoginHistory(
+                        user,
+                        page,
+                        size,
+                        filters
+                );
 
-        log.info("Login history fetched successfully, userId={}, count={}", user.getId(), response.size());
+        log.info("Login history fetched successfully, userId={}, count={}", user.getId(), response.getNumberOfElements());
 
         return response;
     }
 
     @Override
-    public List<LoginHistoryResponseDTO> getLoginHistoryByUserId(   Integer userId) {
+    public Page<LoginHistoryResponseDTO> getLoginHistoryByUserId(
+            Integer userId,
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
 
 
         log.info("Get login history by userId service started, userId={}", userId);
 
-        List<LoginHistoryResponseDTO> response =
-                loginHistoryService.getLoginHistoryByUserId(userId);
+        Page<LoginHistoryResponseDTO> response =
+                loginHistoryService.getLoginHistoryByUserId(
+                        userId,
+                        page,
+                        size,
+                        filters
+                );
 
-        log.info("Login history by userId fetched successfully, userId={}, count={}", userId, response.size());
+        log.info("Login history by userId fetched successfully, userId={}, count={}", userId, response.getNumberOfElements());
 
         return response;
     }
@@ -703,5 +655,31 @@ public class AuthServiceImpl implements AuthService {
                 + phoneNumber.substring(
                 phoneNumber.length() - 4
         );
+    }
+
+    private String resolveMacAddress(
+            String requestMacAddress,
+            String storedMacAddress
+    ) {
+
+        String cleanedRequestMacAddress =
+                cleanMacAddress(requestMacAddress);
+
+        if (cleanedRequestMacAddress != null) {
+            return cleanedRequestMacAddress;
+        }
+
+        return cleanMacAddress(storedMacAddress);
+    }
+
+    private String cleanMacAddress(
+            String macAddress
+    ) {
+
+        if (macAddress == null || macAddress.isBlank()) {
+            return null;
+        }
+
+        return XssUtil.clean(macAddress.trim());
     }
 }

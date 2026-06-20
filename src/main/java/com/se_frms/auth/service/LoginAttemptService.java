@@ -6,9 +6,11 @@ import com.se_frms.auth.dto.LoginAttemptResponseDTO;
 import com.se_frms.user.model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.lang.Integer;
 
 public interface LoginAttemptService {
@@ -30,10 +32,19 @@ public interface LoginAttemptService {
             HttpServletRequest request
     );
 
-    List<LoginAttemptResponseDTO>
-    getAllLoginAttempts();
+    Page<LoginAttemptResponseDTO>
+    getAllLoginAttempts(
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 
 
-    List<LoginAttemptResponseDTO>
-    getLoginAttemptsByUserId(Integer userId);
+    Page<LoginAttemptResponseDTO>
+    getLoginAttemptsByUserId(
+            Integer userId,
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 }

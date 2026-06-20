@@ -2,7 +2,6 @@ package com.se_frms.admin.loader;
 
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
-import com.se_frms.user.enums.Role;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 import com.se_frms.userRole.model.UserRole;
@@ -12,12 +11,21 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class AdminDataLoader
         implements CommandLineRunner {
+
+    private static final String ADMIN_ROLE_NAME = "ADMIN";
+
+    private static final List<String> DEFAULT_ROLE_NAMES =
+            List.of(
+                    ADMIN_ROLE_NAME,
+                    "EMPLOYEE",
+                    "USER"
+            );
 
     private final UserRepository userRepository;
 
@@ -39,7 +47,7 @@ public class AdminDataLoader
                 .orElseGet(this::createAdminUser);
 
         RoleMaster adminRole = roleMasterRepository
-                .findByRoleNameAndStatus(Role.ADMIN.name(), true)
+                .findByRoleNameAndStatus(ADMIN_ROLE_NAME, true)
                 .orElseThrow();
 
         UserRole userRole = userRoleRepository
@@ -56,13 +64,13 @@ public class AdminDataLoader
     }
 
     private void seedRoles() {
-        Arrays.stream(Role.values())
-                .forEach(role -> {
+        DEFAULT_ROLE_NAMES
+                .forEach(roleName -> {
                     RoleMaster roleMaster = roleMasterRepository
-                            .findByRoleName(role.name())
+                            .findByRoleName(roleName)
                             .orElse(
                                     RoleMaster.builder()
-                                            .roleName(role.name())
+                                            .roleName(roleName)
                                             .build()
                             );
 
@@ -83,7 +91,7 @@ public class AdminDataLoader
                                         "Admin@123"
                                 )
                         )
-                        .userType(Role.ADMIN.name())
+                        .userType(ADMIN_ROLE_NAME)
                         .status(true)
                         .build();
 

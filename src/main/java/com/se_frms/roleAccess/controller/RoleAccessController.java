@@ -5,7 +5,9 @@ import com.se_frms.roleAccess.dto.RoleAccessRequestDTO;
 import com.se_frms.roleAccess.dto.RoleAccessResponseDTO;
 import com.se_frms.roleAccess.service.RoleAccessService;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,14 +39,27 @@ public class RoleAccessController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<List<RoleAccessResponseDTO>>> getAll() {
+    public ResponseEntity<AuthResponseDTO<Page<RoleAccessResponseDTO>>> getAll(
+            @RequestParam(defaultValue = "0")
+            int page,
 
-        List<RoleAccessResponseDTO> responseData =
-                service.getAll();
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
+    ) {
+
+        Page<RoleAccessResponseDTO> responseData =
+                service.getAll(
+                        page,
+                        size,
+                        filters
+                );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<List<RoleAccessResponseDTO>>builder()
+                        .<Page<RoleAccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role access fetched successfully")

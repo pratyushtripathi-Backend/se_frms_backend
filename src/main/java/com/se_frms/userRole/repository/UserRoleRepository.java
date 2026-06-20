@@ -3,13 +3,17 @@ package com.se_frms.userRole.repository;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.user.model.User;
 import com.se_frms.userRole.model.UserRole;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserRoleRepository
-        extends JpaRepository<UserRole, Integer> {
+        extends JpaRepository<UserRole, Integer>,
+        JpaSpecificationExecutor<UserRole> {
 
     Optional<UserRole> findByUserAndRole(
             User user,
@@ -18,10 +22,20 @@ public interface UserRoleRepository
 
     List<UserRole> findByUser(User user);
 
+    List<UserRole> findByUserOrderByRoleRoleNameAsc(
+            User user
+    );
+
     List<UserRole> findByUserAndStatus(
             User user,
             Boolean status
     );
 
-    List<UserRole> findByStatus(Boolean status);
+    Page<UserRole> findAllByOrderByUserFirstNameAscUserLastNameAsc(
+            Pageable pageable
+    );
+
+    List<UserRole> findByStatusOrderByUserFirstNameAscUserLastNameAsc(
+            Boolean status
+    );
 }

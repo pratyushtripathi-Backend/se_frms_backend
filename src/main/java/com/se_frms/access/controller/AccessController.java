@@ -8,12 +8,13 @@ import com.se_frms.auth.dto.AuthResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -55,22 +56,39 @@ public class AccessController {
     }
 
     @GetMapping("/get-access-list")
-    public ResponseEntity<AuthResponseDTO<List<AccessResponseDTO>>>
-    getAll() {
+    public ResponseEntity<AuthResponseDTO<Page<AccessResponseDTO>>>
+    getAll(
+            @RequestParam(defaultValue = "0")
+            int page,
 
-        log.info("Fetch all access request received");
+            @RequestParam(defaultValue = "10")
+            int size,
 
-        List<AccessResponseDTO> response =
-                accessService.getAll();
+            @RequestParam
+            Map<String, String> filters
+    ) {
+
+        log.info(
+                "Fetch all access request received, page={}, size={}",
+                page,
+                size
+        );
+
+        Page<AccessResponseDTO> response =
+                accessService.getAll(
+                        page,
+                        size,
+                        filters
+                );
 
         log.info(
                 "Access list fetched successfully, count={}",
-                response.size()
+                response.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<List<AccessResponseDTO>>builder()
+                        .<Page<AccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Access list fetched successfully")

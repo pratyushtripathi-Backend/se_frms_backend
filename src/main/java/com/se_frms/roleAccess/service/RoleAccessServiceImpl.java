@@ -2,6 +2,7 @@ package com.se_frms.roleAccess.service;
 
 import com.se_frms.access.model.AccessMaster;
 import com.se_frms.access.repository.AccessMasterRepository;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.roleAccess.dto.RoleAccessRequestDTO;
 import com.se_frms.roleAccess.dto.RoleAccessResponseDTO;
 import com.se_frms.roleAccess.model.RoleAccess;
@@ -11,15 +12,32 @@ import com.se_frms.roleMaster.repository.RoleMasterRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class RoleAccessServiceImpl
         implements RoleAccessService {
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("roleId", "role.roleId"),
+                    Map.entry("roleName", "role.roleName"),
+                    Map.entry("accessId", "access.id"),
+                    Map.entry("accessName", "access.accessName"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final RoleAccessRepository repository;
 
@@ -132,16 +150,40 @@ public class RoleAccessServiceImpl
     }
 
     @Override
-    public List<RoleAccessResponseDTO> getAll() {
+    public Page<RoleAccessResponseDTO> getAll(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "role.roleName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<RoleAccess> specification =
+                DynamicFilterSpecification
+                        .<RoleAccess>equal(
+                                "status",
+                                true
+                        )
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        filters,
+                                        FILTER_FIELDS
+                                )
+                        );
 
         return repository
 
-                .findAll()
-
-                .stream()
-
-                .filter(
-                        RoleAccess::getStatus
+                .findAll(
+                        specification,
+                        pageable
                 )
 
                 .map(
@@ -182,9 +224,7 @@ public class RoleAccessServiceImpl
 
                                         .build()
 
-                )
-
-                .toList();
+                );
 
     }
 
@@ -199,7 +239,7 @@ public class RoleAccessServiceImpl
 
                 repository
 
-                        .findByRoleRoleIdAndStatusTrue(
+                        .findByRoleRoleIdAndStatusTrueOrderByAccessAccessNameAsc(
                                 roleId
                         );
 

@@ -4,6 +4,7 @@ import com.se_frms.roleMaster.dto.RoleMasterRequestDTO;
 import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import org.springframework.data.domain.Page;
 import java.util.List;
+import java.util.Map;
 
 public interface RoleMasterService {
 
@@ -11,9 +12,11 @@ public interface RoleMasterService {
 
 
     Page<RoleMasterResponseDTO> getAllRoles(
-            Integer page,
-            Integer size
+        int page,
+        int size,
+        Map<String, String> filters
     );
+
     List<RoleMasterResponseDTO> getActiveRoles();
 
     RoleMasterResponseDTO getRoleById(Integer roleId);

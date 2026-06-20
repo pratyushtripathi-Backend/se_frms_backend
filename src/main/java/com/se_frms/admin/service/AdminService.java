@@ -6,8 +6,10 @@ import com.se_frms.admin.dto.EmployeeSummaryDTO;
 import com.se_frms.admin.dto.UpdateEmployeePatchRequest;
 import com.se_frms.admin.dto.UpdateEmployeeRequest;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AdminService {
 
@@ -20,6 +22,17 @@ public interface AdminService {
     );
 
     List<EmployeeSummaryDTO> getAllEmployees();
+
+    Page<EmployeeSummaryDTO> getAllEmployees(
+            int page,
+            int size
+    );
+
+    Page<EmployeeSummaryDTO> getAllEmployees(
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 
     void deleteEmployee(
             Integer employeeId

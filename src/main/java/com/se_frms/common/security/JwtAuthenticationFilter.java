@@ -122,6 +122,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (Boolean.FALSE.equals(user.getStatus())) {
+
+            log.warn("Authentication failed because user is blacklisted, userId={}, uri={}", user.getId(), uri);
+
+            writeErrorResponse(
+                    response,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "User is blocked. Please contact admin."
+            );
+
+            return;
+        }
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         UsernamePasswordAuthenticationToken authentication =

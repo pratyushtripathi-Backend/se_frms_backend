@@ -7,7 +7,7 @@ import com.se_frms.userRole.dto.UserRoleStatusRequestDTO;
 import com.se_frms.userRole.service.UserRoleService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
-import com.se_frms.common.dto.PagedResponseDTO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/user-roles")
@@ -52,32 +53,47 @@ public class UserRoleController {
                 );
     }
 
-//    @GetMapping
-//    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<UserRoleResponseDTO>>>
-//    getAllUserRoles(
-//            @RequestParam(required = false)
-//            Integer page,
-//
-//            @RequestParam(required = false)
-//            Integer size
-//    ) {
-//
-//        Page<UserRoleResponseDTO> pageData =
-//                userRoleService.getAllUserRoles(page, size);
-//
-//        PagedResponseDTO<UserRoleResponseDTO> responseData =
-//                PagedResponseDTO.from(pageData);
-//
-//        return ResponseEntity.ok(
-//                AuthResponseDTO
-//                        .<PagedResponseDTO<UserRoleResponseDTO>>builder()
-//                        .status(true)
-//                        .responseCode(200)
-//                        .responseMessage("User roles fetched successfully")
-//                        .responseData(responseData)
-//                        .build()
-//        );
-//    }
+    @GetMapping
+    public ResponseEntity<AuthResponseDTO<Page<UserRoleResponseDTO>>>
+    getAllUserRoles(
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
+    ) {
+
+        log.info(
+                "Fetch all user roles request received, page={}, size={}",
+                page,
+                size
+        );
+
+        Page<UserRoleResponseDTO> responseData =
+                userRoleService.getAllUserRoles(
+                        page,
+                        size,
+                        filters
+                );
+
+        log.info(
+                "User roles fetched successfully, count={}",
+                responseData.getNumberOfElements()
+        );
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<Page<UserRoleResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("User roles fetched successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
 
     @GetMapping("/active")
     public ResponseEntity<AuthResponseDTO<List<UserRoleResponseDTO>>>

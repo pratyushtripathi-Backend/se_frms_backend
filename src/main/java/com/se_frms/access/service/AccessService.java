@@ -3,7 +3,8 @@ package com.se_frms.access.service;
 import com.se_frms.access.dto.AccessRequestDTO;
 import com.se_frms.access.dto.AccessResponseDTO;
 
-import java.util.List;
+import java.util.Map;
+import org.springframework.data.domain.Page;
 
 public interface AccessService {
 
@@ -12,8 +13,12 @@ public interface AccessService {
             AccessRequestDTO request
     );
 
-    List<AccessResponseDTO>
-    getAll();
+    Page<AccessResponseDTO>
+    getAll(
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 
     AccessResponseDTO getById(
             Integer id

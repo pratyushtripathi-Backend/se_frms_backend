@@ -1,6 +1,8 @@
 package com.se_frms.emailNotification.service;
 
 import com.se_frms.auth.exception.InvalidRequestException;
+import com.se_frms.common.util.DynamicFilterSpecification;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
 import com.se_frms.emailNotification.model.EmailNotificationTemplate;
@@ -9,9 +11,10 @@ import com.se_frms.common.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import com.se_frms.common.util.PaginationUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,19 @@ import java.util.Map;
 @Transactional
 public class EmailNotificationTemplateServiceImpl
         implements EmailNotificationTemplateService {
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("templateCode", "templateCode"),
+                    Map.entry("channel", "channel"),
+                    Map.entry("subject", "subject"),
+                    Map.entry("body", "body"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final EmailNotificationTemplateRepository repository;
     private final CurrentUserService currentUserService;
@@ -183,20 +199,47 @@ public class EmailNotificationTemplateServiceImpl
 
     @Override
     public Page<EmailNotificationTemplateResponseDTO> getAllTemplates(
-            Integer page,
-            Integer size
+            int page,
+            int size,
+            Map<String, String> filters
     ) {
 
+        log.info(
+                "Fetch all email notification templates service started, page={}, size={}",
+                page,
+                size
+        );
+
         Pageable pageable =
-                PaginationUtil.createPageable(
+                DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        Sort.by("id").ascending()
+                        filters,
+                        FILTER_FIELDS,
+                        "templateCode",
+                        Sort.Direction.ASC
                 );
 
-        return repository
-                .findAll(pageable)
-                .map(this::mapToResponse);
+        Specification<EmailNotificationTemplate> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
+                );
+
+        Page<EmailNotificationTemplateResponseDTO> responseData =
+                repository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::mapToResponse);
+
+        log.info(
+                "Email notification templates fetched successfully, count={}",
+                responseData.getNumberOfElements()
+        );
+
+        return responseData;
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.se_frms.roleAccess.dto.RoleAccessRequestDTO;
 import com.se_frms.roleAccess.dto.RoleAccessResponseDTO;
 
 import java.util.List;
+import java.util.Map;
+import org.springframework.data.domain.Page;
 
 public interface RoleAccessService {
 
@@ -11,7 +13,11 @@ public interface RoleAccessService {
             RoleAccessRequestDTO request
     );
 
-    List<RoleAccessResponseDTO> getAll();
+    Page<RoleAccessResponseDTO> getAll(
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 
     RoleAccessResponseDTO getByRole(
 

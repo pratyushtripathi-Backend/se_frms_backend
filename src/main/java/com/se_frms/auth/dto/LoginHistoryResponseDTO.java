@@ -23,6 +23,8 @@ public class LoginHistoryResponseDTO {
 
     private String ipAddress;
 
+    private String macAddress;
+
     private Double latitude;
 
     private Double longitude;

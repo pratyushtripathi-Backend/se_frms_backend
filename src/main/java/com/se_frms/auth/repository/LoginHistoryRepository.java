@@ -5,6 +5,7 @@ import com.se_frms.auth.model.LoginHistory;
 
 import com.se_frms.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,8 @@ public interface LoginHistoryRepository
         extends JpaRepository<
         LoginHistory,
         Long
-        > {
+        >,
+        JpaSpecificationExecutor<LoginHistory> {
 
     List<LoginHistory> findByUserOrderByCreatedDateDesc(
             User user

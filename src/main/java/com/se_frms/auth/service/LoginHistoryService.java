@@ -7,8 +7,10 @@ import com.se_frms.auth.model.LoginHistory;
 import com.se_frms.user.model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 import java.lang.Integer;
 
 public interface LoginHistoryService {
@@ -19,16 +21,24 @@ public interface LoginHistoryService {
 
             HttpServletRequest request,
 
-            Boolean status
+            Boolean status,
+
+            String macAddress
     );
 
-    List<LoginHistoryResponseDTO>
+    Page<LoginHistoryResponseDTO>
     getLoginHistory(
-            User user
+            User user,
+            int page,
+            int size,
+            Map<String, String> filters
     );
 
-    List<LoginHistoryResponseDTO>
+    Page<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
-            Integer userId
+            Integer userId,
+            int page,
+            int size,
+            Map<String, String> filters
     );
 }
