@@ -11,10 +11,11 @@ public interface UserRoleService {
     UserRoleResponseDTO assignRole(UserRoleRequestDTO request);
 
 
-    Page<UserRoleResponseDTO> getAllUserRoles(
-            Integer page,
-            Integer size
-    );
+//    Page<UserRoleResponseDTO> getAllUserRoles(
+//            Integer page,
+//            Integer size
+//    );
+
     List<UserRoleResponseDTO> getActiveUserRoles();
 
     List<UserRoleResponseDTO> getRolesByUser(Integer userId);

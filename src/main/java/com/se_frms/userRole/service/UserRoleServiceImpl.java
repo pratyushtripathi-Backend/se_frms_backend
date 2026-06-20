@@ -102,23 +102,23 @@ public class UserRoleServiceImpl
         return mapToResponse(savedUserRole);
     }
 
-    @Override
-    public Page<UserRoleResponseDTO> getAllUserRoles(
-            Integer page,
-            Integer size
-    ) {
-
-        Pageable pageable =
-                PaginationUtil.createPageable(
-                        page,
-                        size,
-                        Sort.by("id").ascending()
-                );
-
-        return userRoleRepository
-                .findAll(pageable)
-                .map(this::mapToResponse);
-    }
+//    @Override
+//    public Page<UserRoleResponseDTO> getAllUserRoles(
+//            Integer page,
+//            Integer size
+//    ) {
+//
+//        Pageable pageable =
+//                PaginationUtil.createPageable(
+//                        page,
+//                        size,
+//                        Sort.by("id").ascending()
+//                );
+//
+//        return userRoleRepository
+//                .findAll(pageable)
+//                .map(this::mapToResponse);
+//    }
 
     @Override
     @Transactional(readOnly = true)

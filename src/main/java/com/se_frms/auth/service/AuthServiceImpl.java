@@ -29,7 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.se_frms.sms.service.SmsService;
+import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -52,7 +53,10 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final LoginHistoryService loginHistoryService;
     private final LoginAttemptService loginAttemptService;
+    private final SmsService smsService;
 
+    @Value("${sms.otp.return-in-response:false}")
+    private boolean returnOtpInResponse;
     @Override
     public RegistrationResponseDTO registerUser(UserRegistrationRequest request) {
 
@@ -272,7 +276,10 @@ public class AuthServiceImpl implements AuthService {
     ) {
 
         String email =
-                request.getEmail().trim().toLowerCase();
+                XssUtil.clean(request.getEmail())
+                        .trim()
+                        .toLowerCase();
+        log.info("Sanitized email={}", email);
 
         User user =
                 userRepository
@@ -361,17 +368,137 @@ public class AuthServiceImpl implements AuthService {
                 httpRequest
         );
 
+        log.info(
+                "Sending login OTP SMS, userId={}, mobile={}",
+                user.getId(),
+                maskPhoneNumber(user.getPhoneNumber())
+        );
 
-        // smsService.sendOtp(user.getPhoneNumber(), otp);
+        smsService.sendLoginOtp(
+                user.getPhoneNumber(),
+                otp
+        );
+
+        log.info(
+                "Login OTP SMS service completed, userId={}",
+                user.getId()
+        );
 
         return LoginOtpResponseDTO
                 .builder()
                 .email(user.getEmail())
                 .maskedPhoneNumber(maskPhoneNumber(user.getPhoneNumber()))
-                .otp(otp)
+                .otp(returnOtpInResponse ? otp : null)
                 .otpRequired(true)
                 .build();
     }
+
+//    @Override
+//    public LoginResponseDTO verifyOtp(
+//            VerifyOtpRequestDTO request,
+//            HttpServletRequest httpRequest
+//    ) {
+//
+//        String email =
+//                request.getEmail().trim().toLowerCase();
+//
+//        User user =
+//                userRepository
+//                        .findByEmail(email)
+//                        .orElseThrow(
+//                                () -> new InvalidCredentialsException(
+//                                        "User not found"
+//                                )
+//                        );
+//
+//        EmailOtp emailOtp =
+//                emailOtpRepository
+//                        .findTopByEmailAndVerifiedFalseOrderByIdDesc(email)
+//                        .orElseThrow(() -> {
+//
+//                            loginAttemptService.saveAttempt(
+//                                    user,
+//                                    email,
+//                                    false,
+//                                    "OTP_NOT_FOUND",
+//                                    null,
+//                                    null,
+//                                    httpRequest
+//                            );
+//
+//                            return new InvalidTokenException(
+//                                    "OTP not found"
+//                            );
+//                        });
+//
+//        if (emailOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
+//
+//            emailOtp.setVerified(true);
+//            emailOtpRepository.save(emailOtp);
+//
+//            loginAttemptService.saveAttempt(
+//                    user,
+//                    email,
+//                    false,
+//                    "OTP_EXPIRED",
+//                    null,
+//                    null,
+//                    httpRequest
+//            );
+//
+//            throw new TokenExpiredException("OTP expired");
+//        }
+//
+//        if (!emailOtp.getOtp().equals(request.getOtp())) {
+//
+//            loginAttemptService.saveAttempt(
+//                    user,
+//                    email,
+//                    false,
+//                    "INVALID_OTP",
+//                    null,
+//                    null,
+//                    httpRequest
+//            );
+//
+//            throw new InvalidTokenException("Invalid OTP");
+//        }
+//
+//        emailOtp.setVerified(true);
+//        emailOtpRepository.save(emailOtp);
+//
+//        String token =
+//                jwtUtil.generateToken(
+//                        user.getEmail(),
+//                        user.getUserType()
+//                );
+//
+//        sessionStoreService.createSession(user, token);
+//
+//        loginAttemptService.saveAttempt(
+//                user,
+//                email,
+//                true,
+//                "LOGIN_SUCCESS",
+//                null,
+//                null,
+//                httpRequest
+//        );
+//
+//        loginHistoryService.saveLoginHistory(
+//                user,
+//                httpRequest,
+//                true
+//        );
+//
+//        return LoginResponseDTO
+//                .builder()
+//                .userId(user.getId())
+//                .email(user.getEmail())
+//                .role(user.getUserType())
+//                .token(token)
+//                .build();
+//    }
 
     @Override
     public LoginResponseDTO verifyOtp(
@@ -393,7 +520,7 @@ public class AuthServiceImpl implements AuthService {
 
         EmailOtp emailOtp =
                 emailOtpRepository
-                        .findTopByEmailAndVerifiedFalseOrderByIdDesc(email)
+                        .findTopByEmailOrderByIdDesc(email)
                         .orElseThrow(() -> {
 
                             loginAttemptService.saveAttempt(
@@ -411,6 +538,23 @@ public class AuthServiceImpl implements AuthService {
                             );
                         });
 
+        if (Boolean.TRUE.equals(emailOtp.getVerified())) {
+
+            loginAttemptService.saveAttempt(
+                    user,
+                    email,
+                    false,
+                    "OTP_ALREADY_USED",
+                    null,
+                    null,
+                    httpRequest
+            );
+
+            throw new InvalidTokenException(
+                    "OTP already used"
+            );
+        }
+
         if (emailOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
 
             emailOtp.setVerified(true);
@@ -426,7 +570,9 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            throw new TokenExpiredException("OTP expired");
+            throw new TokenExpiredException(
+                    "OTP expired"
+            );
         }
 
         if (!emailOtp.getOtp().equals(request.getOtp())) {
@@ -441,7 +587,9 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            throw new InvalidTokenException("Invalid OTP");
+            throw new InvalidTokenException(
+                    "Invalid OTP"
+            );
         }
 
         emailOtp.setVerified(true);
@@ -479,6 +627,7 @@ public class AuthServiceImpl implements AuthService {
                 .token(token)
                 .build();
     }
+
 
     @Override
     public void logout(String token) {

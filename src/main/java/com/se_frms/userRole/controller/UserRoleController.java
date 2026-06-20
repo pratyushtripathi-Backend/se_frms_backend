@@ -52,32 +52,32 @@ public class UserRoleController {
                 );
     }
 
-    @GetMapping
-    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<UserRoleResponseDTO>>>
-    getAllUserRoles(
-            @RequestParam(required = false)
-            Integer page,
-
-            @RequestParam(required = false)
-            Integer size
-    ) {
-
-        Page<UserRoleResponseDTO> pageData =
-                userRoleService.getAllUserRoles(page, size);
-
-        PagedResponseDTO<UserRoleResponseDTO> responseData =
-                PagedResponseDTO.from(pageData);
-
-        return ResponseEntity.ok(
-                AuthResponseDTO
-                        .<PagedResponseDTO<UserRoleResponseDTO>>builder()
-                        .status(true)
-                        .responseCode(200)
-                        .responseMessage("User roles fetched successfully")
-                        .responseData(responseData)
-                        .build()
-        );
-    }
+//    @GetMapping
+//    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<UserRoleResponseDTO>>>
+//    getAllUserRoles(
+//            @RequestParam(required = false)
+//            Integer page,
+//
+//            @RequestParam(required = false)
+//            Integer size
+//    ) {
+//
+//        Page<UserRoleResponseDTO> pageData =
+//                userRoleService.getAllUserRoles(page, size);
+//
+//        PagedResponseDTO<UserRoleResponseDTO> responseData =
+//                PagedResponseDTO.from(pageData);
+//
+//        return ResponseEntity.ok(
+//                AuthResponseDTO
+//                        .<PagedResponseDTO<UserRoleResponseDTO>>builder()
+//                        .status(true)
+//                        .responseCode(200)
+//                        .responseMessage("User roles fetched successfully")
+//                        .responseData(responseData)
+//                        .build()
+//        );
+//    }
 
     @GetMapping("/active")
     public ResponseEntity<AuthResponseDTO<List<UserRoleResponseDTO>>>

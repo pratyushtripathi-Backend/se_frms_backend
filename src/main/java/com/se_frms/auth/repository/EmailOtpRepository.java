@@ -12,7 +12,4 @@ public interface EmailOtpRepository
             String email
     );
 
-    Optional<EmailOtp> findTopByEmailAndVerifiedFalseOrderByIdDesc(
-            String email
-    );
 }
