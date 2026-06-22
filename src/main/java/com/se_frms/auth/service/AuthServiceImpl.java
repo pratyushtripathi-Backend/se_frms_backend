@@ -35,7 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.sms.service.SmsService;
 import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.util.DigestUtils;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Locale;
 import java.util.Map;
 import java.lang.Integer;
@@ -170,43 +175,126 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void forgotPassword(ForgotPasswordRequest request) {
+    public void forgotPassword(
+            ForgotPasswordRequest request
+    ) {
 
-        log.info("Forgot password service started");
-
-        String token =
-                String.valueOf(Math.random());
-        User user = userRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() -> {
-                    log.warn("Forgot password failed because user was not found");
-                    return new InvalidRequestException("User not found");
-                });
-
-      //  String token = UUID.randomUUID().toString();
-
-        String resetLink =
-                "http://localhost:3000/reset-password?token=" + token;
-
-        PasswordResetToken resetToken = PasswordResetToken.builder()
-                .token(token)
-                .user(user)
-                .createdAt(LocalDateTime.now())
-                .used(false)
-                .expiryTime(LocalDateTime.now().plusMinutes(15))
-                .build();
-
-        passwordResetTokenRepository.save(resetToken);
-
-        log.info("Password reset token created, userId={}", user.getId());
-
-        mailService.sendPasswordResetMail(
-                user.getEmail(),
-                user.getFirstName(),
-                resetLink
+        log.info(
+                "Forgot password service started"
         );
 
-        log.info("Password reset mail triggered, userId={}", user.getId());
+        User user = userRepository
+
+                .findByEmail(
+                        request.getEmail()
+                )
+
+                .orElseThrow(
+
+                        () -> {
+
+                            log.warn(
+                                    "Forgot password failed because user was not found"
+                            );
+
+                            return new InvalidRequestException(
+                                    "User not found"
+                            );
+
+                        }
+
+                );
+
+        byte[] randomBytes =
+                new byte[32];
+
+        SecureRandom secureRandom =
+                new SecureRandom();
+
+        secureRandom.nextBytes(
+                randomBytes
+        );
+
+        String rawToken =
+
+                Base64
+
+                        .getUrlEncoder()
+
+                        .withoutPadding()
+
+                        .encodeToString(
+                                randomBytes
+                        );
+
+        String hashedToken =
+
+                DigestUtils
+                        .sha256Hex(
+                                rawToken
+                        );
+
+        String resetLink =
+
+                "http://localhost:3000/reset-password?token="
+                        + rawToken;
+
+        PasswordResetToken resetToken =
+
+                PasswordResetToken
+                        .builder()
+
+                        .token(
+                                hashedToken
+                        )
+
+                        .user(
+                                user
+                        )
+
+                        .createdAt(
+                                LocalDateTime.now()
+                        )
+
+                        .used(
+                                false
+                        )
+
+                        .expiryTime(
+                                LocalDateTime.now()
+                                        .plusMinutes(15)
+                        )
+
+                        .build();
+
+        passwordResetTokenRepository
+                .save(
+                        resetToken
+                );
+
+        log.info(
+                "Password reset token created, userId={}",
+                user.getId()
+        );
+
+        mailService.sendPasswordResetMail(
+
+                user.getEmail(),
+
+                user.getFirstName(),
+
+                resetLink
+
+        );
+
+        log.info(
+
+                "Password reset mail triggered, userId={}",
+
+                user.getId()
+
+        );
+
     }
 
     @Override
@@ -221,9 +309,16 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidRequestException("New password is required");
         }
 
+        String hashedToken =
+
+                DigestUtils
+                        .sha256Hex(
+                                request.getToken()
+                        );
+
         PasswordResetToken resetToken =
                 passwordResetTokenRepository
-                        .findByToken(request.getToken())
+                        .findByToken(hashedToken)
                         .orElseThrow(() -> {
                             log.warn("Reset password failed because token was invalid");
                             return new InvalidTokenException("Invalid token");
