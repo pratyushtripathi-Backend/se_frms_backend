@@ -1,0 +1,215 @@
+package com.se_frms.ruleCategory.service;
+
+import com.se_frms.auth.exception.InvalidRequestException;
+import com.se_frms.common.security.CurrentUserService;
+import com.se_frms.common.security.XssUtil;
+import com.se_frms.common.util.PaginationUtil;
+import com.se_frms.ruleCategory.dto.*;
+import com.se_frms.ruleCategory.model.RuleCategory;
+import com.se_frms.ruleCategory.repository.RuleCategoryRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class RuleCategoryServiceImpl
+        implements RuleCategoryService {
+
+    private final RuleCategoryRepository ruleCategoryRepository;
+
+    private final CurrentUserService currentUserService;
+
+    @Override
+    public RuleCategoryResponseDTO createCategory(
+            RuleCategoryRequestDTO request
+    ) {
+
+        String categoryName =
+                cleanText(request.getCategoryName());
+
+        log.info("Create rule category started, categoryName={}", categoryName);
+
+        if (ruleCategoryRepository.existsByCategoryNameIgnoreCase(categoryName)) {
+            throw new InvalidRequestException("Category already exists");
+        }
+
+        Integer loggedInUserId =
+                currentUserService.getCurrentUserId();
+
+        RuleCategory category =
+                RuleCategory.builder()
+                        .categoryName(categoryName)
+                        .status(
+                                request.getStatus() != null
+                                        ? request.getStatus()
+                                        : true
+                        )
+                        .createdBy(loggedInUserId)
+                        .build();
+
+        RuleCategory savedCategory =
+                ruleCategoryRepository.save(category);
+
+        log.info("Rule category created successfully, id={}", savedCategory.getId());
+
+        return mapToResponse(savedCategory);
+    }
+
+    @Override
+    public RuleCategoryResponseDTO updateCategory(
+            Integer id,
+            RuleCategoryRequestDTO request
+    ) {
+
+        log.info("Update rule category started, id={}", id);
+
+        RuleCategory category =
+                getCategoryEntity(id);
+
+        String categoryName =
+                cleanText(request.getCategoryName());
+
+        ruleCategoryRepository
+                .findByCategoryNameIgnoreCase(categoryName)
+                .ifPresent(existingCategory -> {
+                    if (!existingCategory.getId().equals(id)) {
+                        throw new InvalidRequestException(
+                                "Category already exists"
+                        );
+                    }
+                });
+
+        category.setCategoryName(categoryName);
+
+        if (request.getStatus() != null) {
+            category.setStatus(request.getStatus());
+        }
+
+        RuleCategory updatedCategory =
+                ruleCategoryRepository.save(category);
+
+        log.info("Rule category updated successfully, id={}", id);
+
+        return mapToResponse(updatedCategory);
+    }
+
+    @Override
+    public RuleCategoryResponseDTO updateStatus(
+            Integer id,
+            RuleCategoryStatusRequestDTO request
+    ) {
+
+        log.info("Update rule category status started, id={}, status={}",
+                id,
+                request.getStatus()
+        );
+
+        RuleCategory category =
+                getCategoryEntity(id);
+
+        category.setStatus(request.getStatus());
+
+        RuleCategory updatedCategory =
+                ruleCategoryRepository.save(category);
+
+        log.info("Rule category status updated successfully, id={}", id);
+
+        return mapToResponse(updatedCategory);
+    }
+
+    @Override
+    public void deleteCategory(
+            Integer id
+    ) {
+
+        log.info("Delete rule category started, id={}", id);
+
+        RuleCategory category =
+                getCategoryEntity(id);
+
+        category.setStatus(false);
+
+        ruleCategoryRepository.save(category);
+
+        log.info("Rule category deleted successfully, id={}", id);
+    }
+
+    @Override
+    public Page<RuleCategoryResponseDTO> getAllCategories(
+            Integer page,
+            Integer size
+    ) {
+
+        Pageable pageable =
+                PaginationUtil.createPageable(
+                        page,
+                        size,
+                        Sort.by(
+                                Sort.Direction.DESC,
+                                "id"
+                        )
+                );
+
+        return ruleCategoryRepository
+                .findAll(pageable)
+                .map(this::mapToResponse);
+    }
+
+    @Override
+    public RuleCategoryResponseDTO getCategoryById(
+            Integer id
+    ) {
+
+        RuleCategory category =
+                getCategoryEntity(id);
+
+        return mapToResponse(category);
+    }
+
+    private RuleCategory getCategoryEntity(
+            Integer id
+    ) {
+
+        return ruleCategoryRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new InvalidRequestException(
+                                "Category not found"
+                        )
+                );
+    }
+
+    private RuleCategoryResponseDTO mapToResponse(
+            RuleCategory category
+    ) {
+
+        return RuleCategoryResponseDTO
+                .builder()
+                .id(category.getId())
+                .categoryName(category.getCategoryName())
+                .status(category.getStatus())
+                .createdBy(category.getCreatedBy())
+                .createdDate(category.getCreatedDate())
+                .updatedAt(category.getUpdatedAt())
+                .build();
+    }
+
+    private String cleanText(
+            String value
+    ) {
+
+        if (value == null) {
+            return null;
+        }
+
+        return XssUtil.clean(value).trim();
+    }
+}
