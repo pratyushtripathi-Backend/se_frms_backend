@@ -516,9 +516,6 @@ public class AuthServiceImpl implements AuthService {
         emailOtp.setVerified(true);
         emailOtpRepository.save(emailOtp);
 
-
-
-
         String token = jwtUtil.generateToken(
                 user.getEmail(),
                 user.getUserType()
@@ -546,10 +543,6 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-
-
-
-
         return LoginResponseDTO
                 .builder()
                 .userId(user.getId())
@@ -558,9 +551,6 @@ public class AuthServiceImpl implements AuthService {
                 .token(token)
                 .build();
     }
-
-
-
 
     @Override
     public void logout(String token) {
