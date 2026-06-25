@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/admin/rule-category")
+@RequestMapping("/api/v1/rule-category")
 @RequiredArgsConstructor
 public class RuleCategoryController {
 
