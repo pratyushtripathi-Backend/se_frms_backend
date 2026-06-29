@@ -1,6 +1,7 @@
 package com.se_frms.ruleCategory.service;
 
 import com.se_frms.auth.exception.InvalidRequestException;
+import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
 import com.se_frms.common.security.XssUtil;
 import com.se_frms.common.util.PaginationUtil;
@@ -23,14 +24,28 @@ import org.springframework.stereotype.Service;
 public class RuleCategoryServiceImpl
         implements RuleCategoryService {
 
+    private static final String RULE_CATEGORY_VIEW = "RULE_CATEGORY_VIEW";
+
+    private static final String RULE_CATEGORY_CREATE = "RULE_CATEGORY_CREATE";
+
+    private static final String RULE_CATEGORY_UPDATE = "RULE_CATEGORY_UPDATE";
+
+    private static final String RULE_CATEGORY_DELETE = "RULE_CATEGORY_DELETE";
+
     private final RuleCategoryRepository ruleCategoryRepository;
 
     private final CurrentUserService currentUserService;
+
+    private final AccessPermissionService accessPermissionService;
 
     @Override
     public RuleCategoryResponseDTO createCategory(
             RuleCategoryRequestDTO request
     ) {
+
+        accessPermissionService.validateAccess(
+                RULE_CATEGORY_CREATE
+        );
 
         String categoryName =
                 cleanText(request.getCategoryName());
@@ -68,6 +83,10 @@ public class RuleCategoryServiceImpl
             Integer id,
             RuleCategoryRequestDTO request
     ) {
+
+        accessPermissionService.validateAccess(
+                RULE_CATEGORY_UPDATE
+        );
 
         log.info("Update rule category started, id={}", id);
 
@@ -107,6 +126,10 @@ public class RuleCategoryServiceImpl
             RuleCategoryStatusRequestDTO request
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_CATEGORY_UPDATE
+        );
+
         log.info("Update rule category status started, id={}, status={}",
                 id,
                 request.getStatus()
@@ -130,6 +153,10 @@ public class RuleCategoryServiceImpl
             Integer id
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_CATEGORY_DELETE
+        );
+
         log.info("Delete rule category started, id={}", id);
 
         RuleCategory category =
@@ -147,6 +174,10 @@ public class RuleCategoryServiceImpl
             Integer page,
             Integer size
     ) {
+
+        accessPermissionService.validateAccess(
+                RULE_CATEGORY_VIEW
+        );
 
         Pageable pageable =
                 PaginationUtil.createPageable(
@@ -167,6 +198,10 @@ public class RuleCategoryServiceImpl
     public RuleCategoryResponseDTO getCategoryById(
             Integer id
     ) {
+
+        accessPermissionService.validateAccess(
+                RULE_CATEGORY_VIEW
+        );
 
         RuleCategory category =
                 getCategoryEntity(id);

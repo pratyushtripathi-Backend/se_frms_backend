@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,5 +39,16 @@ public interface UserRoleRepository
 
     List<UserRole> findByStatusOrderByUserFirstNameAscUserLastNameAsc(
             Boolean status
+    );
+
+    @Query("""
+            select ur.role.roleId
+            from UserRole ur
+            where ur.user.id = :userId
+              and ur.status = true
+              and ur.role.status = true
+            """)
+    List<Integer> findActiveRoleIdsByUserId(
+            @Param("userId") Integer userId
     );
 }

@@ -35,6 +35,11 @@ public interface RoleAccessRepository
             Integer accessId
     );
 
+    boolean existsByStatusTrueAndAccessAccessNameIgnoreCaseAndAccessStatusTrueAndRoleRoleIdIn(
+            String accessName,
+            List<Integer> roleIds
+    );
+
     Optional<RoleAccess>
 
     findByRoleRoleIdAndAccessId(

@@ -1,6 +1,7 @@
 package com.se_frms.ruleScore.service;
 
 import com.se_frms.auth.exception.InvalidRequestException;
+import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
 import com.se_frms.common.util.PaginationUtil;
 import com.se_frms.fraudRule.model.FraudRule;
@@ -24,16 +25,30 @@ import org.springframework.stereotype.Service;
 public class RuleScoreServiceImpl
         implements RuleScoreService {
 
+    private static final String RULE_SCORE_VIEW = "RULE_SCORE_VIEW";
+
+    private static final String RULE_SCORE_CREATE = "RULE_SCORE_CREATE";
+
+    private static final String RULE_SCORE_UPDATE = "RULE_SCORE_UPDATE";
+
+    private static final String RULE_SCORE_DELETE = "RULE_SCORE_DELETE";
+
     private final RuleScoreRepository ruleScoreRepository;
 
     private final FraudRuleRepository fraudRuleRepository;
 
     private final CurrentUserService currentUserService;
 
+    private final AccessPermissionService accessPermissionService;
+
     @Override
     public RuleScoreResponseDTO createRuleScore(
             RuleScoreRequestDTO request
     ) {
+
+        accessPermissionService.validateAccess(
+                RULE_SCORE_CREATE
+        );
 
         log.info(
                 "Create rule score started, ruleId={}",
@@ -81,6 +96,10 @@ public class RuleScoreServiceImpl
             RuleScoreRequestDTO request
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_SCORE_UPDATE
+        );
+
         log.info(
                 "Update rule score started, id={}",
                 id
@@ -126,6 +145,10 @@ public class RuleScoreServiceImpl
             RuleScoreStatusRequestDTO request
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_SCORE_UPDATE
+        );
+
         log.info(
                 "Update rule score status started, id={}, status={}",
                 id,
@@ -153,6 +176,10 @@ public class RuleScoreServiceImpl
             Integer id
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_SCORE_DELETE
+        );
+
         log.info(
                 "Delete rule score started, id={}",
                 id
@@ -177,6 +204,10 @@ public class RuleScoreServiceImpl
             Integer size
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_SCORE_VIEW
+        );
+
         Pageable pageable =
                 PaginationUtil.createPageable(
                         page,
@@ -197,6 +228,10 @@ public class RuleScoreServiceImpl
             Integer id
     ) {
 
+        accessPermissionService.validateAccess(
+                RULE_SCORE_VIEW
+        );
+
         RuleScore ruleScore =
                 getRuleScoreEntity(id);
 
@@ -207,6 +242,10 @@ public class RuleScoreServiceImpl
     public RuleScoreResponseDTO getRuleScoreByRuleId(
             Integer ruleId
     ) {
+
+        accessPermissionService.validateAccess(
+                RULE_SCORE_VIEW
+        );
 
         FraudRule fraudRule =
                 getActiveFraudRule(ruleId);
