@@ -14,7 +14,7 @@ import org.springframework.data.domain.Page;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import java.util.Map;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -126,11 +126,18 @@ public class RuleCategoryController {
             Integer page,
 
             @RequestParam(required = false)
-            Integer size
+            Integer size,
+
+            @RequestParam
+            Map<String, String> filters
     ) {
 
         Page<RuleCategoryResponseDTO> pageData =
-                ruleCategoryService.getAllCategories(page, size);
+                ruleCategoryService.getAllCategories(
+                        page,
+                        size,
+                        filters
+                );
 
         PagedResponseDTO<RuleCategoryResponseDTO> responseData =
                 PagedResponseDTO.from(pageData);

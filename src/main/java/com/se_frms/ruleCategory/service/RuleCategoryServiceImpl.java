@@ -8,7 +8,11 @@ import com.se_frms.common.util.PaginationUtil;
 import com.se_frms.ruleCategory.dto.*;
 import com.se_frms.ruleCategory.model.RuleCategory;
 import com.se_frms.ruleCategory.repository.RuleCategoryRepository;
+import com.se_frms.common.util.DynamicFilterSpecification;
 
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +41,15 @@ public class RuleCategoryServiceImpl
     private final CurrentUserService currentUserService;
 
     private final AccessPermissionService accessPermissionService;
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("categoryName", "categoryName"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     @Override
     public RuleCategoryResponseDTO createCategory(
@@ -172,25 +185,55 @@ public class RuleCategoryServiceImpl
     @Override
     public Page<RuleCategoryResponseDTO> getAllCategories(
             Integer page,
-            Integer size
+            Integer size,
+            Map<String, String> filters
     ) {
 
         accessPermissionService.validateAccess(
                 RULE_CATEGORY_VIEW
         );
 
+        int pageNumber =
+                page == null
+                        ? 0
+                        : page;
+
+        int pageSize =
+                size == null
+                        ? 10
+                        : size;
+
         Pageable pageable =
-                PaginationUtil.createPageable(
-                        page,
-                        size,
-                        Sort.by(
-                                Sort.Direction.DESC,
-                                "id"
-                        )
+                DynamicFilterSpecification.createPageable(
+                        pageNumber,
+                        pageSize,
+                        filters,
+                        FILTER_FIELDS,
+                        "categoryName",
+                        Sort.Direction.ASC
                 );
 
+        Specification<RuleCategory> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
+                );
+
+        if (!filters.containsKey("status")) {
+            specification =
+                    DynamicFilterSpecification
+                            .<RuleCategory>equal(
+                                    "status",
+                                    true
+                            )
+                            .and(specification);
+        }
+
         return ruleCategoryRepository
-                .findAll(pageable)
+                .findAll(
+                        specification,
+                        pageable
+                )
                 .map(this::mapToResponse);
     }
 

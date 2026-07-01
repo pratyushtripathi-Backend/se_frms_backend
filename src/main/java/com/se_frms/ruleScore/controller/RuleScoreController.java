@@ -4,7 +4,7 @@ import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.common.dto.PagedResponseDTO;
 import com.se_frms.ruleScore.dto.*;
 import com.se_frms.ruleScore.service.RuleScoreService;
-
+import java.util.Map;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -126,11 +126,18 @@ public class RuleScoreController {
             Integer page,
 
             @RequestParam(required = false)
-            Integer size
+            Integer size,
+
+            @RequestParam
+            Map<String, String> filters
     ) {
 
         Page<RuleScoreResponseDTO> pageData =
-                ruleScoreService.getAllRuleScores(page, size);
+                ruleScoreService.getAllRuleScores(
+                        page,
+                        size,
+                        filters
+                );
 
         PagedResponseDTO<RuleScoreResponseDTO> responseData =
                 PagedResponseDTO.from(pageData);

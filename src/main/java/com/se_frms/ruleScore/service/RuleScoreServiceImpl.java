@@ -3,7 +3,6 @@ package com.se_frms.ruleScore.service;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
-import com.se_frms.common.util.PaginationUtil;
 import com.se_frms.fraudRule.model.FraudRule;
 import com.se_frms.fraudRule.repository.FraudRuleRepository;
 import com.se_frms.ruleScore.dto.*;
@@ -18,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.stereotype.Service;
+import com.se_frms.common.util.DynamicFilterSpecification;
+import org.springframework.data.jpa.domain.Specification;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -40,6 +42,18 @@ public class RuleScoreServiceImpl
     private final CurrentUserService currentUserService;
 
     private final AccessPermissionService accessPermissionService;
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("ruleId", "rule.id"),
+                    Map.entry("ruleCode", "rule.ruleCode"),
+                    Map.entry("ruleName", "rule.ruleName"),
+                    Map.entry("score", "score"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdAt", "createdAt"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     @Override
     public RuleScoreResponseDTO createRuleScore(
@@ -201,25 +215,55 @@ public class RuleScoreServiceImpl
     @Override
     public Page<RuleScoreResponseDTO> getAllRuleScores(
             Integer page,
-            Integer size
+            Integer size,
+            Map<String, String> filters
     ) {
 
         accessPermissionService.validateAccess(
                 RULE_SCORE_VIEW
         );
 
+        int pageNumber =
+                page == null
+                        ? 0
+                        : page;
+
+        int pageSize =
+                size == null
+                        ? 10
+                        : size;
+
         Pageable pageable =
-                PaginationUtil.createPageable(
-                        page,
-                        size,
-                        Sort.by(
-                                Sort.Direction.DESC,
-                                "id"
-                        )
+                DynamicFilterSpecification.createPageable(
+                        pageNumber,
+                        pageSize,
+                        filters,
+                        FILTER_FIELDS,
+                        "rule.ruleName",
+                        Sort.Direction.ASC
                 );
 
+        Specification<RuleScore> specification =
+                DynamicFilterSpecification.build(
+                        filters,
+                        FILTER_FIELDS
+                );
+
+        if (!filters.containsKey("status")) {
+            specification =
+                    DynamicFilterSpecification
+                            .<RuleScore>equal(
+                                    "status",
+                                    true
+                            )
+                            .and(specification);
+        }
+
         return ruleScoreRepository
-                .findAll(pageable)
+                .findAll(
+                        specification,
+                        pageable
+                )
                 .map(this::mapToResponse);
     }
 
