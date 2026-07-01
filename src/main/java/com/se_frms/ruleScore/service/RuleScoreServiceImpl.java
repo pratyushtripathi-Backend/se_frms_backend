@@ -222,6 +222,7 @@ public class RuleScoreServiceImpl
         accessPermissionService.validateAccess(
                 RULE_SCORE_VIEW
         );
+        log.info("Rule score filters received: {}", filters);
 
         int pageNumber =
                 page == null

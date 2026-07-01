@@ -6,7 +6,8 @@ import com.se_frms.ruleScore.dto.*;
 import com.se_frms.ruleScore.service.RuleScoreService;
 import java.util.Map;
 import jakarta.validation.Valid;
-
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -119,6 +120,40 @@ public class RuleScoreController {
         );
     }
 
+//    @GetMapping("/list")
+//    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<RuleScoreResponseDTO>>>
+//    getAllRuleScores(
+//            @RequestParam(required = false)
+//            Integer page,
+//
+//            @RequestParam(required = false)
+//            Integer size,
+//
+//            @RequestParam
+//            Map<String, String> filters
+//    ) {
+//
+//        Page<RuleScoreResponseDTO> pageData =
+//                ruleScoreService.getAllRuleScores(
+//                        page,
+//                        size,
+//                        filters
+//                );
+//
+//        PagedResponseDTO<RuleScoreResponseDTO> responseData =
+//                PagedResponseDTO.from(pageData);
+//
+//        return ResponseEntity.ok(
+//                AuthResponseDTO
+//                        .<PagedResponseDTO<RuleScoreResponseDTO>>builder()
+//                        .status(true)
+//                        .responseCode(200)
+//                        .responseMessage("Rule scores fetched successfully")
+//                        .responseData(responseData)
+//                        .build()
+//        );
+//    }
+
     @GetMapping("/list")
     public ResponseEntity<AuthResponseDTO<PagedResponseDTO<RuleScoreResponseDTO>>>
     getAllRuleScores(
@@ -128,9 +163,24 @@ public class RuleScoreController {
             @RequestParam(required = false)
             Integer size,
 
-            @RequestParam
-            Map<String, String> filters
+            HttpServletRequest httpRequest
     ) {
+
+        Map<String, String> filters =
+                httpRequest
+                        .getParameterMap()
+                        .entrySet()
+                        .stream()
+                        .collect(
+                                Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        entry ->
+                                                entry.getValue() != null
+                                                        && entry.getValue().length > 0
+                                                        ? entry.getValue()[0]
+                                                        : ""
+                                )
+                        );
 
         Page<RuleScoreResponseDTO> pageData =
                 ruleScoreService.getAllRuleScores(
