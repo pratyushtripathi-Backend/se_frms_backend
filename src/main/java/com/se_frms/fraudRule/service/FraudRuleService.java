@@ -6,9 +6,9 @@ import com.se_frms.fraudRule.dto.FraudRuleStatusDTO;
 import com.se_frms.fraudRule.dto.FraudRuleUpdateDTO;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FraudRuleService {
 
@@ -30,7 +30,9 @@ public interface FraudRuleService {
     );
 
     Page<FraudRuleResponseDTO> getAll(
-            Pageable pageable
+            int page,
+            int size,
+            Map<String, String> filters
     );
 
     List<FraudRuleResponseDTO> getByCategoryId(

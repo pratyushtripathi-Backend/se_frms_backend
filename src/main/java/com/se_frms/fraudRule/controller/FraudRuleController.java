@@ -6,6 +6,7 @@ import com.se_frms.fraudRule.dto.FraudRuleResponseDTO;
 import com.se_frms.fraudRule.dto.FraudRuleStatusDTO;
 import com.se_frms.fraudRule.dto.FraudRuleUpdateDTO;
 import com.se_frms.fraudRule.service.FraudRuleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -13,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(
@@ -30,6 +31,7 @@ public class FraudRuleController {
     @PostMapping
     public ResponseEntity<?> create(
 
+            @Valid
             @RequestBody
             FraudRuleRequestDTO request
 
@@ -65,6 +67,7 @@ public class FraudRuleController {
             @PathVariable
             Integer id,
 
+            @Valid
             @RequestBody
             FraudRuleUpdateDTO request
 
@@ -171,18 +174,23 @@ Integer id
 
     @GetMapping
     public ResponseEntity<?> getAll(
+            @RequestParam(defaultValue = "0")
+            int page,
 
+            @RequestParam(defaultValue = "10")
+            int size,
 
-Pageable pageable
-
-
+            @RequestParam
+            Map<String, String> filters
     ) {
 
 
         Page<FraudRuleResponseDTO> responseData =
 
                 service.getAll(
-                        pageable
+                        page,
+                        size,
+                        filters
                 );
 
         return ResponseEntity.ok(
@@ -247,6 +255,7 @@ Integer categoryId
 @PathVariable
 Integer id,
 
+@Valid
 @RequestBody
 FraudRuleStatusDTO request
 

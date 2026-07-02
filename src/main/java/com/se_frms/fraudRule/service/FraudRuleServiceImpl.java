@@ -5,6 +5,7 @@ import com.se_frms.auth.exception.InvalidRequestException;
 
 import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
+import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.fraudRule.dto.FraudRuleRequestDTO;
 import com.se_frms.fraudRule.dto.FraudRuleResponseDTO;
 import com.se_frms.fraudRule.dto.FraudRuleStatusDTO;
@@ -19,14 +20,16 @@ import com.se_frms.ruleCategory.repository.RuleCategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -41,6 +44,20 @@ public class FraudRuleServiceImpl
     private static final String FRAUD_RULE_UPDATE = "FRAUD_RULE_UPDATE";
 
     private static final String FRAUD_RULE_DELETE = "FRAUD_RULE_DELETE";
+
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("categoryId", "category.id"),
+                    Map.entry("categoryName", "category.categoryName"),
+                    Map.entry("ruleCode", "ruleCode"),
+                    Map.entry("ruleName", "ruleName"),
+                    Map.entry("ruleDescription", "ruleDescription"),
+                    Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy"),
+                    Map.entry("createdAt", "createdAt"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     private final FraudRuleRepository repository;
 
@@ -123,7 +140,7 @@ FraudRuleUpdateDTO request
 
                 repository
 
-                        .findById(id)
+                        .findByIdAndStatusTrue(id)
 
                         .orElseThrow(
 
@@ -184,22 +201,29 @@ FraudRuleUpdateDTO request
             Integer categoryId
     ) {
 
+        RuleCategory category =
+                categoryRepository
 
-        return categoryRepository
+                        .findById(
+                                categoryId
+                        )
 
-                .findById(
-                        categoryId
-                )
+                        .orElseThrow(
 
-                .orElseThrow(
+                                () ->
+                                        new InvalidRequestException(
+                                                "Category not found"
+                                        )
 
-                        () ->
-                                new InvalidRequestException(
-                                        "Category not found"
-                                )
+                        );
 
-                );
+        if (!Boolean.TRUE.equals(category.getStatus())) {
+            throw new InvalidRequestException(
+                    "Active category not found"
+            );
+        }
 
+        return category;
 
     }
 
@@ -277,7 +301,10 @@ FraudRuleUpdateDTO request
 
                         );
 
-        repository.delete(
+        entity.setStatus(false);
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(
                 entity
         );
 
@@ -296,7 +323,7 @@ FraudRuleUpdateDTO request
 
                 repository
 
-                        .findById(
+                        .findByIdAndStatusTrue(
                                 id
                         )
 
@@ -317,16 +344,42 @@ FraudRuleUpdateDTO request
 
     @Override
     public Page<FraudRuleResponseDTO> getAll(
-            Pageable pageable
+            int page,
+            int size,
+            Map<String, String> filters
     ) {
 
         accessPermissionService.validateAccess(
                 FRAUD_RULE_VIEW
         );
 
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        filters,
+                        FILTER_FIELDS,
+                        "ruleName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<FraudRule> specification =
+                DynamicFilterSpecification
+                        .<FraudRule>equal(
+                                "status",
+                                true
+                        )
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        filters,
+                                        FILTER_FIELDS
+                                )
+                        );
+
         return repository
 
                 .findAll(
+                        specification,
                         pageable
                 )
 
@@ -347,7 +400,7 @@ FraudRuleUpdateDTO request
 
         return repository
 
-                .findByCategoryId(
+                .findByCategoryIdAndStatusTrue(
                         categoryId
                 )
 
