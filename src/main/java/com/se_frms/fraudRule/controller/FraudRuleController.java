@@ -8,7 +8,7 @@ import com.se_frms.fraudRule.dto.FraudRuleUpdateDTO;
 import com.se_frms.fraudRule.service.FraudRuleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -111,8 +111,6 @@ Integer id
 
 
     ) {
-
-
         service.delete(
                 id
         );
@@ -130,23 +128,14 @@ Integer id
                                 "Deleted Successfully"
                         )
                         .build()
-
         );
-
-
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(
-
-
 @PathVariable
 Integer id
 
-
     ) {
-
-
         FraudRuleResponseDTO responseData =
 
                 service.getById(
@@ -166,14 +155,10 @@ Integer id
                                 responseData
                         )
                         .build()
-
         );
-
-
     }
-
     @GetMapping
-    public ResponseEntity<?> getAll(
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<FraudRuleResponseDTO>>> getAll(
             @RequestParam(defaultValue = "0")
             int page,
 
@@ -184,19 +169,19 @@ Integer id
             Map<String, String> filters
     ) {
 
-
-        Page<FraudRuleResponseDTO> responseData =
-
+        Page<FraudRuleResponseDTO> pageData =
                 service.getAll(
                         page,
                         size,
                         filters
                 );
 
-        return ResponseEntity.ok(
+        PagedResponseDTO<FraudRuleResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
+        return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<FraudRuleResponseDTO>>builder()
+                        .<PagedResponseDTO<FraudRuleResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(
@@ -206,10 +191,7 @@ Integer id
                                 responseData
                         )
                         .build()
-
         );
-
-
     }
 
     @GetMapping("/category/{categoryId}")
