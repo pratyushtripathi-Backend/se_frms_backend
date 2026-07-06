@@ -16,6 +16,8 @@ public class LoginResponseDTO extends LoginOtpResponseDTO {
 
     private Integer userId;
 
+    private String name;
+
     private String email;
 
     private String role;

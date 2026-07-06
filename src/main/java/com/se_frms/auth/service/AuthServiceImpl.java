@@ -72,6 +72,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${sms.otp.return-in-response:false}")
     private boolean returnOtpInResponse;
+
+    @Value("${app.frontend.reset-password-url:http://localhost:5173/create-new-password}")
+    private String resetPasswordUrl;
+
     @Override
     public RegistrationResponseDTO registerUser(UserRegistrationRequest request) {
 
@@ -238,7 +242,8 @@ public class AuthServiceImpl implements AuthService {
 
         String resetLink =
 
-                "http://localhost:3000/reset-password?token="
+                resetPasswordUrl
+                        + "?token="
                         + rawToken;
 
         PasswordResetToken resetToken =
@@ -891,10 +896,32 @@ public class AuthServiceImpl implements AuthService {
         return LoginResponseDTO
                 .builder()
                 .userId(user.getId())
+                .name(buildFullName(user))
                 .email(user.getEmail())
                 .role(user.getUserType())
                 .token(token)
                 .build();
+    }
+
+    private String buildFullName(
+            User user
+    ) {
+
+        String firstName =
+                user.getFirstName() == null
+                        ? ""
+                        : user.getFirstName().trim();
+
+        String lastName =
+                user.getLastName() == null
+                        ? ""
+                        : user.getLastName().trim();
+
+        return (
+                firstName
+                        + " "
+                        + lastName
+        ).trim();
     }
 
     @Override
