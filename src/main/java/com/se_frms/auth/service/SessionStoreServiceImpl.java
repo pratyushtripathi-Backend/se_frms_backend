@@ -10,6 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Slf4j
 @Service
@@ -114,6 +118,41 @@ public class SessionStoreServiceImpl
                 .sessionActiveTime(
                         sessionStore.getSessionActiveTime()
                 )
+                .build();
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SessionStatusResponseDTO> getAllSessions(
+            int page,
+            int size
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by(Sort.Direction.DESC, "createdDate")
+                );
+
+        return sessionStoreRepository
+                .findAll(pageable)
+                .map(this::toSessionStatusResponseDTO);
+    }
+
+    private SessionStatusResponseDTO toSessionStatusResponseDTO(
+            SessionStore sessionStore
+    ) {
+
+        User user = sessionStore.getUser();
+
+        return SessionStatusResponseDTO
+                .builder()
+                .active(sessionStore.getStatus())
+                .userId(user.getId())
+                .email(user.getEmail())
+                .role(user.getUserType())
+                .sessionActiveDate(sessionStore.getSessionActiveDate())
+                .sessionActiveTime(sessionStore.getSessionActiveTime())
                 .build();
     }
 }

@@ -118,7 +118,9 @@ public class SecurityConfig {
                                 "/api/v1/auth/login-history",
                                 "/api/v1/auth/login-history/**",
                                 "/api/v1/auth/login-attempt",
-                                "/api/v1/auth/login-attempt/**"
+                                "/api/v1/auth/login-attempt/**",
+                                "/api/v1/auth/sessions",
+                                "/api/v1/auth/sessions/**"
                         )
                         .hasRole(
                                 "ADMIN"

@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.se_frms.common.dto.PagedResponseDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -468,6 +470,33 @@ public class AuthController {
                                         ? "No login attempts found"
                                         : "Login attempts fetched successfully"
                         )
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @GetMapping("/sessions")
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<SessionStatusResponseDTO>>>
+    getAllSessions(
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
+
+        Page<SessionStatusResponseDTO> pageData =
+                sessionStoreService.getAllSessions(page, size);
+
+        PagedResponseDTO<SessionStatusResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<PagedResponseDTO<SessionStatusResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Sessions fetched successfully")
                         .responseData(responseData)
                         .build()
         );
