@@ -4,7 +4,7 @@ import com.se_frms.auth.dto.*;
 import com.se_frms.auth.service.AuthService;
 import com.se_frms.auth.service.LoginAttemptService;
 import com.se_frms.auth.service.SessionStoreService;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -97,7 +97,7 @@ public class AuthController {
     }
 
     @GetMapping("/login-history")
-    public ResponseEntity<AuthResponseDTO<Page<LoginHistoryResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<LoginHistoryResponseDTO>>>
     getLoginHistory(
             @RequestParam(defaultValue = "0")
             int page,
@@ -111,21 +111,20 @@ public class AuthController {
 
         log.info("Fetch login history request received");
 
-        Page<LoginHistoryResponseDTO> responseData =
-                authService.getLoginHistory(
-                        page,
-                        size,
-                        filters
-                );
+        Page<LoginHistoryResponseDTO> pageData =
+                authService.getLoginHistory(page, size, filters);
+
+        PagedResponseDTO<LoginHistoryResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
         log.info(
                 "Login history fetched successfully, count={}",
-                responseData.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<LoginHistoryResponseDTO>>builder()
+                        .<PagedResponseDTO<LoginHistoryResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Login history fetched successfully")
@@ -135,7 +134,7 @@ public class AuthController {
     }
 
     @GetMapping("/login-history/{userId}")
-    public ResponseEntity<AuthResponseDTO<Page<LoginHistoryResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<LoginHistoryResponseDTO>>>
     getLoginHistoryByUserId(
             @PathVariable
             Integer userId,
@@ -148,15 +147,11 @@ public class AuthController {
 
             @RequestParam
             Map<String, String> filters
-
     ) {
 
-        log.info(
-                "Fetch login history request received, userId={}",
-                userId
-        );
+        log.info("Fetch login history request received, userId={}", userId);
 
-        Page<LoginHistoryResponseDTO> responseData =
+        Page<LoginHistoryResponseDTO> pageData =
                 authService.getLoginHistoryByUserId(
                         userId,
                         page,
@@ -164,15 +159,18 @@ public class AuthController {
                         filters
                 );
 
+        PagedResponseDTO<LoginHistoryResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Login history fetched successfully, userId={}, count={}",
                 userId,
-                responseData.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<LoginHistoryResponseDTO>>builder()
+                        .<PagedResponseDTO<LoginHistoryResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Login history fetched successfully")
@@ -182,7 +180,7 @@ public class AuthController {
     }
 
     @GetMapping("/login-attempt")
-    public ResponseEntity<AuthResponseDTO<Page<LoginAttemptResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<LoginAttemptResponseDTO>>>
     getAllLoginAttempts(
             @RequestParam(defaultValue = "0")
             int page,
@@ -196,25 +194,28 @@ public class AuthController {
 
         log.info("Fetch all login attempts request received");
 
-        Page<LoginAttemptResponseDTO> response =
+        Page<LoginAttemptResponseDTO> pageData =
                 loginAttemptService.getAllLoginAttempts(
                         page,
                         size,
                         filters
                 );
 
+        PagedResponseDTO<LoginAttemptResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Login attempts fetched successfully, count={}",
-                response.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<LoginAttemptResponseDTO>>builder()
+                        .<PagedResponseDTO<LoginAttemptResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Login attempts fetched successfully")
-                        .responseData(response)
+                        .responseData(responseData)
                         .build()
         );
     }
@@ -423,7 +424,7 @@ public class AuthController {
     }
 
     @GetMapping("/login-attempt/{userId}")
-    public ResponseEntity<AuthResponseDTO<Page<LoginAttemptResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<LoginAttemptResponseDTO>>>
     getLoginAttemptsByUserId(
             @PathVariable
             Integer userId,
@@ -436,15 +437,11 @@ public class AuthController {
 
             @RequestParam
             Map<String, String> filters
-
     ) {
 
-        log.info(
-                "Fetch login attempts request received, userId={}",
-                userId
-        );
+        log.info("Fetch login attempts request received, userId={}", userId);
 
-        Page<LoginAttemptResponseDTO> response =
+        Page<LoginAttemptResponseDTO> pageData =
                 loginAttemptService.getLoginAttemptsByUserId(
                         userId,
                         page,
@@ -452,23 +449,26 @@ public class AuthController {
                         filters
                 );
 
+        PagedResponseDTO<LoginAttemptResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Login attempts fetched successfully, userId={}, count={}",
                 userId,
-                response.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<LoginAttemptResponseDTO>>builder()
+                        .<PagedResponseDTO<LoginAttemptResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(
-                                response.isEmpty()
+                                pageData.isEmpty()
                                         ? "No login attempts found"
                                         : "Login attempts fetched successfully"
                         )
-                        .responseData(response)
+                        .responseData(responseData)
                         .build()
         );
     }

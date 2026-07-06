@@ -4,7 +4,7 @@ import com.se_frms.access.dto.AccessRequestDTO;
 import com.se_frms.access.dto.AccessResponseDTO;
 import com.se_frms.access.service.AccessService;
 import com.se_frms.auth.dto.AuthResponseDTO;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +56,7 @@ public class AccessController {
     }
 
     @GetMapping("/get-access-list")
-    public ResponseEntity<AuthResponseDTO<Page<AccessResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<AccessResponseDTO>>>
     getAll(
             @RequestParam(defaultValue = "0")
             int page,
@@ -74,25 +74,28 @@ public class AccessController {
                 size
         );
 
-        Page<AccessResponseDTO> response =
+        Page<AccessResponseDTO> pageData =
                 accessService.getAll(
                         page,
                         size,
                         filters
                 );
 
+        PagedResponseDTO<AccessResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Access list fetched successfully, count={}",
-                response.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<AccessResponseDTO>>builder()
+                        .<PagedResponseDTO<AccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Access list fetched successfully")
-                        .responseData(response)
+                        .responseData(responseData)
                         .build()
         );
     }

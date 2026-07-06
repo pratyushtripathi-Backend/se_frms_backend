@@ -56,7 +56,7 @@ public class EmailNotificationTemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<Page<EmailNotificationTemplateResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<EmailNotificationTemplateResponseDTO>>>
     getAllEmailNotificationTemplates(
             @RequestParam(defaultValue = "0")
             int page,
@@ -74,23 +74,24 @@ public class EmailNotificationTemplateController {
                 size
         );
 
-        Page<EmailNotificationTemplateResponseDTO> responseData =
+        Page<EmailNotificationTemplateResponseDTO> pageData =
                 emailNotificationTemplateService.getAllTemplates(
                         page,
                         size,
                         filters
                 );
-        Page<EmailNotificationTemplateResponseDTO> pageData =
-                emailNotificationTemplateService.getAllTemplates(page, size,filters);
+
+        PagedResponseDTO<EmailNotificationTemplateResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
         log.info(
                 "Email notification templates fetched successfully, count={}",
-                responseData.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<EmailNotificationTemplateResponseDTO>>builder()
+                        .<PagedResponseDTO<EmailNotificationTemplateResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(

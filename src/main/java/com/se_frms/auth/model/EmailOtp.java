@@ -28,4 +28,12 @@ public class EmailOtp {
 
     @Column(name = "mac_address", length = 50)
     private String macAddress;
+
+    @Builder.Default
+    @Column(name = "failed_attempts")
+    private Integer failedAttempts = 0;
+
+    @Builder.Default
+    @Column(name = "locked")
+    private Boolean locked = false;
 }

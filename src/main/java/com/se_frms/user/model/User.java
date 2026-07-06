@@ -62,6 +62,13 @@ public class User {
     @Builder.Default
     private Boolean status = true;
 
+    @Builder.Default
+    @Column(name = "failed_password_attempts")
+    private Integer failedPasswordAttempts = 0;
+
+    @Column(name = "password_locked_until")
+    private LocalDateTime passwordLockedUntil;
+
     @ManyToOne
     @JoinColumn(
             name = "created_by"

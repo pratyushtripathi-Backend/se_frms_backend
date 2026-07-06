@@ -54,7 +54,7 @@ public class RoleMasterController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<Page<RoleMasterResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<RoleMasterResponseDTO>>>
     getAllRoles(
             @RequestParam(defaultValue = "0")
             int page,
@@ -66,23 +66,24 @@ public class RoleMasterController {
             Map<String, String> filters
     ) {
 
-
-
-        Page<RoleMasterResponseDTO> responseData =
+        Page<RoleMasterResponseDTO> pageData =
                 roleMasterService.getAllRoles(
                         page,
                         size,
                         filters
                 );
 
+        PagedResponseDTO<RoleMasterResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Roles fetched successfully, totalElements={}",
-                responseData.getTotalElements()
+                pageData.getTotalElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<RoleMasterResponseDTO>>builder()
+                        .<PagedResponseDTO<RoleMasterResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Roles fetched successfully")

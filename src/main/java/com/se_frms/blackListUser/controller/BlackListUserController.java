@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import java.util.Map;
 
 @Slf4j
@@ -75,7 +75,7 @@ public class BlackListUserController {
     }
 
     @GetMapping
-    public ResponseEntity<AuthResponseDTO<Page<BlackListUserResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<BlackListUserResponseDTO>>>
     getAllBlackListUsers(
             @RequestParam(defaultValue = "0")
             int page,
@@ -93,21 +93,24 @@ public class BlackListUserController {
                 size
         );
 
-        Page<BlackListUserResponseDTO> responseData =
+        Page<BlackListUserResponseDTO> pageData =
                 blackListUserService.getAllBlackListUsers(
                         page,
                         size,
                         filters
                 );
 
+        PagedResponseDTO<BlackListUserResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Blacklist users fetched successfully, count={}",
-                responseData.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<BlackListUserResponseDTO>>builder()
+                        .<PagedResponseDTO<BlackListUserResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Blacklist users fetched successfully")
@@ -142,7 +145,7 @@ public class BlackListUserController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<AuthResponseDTO<Page<BlackListUserResponseDTO>>>
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<BlackListUserResponseDTO>>>
     getBlackListUsersByUserId(
             @PathVariable
             Integer userId,
@@ -164,7 +167,7 @@ public class BlackListUserController {
                 size
         );
 
-        Page<BlackListUserResponseDTO> responseData =
+        Page<BlackListUserResponseDTO> pageData =
                 blackListUserService.getBlackListUsersByUserId(
                         userId,
                         page,
@@ -172,15 +175,18 @@ public class BlackListUserController {
                         filters
                 );
 
+        PagedResponseDTO<BlackListUserResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Blacklist users by userId fetched successfully, userId={}, count={}",
                 userId,
-                responseData.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<BlackListUserResponseDTO>>builder()
+                        .<PagedResponseDTO<BlackListUserResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Blacklist users fetched successfully")

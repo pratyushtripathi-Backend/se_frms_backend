@@ -6,7 +6,7 @@ import com.se_frms.admin.dto.*;
 import com.se_frms.admin.service.AdminService;
 import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
-
+import com.se_frms.common.dto.PagedResponseDTO;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -59,7 +59,7 @@ public class AdminController {
 
     @GetMapping("/employees")
     public ResponseEntity<
-            AuthResponseDTO<Page<EmployeeSummaryDTO>>>
+            AuthResponseDTO<PagedResponseDTO<EmployeeSummaryDTO>>>
     getAllEmployees(
             @RequestParam(defaultValue = "0")
             int page,
@@ -75,19 +75,25 @@ public class AdminController {
                 page,
                 size
         );
-        Page<EmployeeSummaryDTO> responseData =
+
+        Page<EmployeeSummaryDTO> pageData =
                 adminService.getAllEmployees(
                         page,
                         size,
                         filters
                 );
+
+        PagedResponseDTO<EmployeeSummaryDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
         log.info(
                 "Employees fetched successfully, count={}",
-                responseData.getNumberOfElements()
+                pageData.getNumberOfElements()
         );
+
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<Page<EmployeeSummaryDTO>>builder()
+                        .<PagedResponseDTO<EmployeeSummaryDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(
