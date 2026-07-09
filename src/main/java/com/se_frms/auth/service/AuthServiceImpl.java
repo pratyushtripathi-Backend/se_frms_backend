@@ -44,6 +44,9 @@ import java.util.Base64;
 import java.util.Locale;
 import java.util.Map;
 import java.lang.Integer;
+import com.se_frms.auth.model.LoginAttemptCount;
+import com.se_frms.blackListUser.model.BlackListUser;
+import com.se_frms.blackListUser.repository.BlackListUserRepository;
 
 @Slf4j
 @Service
@@ -52,9 +55,6 @@ import java.lang.Integer;
 public class AuthServiceImpl implements AuthService {
 
     private static final String EMPLOYEE_ROLE_NAME = "EMPLOYEE";
-    private static final int MAX_OTP_FAILED_ATTEMPTS = 5;
-    private static final int MAX_PASSWORD_FAILED_ATTEMPTS = 5;
-    private static final int PASSWORD_LOCK_MINUTES = 5;
     private static final SecureRandom OTP_RANDOM = new SecureRandom();
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -69,6 +69,8 @@ public class AuthServiceImpl implements AuthService {
     private final RoleMasterRepository roleMasterRepository;
     private final UserRoleRepository userRoleRepository;
     private final SmsService smsService;
+    private final LoginAttemptCountService loginAttemptCountService;
+    private final BlackListUserRepository blackListUserRepository;
 
     @Value("${sms.otp.return-in-response:false}")
     private boolean returnOtpInResponse;
@@ -405,6 +407,121 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
+//    @Override
+//    public LoginOtpResponseDTO login(
+//            LoginRequestDTO request,
+//            HttpServletRequest httpRequest
+//    ) {
+//
+//        String email =
+//                XssUtil.clean(request.getEmail())
+//                        .trim()
+//                        .toLowerCase();
+//        log.info("Sanitized email={}", email);
+//
+//        User user =
+//                userRepository
+//                        .findByEmail(email)
+//                        .orElse(null);
+//
+//        if (user == null) {
+//
+//            loginAttemptService.saveAttempt(
+//                    null,
+//                    email,
+//                    false,
+//                    "USER_NOT_FOUND",
+//                    request.getLatitude(),
+//                    request.getLongitude(),
+//                    httpRequest
+//            );
+//
+//            throw new InvalidCredentialsException(
+//                    "Invalid email or password"
+//            );
+//        }
+//
+//        if (!Boolean.TRUE.equals(user.getStatus())) {
+//
+//            throw new InvalidCredentialsException("Invalid email or password");
+//        }
+//
+//        if (Boolean.FALSE.equals(user.getStatus())) {
+//
+//            loginAttemptService.saveAttempt(
+//                    user,
+//                    request.getEmail(),
+//                    false,
+//                    "USER_BLOCKED",
+//                    request.getLatitude(),
+//                    request.getLongitude(),
+//                    httpRequest
+//            );
+//
+//            log.warn("Login failed because user is blacklisted, userId={}", user.getId());
+//
+//            throw new InvalidCredentialsException("User is blocked. Please contact admin.");
+//        }
+//
+//        boolean passwordMatches =
+//                passwordEncoder.matches(
+//                        request.getPassword(),
+//                        user.getPasswordHash()
+//                );
+//
+//        if (!passwordMatches) {
+//
+//            loginAttemptService.saveAttempt(
+//                    user,
+//                    request.getEmail(),
+//                    false,
+//                    "INVALID_PASSWORD",
+//                    request.getLatitude(),
+//                    request.getLongitude(),
+//                    httpRequest
+//            );
+//
+//            log.warn("Login failed because password was invalid, userId={}", user.getId());
+//
+//            throw new InvalidCredentialsException("Invalid email or password");
+//        }
+//
+//        String otp =
+//                String.valueOf(
+//                        100000 + OTP_RANDOM.nextInt(900000)
+//                );
+//        EmailOtp emailOtp =
+//                EmailOtp.builder()
+//                        .email(user.getEmail())
+//                        .otp(otp)
+//                        .expiryTime(LocalDateTime.now().plusMinutes(5))
+//                        .verified(false)
+//                        .macAddress(cleanMacAddress(request.getMacAddress()))
+//                        .build();
+//
+//        emailOtpRepository.save(emailOtp);
+//
+//        smsService.sendLoginOtp(
+//                user.getPhoneNumber(),
+//                otp
+//        );
+//
+//        log.info(
+//                "Login OTP SMS service completed, userId={}",
+//                user.getId()
+//        );
+//
+//        return LoginOtpResponseDTO
+//                .builder()
+//                .email(user.getEmail())
+//                .maskedPhoneNumber(maskPhoneNumber(user.getPhoneNumber()))
+//                .otp(returnOtpInResponse ? otp : null)
+//                .otpRequired(true)
+//                .build();
+//
+//    }
+
+
     @Transactional(noRollbackFor = InvalidCredentialsException.class)
     @Override
     public LoginOtpResponseDTO login(
@@ -416,6 +533,7 @@ public class AuthServiceImpl implements AuthService {
                 XssUtil.clean(request.getEmail())
                         .trim()
                         .toLowerCase();
+
         log.info("Sanitized email={}", email);
 
         User user =
@@ -442,11 +560,6 @@ public class AuthServiceImpl implements AuthService {
 
         if (!Boolean.TRUE.equals(user.getStatus())) {
 
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-
-        if (Boolean.FALSE.equals(user.getStatus())) {
-
             loginAttemptService.saveAttempt(
                     user,
                     request.getEmail(),
@@ -457,38 +570,14 @@ public class AuthServiceImpl implements AuthService {
                     httpRequest
             );
 
-            log.warn("Login failed because user is blacklisted, userId={}", user.getId());
-
-            throw new InvalidCredentialsException("User is blocked. Please contact admin.");
-        }
-
-        LocalDateTime now =
-                LocalDateTime.now();
-
-        if (user.getPasswordLockedUntil() != null
-                && user.getPasswordLockedUntil().isAfter(now)) {
-
-            loginAttemptService.saveAttempt(
-                    user,
-                    request.getEmail(),
-                    false,
-                    "PASSWORD_LOCKED",
-                    request.getLatitude(),
-                    request.getLongitude(),
-                    httpRequest
+            log.warn(
+                    "Login failed because user is blocked, userId={}",
+                    user.getId()
             );
 
             throw new InvalidCredentialsException(
-                    "Account temporarily locked. Please try again after 5 minutes."
+                    "Account is locked. Please contact admin department."
             );
-        }
-
-        if (user.getPasswordLockedUntil() != null
-                && !user.getPasswordLockedUntil().isAfter(now)) {
-
-            user.setFailedPasswordAttempts(0);
-            user.setPasswordLockedUntil(null);
-            userRepository.save(user);
         }
 
         boolean passwordMatches =
@@ -499,27 +588,13 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordMatches) {
 
-            int failedAttempts =
-                    user.getFailedPasswordAttempts() == null
-                            ? 0
-                            : user.getFailedPasswordAttempts();
+            LoginAttemptCount attemptCount =
+                    loginAttemptCountService.recordInvalidPasswordAttempt(user);
 
-            failedAttempts++;
-
-            user.setFailedPasswordAttempts(failedAttempts);
-
-            String reason = "INVALID_PASSWORD";
-
-            if (failedAttempts >= MAX_PASSWORD_FAILED_ATTEMPTS) {
-
-                user.setPasswordLockedUntil(
-                        LocalDateTime.now().plusMinutes(PASSWORD_LOCK_MINUTES)
-                );
-
-                reason = "PASSWORD_LOCKED";
-            }
-
-            userRepository.save(user);
+            String reason =
+                    Boolean.TRUE.equals(attemptCount.getLocked())
+                            ? "PASSWORD_LOCKED"
+                            : "INVALID_PASSWORD";
 
             loginAttemptService.saveAttempt(
                     user,
@@ -532,40 +607,61 @@ public class AuthServiceImpl implements AuthService {
             );
 
             log.warn(
-                    "Login failed because password was invalid, userId={}, failedAttempts={}",
-                    user.getId(),
-                    failedAttempts
+                    "Login failed because password was invalid, userId={}",
+                    user.getId()
             );
 
-            if (failedAttempts >= MAX_PASSWORD_FAILED_ATTEMPTS) {
+            if (Boolean.TRUE.equals(attemptCount.getLocked())) {
+
+                autoBlockUserForFailedLogin(user);
+
+                if (!Boolean.TRUE.equals(attemptCount.getAdminNotificationSent())) {
+
+                    mailService.sendPasswordAttemptLockAlert(
+                            user.getEmail(),
+                            buildFullName(user),
+                            user.getId(),
+                            attemptCount.getFailedAttempts()
+                    );
+
+                    loginAttemptCountService.markAdminNotificationSent(
+                            attemptCount
+                    );
+                }
+
                 throw new InvalidCredentialsException(
-                        "Too many invalid password attempts. Please try again after 5 minutes."
+                        "Account is locked. Please contact admin department."
                 );
             }
 
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
         }
 
-        user.setFailedPasswordAttempts(0);
-        user.setPasswordLockedUntil(null);
-        userRepository.save(user);
+        loginAttemptCountService.resetPasswordAttempts(user);
 
         String otp =
                 String.valueOf(
                         100000 + OTP_RANDOM.nextInt(900000)
                 );
+
         EmailOtp emailOtp =
                 EmailOtp.builder()
                         .email(user.getEmail())
                         .otp(otp)
                         .expiryTime(LocalDateTime.now().plusMinutes(5))
                         .verified(false)
-                        .failedAttempts(0)
-                        .locked(false)
                         .macAddress(cleanMacAddress(request.getMacAddress()))
                         .build();
 
-        emailOtpRepository.save(emailOtp);
+        EmailOtp savedEmailOtp =
+                emailOtpRepository.save(emailOtp);
+
+        loginAttemptCountService.createOtpAttempt(
+                user,
+                savedEmailOtp
+        );
 
         smsService.sendLoginOtp(
                 user.getPhoneNumber(),
@@ -584,9 +680,38 @@ public class AuthServiceImpl implements AuthService {
                 .otp(returnOtpInResponse ? otp : null)
                 .otpRequired(true)
                 .build();
-
     }
 
+    private void autoBlockUserForFailedLogin(
+            User user
+    ) {
+
+        if (blackListUserRepository.existsByUserIdAndStatus(
+                user.getId(),
+                true
+        )) {
+            user.setStatus(false);
+            userRepository.save(user);
+            return;
+        }
+
+        BlackListUser blackListUser =
+                BlackListUser.builder()
+                        .user(user)
+                        .employeeName(buildFullName(user))
+                        .email(user.getEmail())
+                        .mobile(user.getPhoneNumber())
+                        .status(true)
+                        .reason("5 invalid password attempts")
+                        .riskType("LOGIN_SECURITY")
+                        .createdBy(null)
+                        .build();
+
+        blackListUserRepository.save(blackListUser);
+
+        user.setStatus(false);
+        userRepository.save(user);
+    }
 
 
 //    @Override
@@ -720,11 +845,11 @@ public class AuthServiceImpl implements AuthService {
 //                .build();
 //    }
 
-    @Override
     @Transactional(noRollbackFor = {
             InvalidTokenException.class,
             TokenExpiredException.class
     })
+    @Override
     public LoginResponseDTO verifyOtp(
             VerifyOtpRequestDTO request,
             HttpServletRequest httpRequest
@@ -762,7 +887,7 @@ public class AuthServiceImpl implements AuthService {
                             );
                         });
 
-        if (Boolean.TRUE.equals(emailOtp.getLocked())) {
+        if (loginAttemptCountService.isOtpLocked(emailOtp)) {
 
             loginAttemptService.saveAttempt(
                     user,
@@ -818,16 +943,14 @@ public class AuthServiceImpl implements AuthService {
 
         if (!emailOtp.getOtp().equals(request.getOtp())) {
 
-            int failedAttempts =
-                    emailOtp.getFailedAttempts() == null
-                            ? 1
-                            : emailOtp.getFailedAttempts() + 1;
+            LoginAttemptCount attemptCount =
+                    loginAttemptCountService.recordInvalidOtpAttempt(
+                            user,
+                            emailOtp
+                    );
 
-            emailOtp.setFailedAttempts(failedAttempts);
+            if (Boolean.TRUE.equals(attemptCount.getLocked())) {
 
-            if (failedAttempts >= MAX_OTP_FAILED_ATTEMPTS) {
-
-                emailOtp.setLocked(true);
                 emailOtp.setVerified(true);
                 emailOtpRepository.save(emailOtp);
 
@@ -846,8 +969,6 @@ public class AuthServiceImpl implements AuthService {
                 );
             }
 
-            emailOtpRepository.save(emailOtp);
-
             loginAttemptService.saveAttempt(
                     user,
                     email,
@@ -862,6 +983,8 @@ public class AuthServiceImpl implements AuthService {
                     "Invalid OTP"
             );
         }
+
+        loginAttemptCountService.resetOtpAttempts(emailOtp);
 
         emailOtp.setVerified(true);
         emailOtpRepository.save(emailOtp);

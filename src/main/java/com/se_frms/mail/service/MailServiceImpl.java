@@ -10,6 +10,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 
@@ -26,6 +27,8 @@ public class MailServiceImpl implements MailService {
 
     private static final String LOGIN_OTP_TEMPLATE =
             "LOGIN_OTP";
+    @Value("${app.admin.security-alert-email:}")
+    private String adminSecurityAlertEmail;
 
     private final JavaMailSender mailSender;
 
@@ -226,5 +229,34 @@ public class MailServiceImpl implements MailService {
 
             throw ex;
         }
+    }
+
+    @Async
+    @Override
+    public void sendPasswordAttemptLockAlert(
+            String userEmail,
+            String userName,
+            Integer userId,
+            Integer failedAttempts
+    ) {
+
+        if (adminSecurityAlertEmail == null
+                || adminSecurityAlertEmail.isBlank()) {
+
+            log.warn("Admin security alert email is not configured");
+            return;
+        }
+
+        sendMail(
+                adminSecurityAlertEmail,
+                "FRMS Account Locked - Failed Login Attempts",
+                "Hello Admin,\n\n"
+                        + "User account has been locked due to multiple wrong password attempts.\n\n"
+                        + "User Id: " + userId + "\n"
+                        + "Name: " + userName + "\n"
+                        + "Email: " + userEmail + "\n"
+                        + "Failed Attempts: " + failedAttempts + "\n\n"
+                        + "Please review and unblock from the admin portal if required."
+        );
     }
 }

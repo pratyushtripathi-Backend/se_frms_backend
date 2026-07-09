@@ -17,6 +17,12 @@ public interface MailService {
             String email,
             String otp
     );
+    void sendPasswordAttemptLockAlert(
+            String userEmail,
+            String userName,
+            Integer userId,
+            Integer failedAttempts
+    );
 }
 
 
