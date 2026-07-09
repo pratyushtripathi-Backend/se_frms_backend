@@ -20,7 +20,8 @@ import org.springframework.stereotype.Service;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import java.util.Map;
-
+import java.util.HashMap;
+import java.util.Locale;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -212,6 +213,7 @@ public class RuleScoreServiceImpl
         );
     }
 
+
     @Override
     public Page<RuleScoreResponseDTO> getAllRuleScores(
             Integer page,
@@ -222,6 +224,7 @@ public class RuleScoreServiceImpl
         accessPermissionService.validateAccess(
                 RULE_SCORE_VIEW
         );
+
         log.info("Rule score filters received: {}", filters);
 
         int pageNumber =
@@ -234,11 +237,21 @@ public class RuleScoreServiceImpl
                         ? 10
                         : size;
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         pageNumber,
                         pageSize,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "rule.ruleName",
                         Sort.Direction.ASC
@@ -246,11 +259,19 @@ public class RuleScoreServiceImpl
 
         Specification<RuleScore> specification =
                 DynamicFilterSpecification.build(
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS
                 );
 
-        if (!filters.containsKey("status")) {
+        Specification<RuleScore> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
+
+        if (!workingFilters.containsKey("status")) {
             specification =
                     DynamicFilterSpecification
                             .<RuleScore>equal(
@@ -340,6 +361,36 @@ public class RuleScoreServiceImpl
         }
 
         return fraudRule;
+    }
+
+    private Specification<RuleScore> buildSearchSpecification(
+            String search
+    ) {
+
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
+        String keyword =
+                "%"
+                        + search.trim().toLowerCase(Locale.ROOT)
+                        + "%";
+
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("rule").get("ruleName")
+                                ),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("rule").get("ruleCode")
+                                ),
+                                keyword
+                        )
+                );
     }
 
     private RuleScoreResponseDTO mapToResponse(

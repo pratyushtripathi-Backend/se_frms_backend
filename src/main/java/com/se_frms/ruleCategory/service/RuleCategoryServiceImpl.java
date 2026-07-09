@@ -11,7 +11,8 @@ import com.se_frms.ruleCategory.repository.RuleCategoryRepository;
 import com.se_frms.common.util.DynamicFilterSpecification;
 
 import org.springframework.data.jpa.domain.Specification;
-
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -203,11 +204,21 @@ public class RuleCategoryServiceImpl
                         ? 10
                         : size;
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         pageNumber,
                         pageSize,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "categoryName",
                         Sort.Direction.ASC
@@ -215,11 +226,19 @@ public class RuleCategoryServiceImpl
 
         Specification<RuleCategory> specification =
                 DynamicFilterSpecification.build(
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS
                 );
 
-        if (!filters.containsKey("status")) {
+        Specification<RuleCategory> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
+
+        if (!workingFilters.containsKey("status")) {
             specification =
                     DynamicFilterSpecification
                             .<RuleCategory>equal(
@@ -278,6 +297,28 @@ public class RuleCategoryServiceImpl
                 .createdDate(category.getCreatedDate())
                 .updatedAt(category.getUpdatedAt())
                 .build();
+    }
+
+    private Specification<RuleCategory> buildSearchSpecification(
+            String search
+    ) {
+
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
+        String keyword =
+                "%"
+                        + search.trim().toLowerCase(Locale.ROOT)
+                        + "%";
+
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(
+                        criteriaBuilder.lower(
+                                root.get("categoryName")
+                        ),
+                        keyword
+                );
     }
 
     private String cleanText(
