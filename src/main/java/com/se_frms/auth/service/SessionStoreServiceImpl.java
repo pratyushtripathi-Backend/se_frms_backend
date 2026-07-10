@@ -14,7 +14,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import com.se_frms.common.util.DynamicFilterSpecification;
+import org.springframework.data.jpa.domain.Specification;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,21 @@ public class SessionStoreServiceImpl
         implements SessionStoreService {
 
     private final SessionStoreRepository sessionStoreRepository;
+    private static final Map<String, String> FILTER_FIELDS =
+            Map.ofEntries(
+                    Map.entry("id", "id"),
+                    Map.entry("userId", "user.id"),
+                    Map.entry("email", "user.email"),
+                    Map.entry("firstName", "user.firstName"),
+                    Map.entry("lastName", "user.lastName"),
+                    Map.entry("role", "user.userType"),
+                    Map.entry("active", "status"),
+                    Map.entry("status", "status"),
+                    Map.entry("sessionActiveDate", "sessionActiveDate"),
+                    Map.entry("sessionActiveTime", "sessionActiveTime"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
+            );
 
     @Override
     @Transactional
@@ -124,19 +144,92 @@ public class SessionStoreServiceImpl
     @Transactional(readOnly = true)
     public Page<SessionStatusResponseDTO> getAllSessions(
             int page,
-            int size
+            int size,
+            Map<String, String> filters
     ) {
 
-        Pageable pageable =
-                PageRequest.of(
-                        page,
-                        size,
-                        Sort.by(Sort.Direction.DESC, "createdDate")
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
                 );
 
+        String search =
+                workingFilters.remove("search");
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        workingFilters,
+                        FILTER_FIELDS,
+                        "createdDate",
+                        Sort.Direction.DESC
+                );
+
+        Specification<SessionStore> specification =
+                DynamicFilterSpecification.build(
+                        workingFilters,
+                        FILTER_FIELDS
+                );
+
+        Specification<SessionStore> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
+
         return sessionStoreRepository
-                .findAll(pageable)
+                .findAll(
+                        specification,
+                        pageable
+                )
                 .map(this::toSessionStatusResponseDTO);
+    }
+
+    private Specification<SessionStore> buildSearchSpecification(
+            String search
+    ) {
+
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
+        String keyword =
+                "%"
+                        + search.trim().toLowerCase(Locale.ROOT)
+                        + "%";
+
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("user").get("email")
+                                ),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("user").get("firstName")
+                                ),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("user").get("lastName")
+                                ),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("user").get("userType")
+                                ),
+                                keyword
+                        )
+                );
     }
 
     private SessionStatusResponseDTO toSessionStatusResponseDTO(

@@ -482,11 +482,18 @@ public class AuthController {
             int page,
 
             @RequestParam(defaultValue = "10")
-            int size
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
     ) {
 
         Page<SessionStatusResponseDTO> pageData =
-                sessionStoreService.getAllSessions(page, size);
+                sessionStoreService.getAllSessions(
+                        page,
+                        size,
+                        filters
+                );
 
         PagedResponseDTO<SessionStatusResponseDTO> responseData =
                 PagedResponseDTO.from(pageData);
