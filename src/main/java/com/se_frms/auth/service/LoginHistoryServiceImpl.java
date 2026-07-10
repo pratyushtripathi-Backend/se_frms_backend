@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.lang.Integer;
@@ -55,7 +56,9 @@ public class LoginHistoryServiceImpl
             User user,
             HttpServletRequest request,
             Boolean status,
-            String macAddress
+            String macAddress,
+            BigDecimal latitude,
+            BigDecimal longitude
     ) {
 
         log.info(
@@ -88,10 +91,18 @@ public class LoginHistoryServiceImpl
                                 resolvedMacAddress
                         )
                         .latitude(
-                                null
+                                resolveCoordinate(
+                                        latitude,
+                                        request,
+                                        "X-Client-Latitude"
+                                )
                         )
                         .longitude(
-                                null
+                                resolveCoordinate(
+                                        longitude,
+                                        request,
+                                        "X-Client-Longitude"
+                                )
                         )
                         .url(
                                 request
@@ -116,6 +127,39 @@ public class LoginHistoryServiceImpl
                 user.getId(),
                 status
         );
+    }
+
+    private Double resolveCoordinate(
+            BigDecimal requestValue,
+            HttpServletRequest request,
+            String headerName
+    ) {
+
+        if (requestValue != null) {
+            return requestValue.doubleValue();
+        }
+
+        String headerValue =
+                request.getHeader(
+                        headerName
+                );
+
+        if (headerValue == null || headerValue.isBlank()) {
+            return null;
+        }
+
+        try {
+            return new BigDecimal(
+                    headerValue.trim()
+            ).doubleValue();
+        } catch (NumberFormatException ex) {
+            log.warn(
+                    "Invalid coordinate header ignored, headerName={}, value={}",
+                    headerName,
+                    headerValue
+            );
+            return null;
+        }
     }
 
     private String extractMacAddress(

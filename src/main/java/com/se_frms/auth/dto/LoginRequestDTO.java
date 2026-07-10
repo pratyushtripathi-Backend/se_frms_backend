@@ -2,6 +2,7 @@ package com.se_frms.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,9 +18,13 @@ public class LoginRequestDTO {
     private String password;
 
 
+    @JsonAlias({"lat", "loginLatitude"})
     private BigDecimal latitude;
 
+    @JsonAlias({"lng", "loginLongitude"})
     private BigDecimal longitude;
+
+    private ClientLocationDTO location;
 
     private String macAddress;
 }

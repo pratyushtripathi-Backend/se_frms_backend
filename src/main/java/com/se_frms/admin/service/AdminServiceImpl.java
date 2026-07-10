@@ -29,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -162,6 +163,16 @@ public class AdminServiceImpl implements AdminService {
                         .firstName(user.getFirstName())
                         .lastName(user.getLastName())
                         .email(user.getEmail())
+                        .phoneNumber(user.getPhoneNumber())
+                        .role(user.getUserType())
+                        .status(user.getStatus())
+                        .createdBy(
+                                user.getCreatedBy() != null
+                                        ? user.getCreatedBy().getId()
+                                        : null
+                        )
+                        .createdDate(user.getCreatedDate())
+                        .updatedAt(user.getUpdatedAt())
                         .build()
                 )
                 .toList();
@@ -196,11 +207,21 @@ public class AdminServiceImpl implements AdminService {
                 size
         );
 
+        Map<String, String> employeeFilters =
+                new HashMap<>(
+                        filters
+                );
+
+        String search =
+                employeeFilters.remove(
+                        "search"
+                );
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        employeeFilters,
                         EMPLOYEE_FILTER_FIELDS,
                         "firstName",
                         Sort.Direction.ASC
@@ -220,8 +241,13 @@ public class AdminServiceImpl implements AdminService {
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        employeeFilters,
                                         EMPLOYEE_FILTER_FIELDS
+                                )
+                        )
+                        .and(
+                                buildEmployeeSearchSpecification(
+                                        search
                                 )
                         );
 
@@ -236,6 +262,16 @@ public class AdminServiceImpl implements AdminService {
                                 .firstName(user.getFirstName())
                                 .lastName(user.getLastName())
                                 .email(user.getEmail())
+                                .phoneNumber(user.getPhoneNumber())
+                                .role(user.getUserType())
+                                .status(user.getStatus())
+                                .createdBy(
+                                        user.getCreatedBy() != null
+                                                ? user.getCreatedBy().getId()
+                                                : null
+                                )
+                                .createdDate(user.getCreatedDate())
+                                .updatedAt(user.getUpdatedAt())
                                 .build()
                         );
 
@@ -247,6 +283,44 @@ public class AdminServiceImpl implements AdminService {
         );
 
         return employees;
+    }
+
+    private Specification<User> buildEmployeeSearchSpecification(
+            String search
+    ) {
+
+        return (root, query, criteriaBuilder) -> {
+
+            if (search == null || search.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String pattern =
+                    "%"
+                            + search
+                            .trim()
+                            .toLowerCase(Locale.ROOT)
+                            + "%";
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("firstName")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("lastName")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("email")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("phoneNumber")),
+                            pattern
+                    )
+            );
+        };
     }
 
     @Override
@@ -407,6 +481,14 @@ public class AdminServiceImpl implements AdminService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getUserType())
+                .status(user.getStatus())
+                .createdBy(
+                        user.getCreatedBy() != null
+                                ? user.getCreatedBy().getId()
+                                : null
+                )
+                .createdDate(user.getCreatedDate())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 

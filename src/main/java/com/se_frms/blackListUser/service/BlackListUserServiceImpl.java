@@ -20,6 +20,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
@@ -142,11 +144,21 @@ public class BlackListUserServiceImpl
                 size
         );
 
+        Map<String, String> blackListFilters =
+                new HashMap<>(
+                        filters
+                );
+
+        String search =
+                blackListFilters.remove(
+                        "search"
+                );
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        blackListFilters,
                         FILTER_FIELDS,
                         "employeeName",
                         Sort.Direction.ASC
@@ -160,8 +172,13 @@ public class BlackListUserServiceImpl
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        blackListFilters,
                                         FILTER_FIELDS
+                                )
+                        )
+                        .and(
+                                buildBlackListUserSearchSpecification(
+                                        search
                                 )
                         );
 
@@ -218,11 +235,21 @@ public class BlackListUserServiceImpl
                 size
         );
 
+        Map<String, String> blackListFilters =
+                new HashMap<>(
+                        filters
+                );
+
+        String search =
+                blackListFilters.remove(
+                        "search"
+                );
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        blackListFilters,
                         FILTER_FIELDS,
                         "employeeName",
                         Sort.Direction.ASC
@@ -242,8 +269,13 @@ public class BlackListUserServiceImpl
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        blackListFilters,
                                         FILTER_FIELDS
+                                )
+                        )
+                        .and(
+                                buildBlackListUserSearchSpecification(
+                                        search
                                 )
                         );
 
@@ -262,6 +294,48 @@ public class BlackListUserServiceImpl
         );
 
         return response;
+    }
+
+    private Specification<BlackListUser> buildBlackListUserSearchSpecification(
+            String search
+    ) {
+
+        return (root, query, criteriaBuilder) -> {
+
+            if (search == null || search.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String pattern =
+                    "%"
+                            + search
+                            .trim()
+                            .toLowerCase(Locale.ROOT)
+                            + "%";
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("employeeName")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("email")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("mobile")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("reason")),
+                            pattern
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("riskType")),
+                            pattern
+                    )
+            );
+        };
     }
 
     private User getUserOrThrow(

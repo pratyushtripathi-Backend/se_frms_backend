@@ -205,11 +205,7 @@ public class SecurityConfig {
         );
         configuration.setAllowedHeaders(
                 List.of(
-                        "Authorization",
-                        "Content-Type",
-                        "Accept",
-                        "Origin",
-                        "X-Requested-With"
+                        "*"
                 )
         );
         configuration.setExposedHeaders(

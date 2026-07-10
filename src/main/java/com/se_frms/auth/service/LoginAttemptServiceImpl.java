@@ -92,8 +92,20 @@ public class LoginAttemptServiceImpl
                         .attemptStatus(status)
                         .failureReason(reason)
                         .ipAddress(ip)
-                        .latitude(latitude)
-                        .longitude(longitude)
+                        .latitude(
+                                resolveCoordinate(
+                                        latitude,
+                                        request,
+                                        "X-Client-Latitude"
+                                )
+                        )
+                        .longitude(
+                                resolveCoordinate(
+                                        longitude,
+                                        request,
+                                        "X-Client-Longitude"
+                                )
+                        )
                         .url(
                                 request
                                         .getRequestURL()
@@ -110,6 +122,39 @@ public class LoginAttemptServiceImpl
                 user != null ? user.getId() : null,
                 status
         );
+    }
+
+    private BigDecimal resolveCoordinate(
+            BigDecimal requestValue,
+            HttpServletRequest request,
+            String headerName
+    ) {
+
+        if (requestValue != null) {
+            return requestValue;
+        }
+
+        String headerValue =
+                request.getHeader(
+                        headerName
+                );
+
+        if (headerValue == null || headerValue.isBlank()) {
+            return null;
+        }
+
+        try {
+            return new BigDecimal(
+                    headerValue.trim()
+            );
+        } catch (NumberFormatException ex) {
+            log.warn(
+                    "Invalid coordinate header ignored, headerName={}, value={}",
+                    headerName,
+                    headerValue
+            );
+            return null;
+        }
     }
 
     @Override

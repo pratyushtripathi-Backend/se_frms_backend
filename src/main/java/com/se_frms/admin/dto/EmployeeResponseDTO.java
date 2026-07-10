@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.lang.Integer;
 
 
@@ -24,5 +25,12 @@ public class EmployeeResponseDTO {
 
     private String role;
 
+    private Boolean status;
+
+    private Integer createdBy;
+
+    private LocalDateTime createdDate;
+
+    private LocalDateTime updatedAt;
 
 }

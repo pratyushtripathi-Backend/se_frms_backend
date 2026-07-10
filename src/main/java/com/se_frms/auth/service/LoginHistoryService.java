@@ -9,6 +9,7 @@ import com.se_frms.user.model.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.lang.Integer;
@@ -23,7 +24,11 @@ public interface LoginHistoryService {
 
             Boolean status,
 
-            String macAddress
+            String macAddress,
+
+            BigDecimal latitude,
+
+            BigDecimal longitude
     );
 
     Page<LoginHistoryResponseDTO>

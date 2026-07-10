@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.util.DigestUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -407,121 +408,6 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
-//    @Override
-//    public LoginOtpResponseDTO login(
-//            LoginRequestDTO request,
-//            HttpServletRequest httpRequest
-//    ) {
-//
-//        String email =
-//                XssUtil.clean(request.getEmail())
-//                        .trim()
-//                        .toLowerCase();
-//        log.info("Sanitized email={}", email);
-//
-//        User user =
-//                userRepository
-//                        .findByEmail(email)
-//                        .orElse(null);
-//
-//        if (user == null) {
-//
-//            loginAttemptService.saveAttempt(
-//                    null,
-//                    email,
-//                    false,
-//                    "USER_NOT_FOUND",
-//                    request.getLatitude(),
-//                    request.getLongitude(),
-//                    httpRequest
-//            );
-//
-//            throw new InvalidCredentialsException(
-//                    "Invalid email or password"
-//            );
-//        }
-//
-//        if (!Boolean.TRUE.equals(user.getStatus())) {
-//
-//            throw new InvalidCredentialsException("Invalid email or password");
-//        }
-//
-//        if (Boolean.FALSE.equals(user.getStatus())) {
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    request.getEmail(),
-//                    false,
-//                    "USER_BLOCKED",
-//                    request.getLatitude(),
-//                    request.getLongitude(),
-//                    httpRequest
-//            );
-//
-//            log.warn("Login failed because user is blacklisted, userId={}", user.getId());
-//
-//            throw new InvalidCredentialsException("User is blocked. Please contact admin.");
-//        }
-//
-//        boolean passwordMatches =
-//                passwordEncoder.matches(
-//                        request.getPassword(),
-//                        user.getPasswordHash()
-//                );
-//
-//        if (!passwordMatches) {
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    request.getEmail(),
-//                    false,
-//                    "INVALID_PASSWORD",
-//                    request.getLatitude(),
-//                    request.getLongitude(),
-//                    httpRequest
-//            );
-//
-//            log.warn("Login failed because password was invalid, userId={}", user.getId());
-//
-//            throw new InvalidCredentialsException("Invalid email or password");
-//        }
-//
-//        String otp =
-//                String.valueOf(
-//                        100000 + OTP_RANDOM.nextInt(900000)
-//                );
-//        EmailOtp emailOtp =
-//                EmailOtp.builder()
-//                        .email(user.getEmail())
-//                        .otp(otp)
-//                        .expiryTime(LocalDateTime.now().plusMinutes(5))
-//                        .verified(false)
-//                        .macAddress(cleanMacAddress(request.getMacAddress()))
-//                        .build();
-//
-//        emailOtpRepository.save(emailOtp);
-//
-//        smsService.sendLoginOtp(
-//                user.getPhoneNumber(),
-//                otp
-//        );
-//
-//        log.info(
-//                "Login OTP SMS service completed, userId={}",
-//                user.getId()
-//        );
-//
-//        return LoginOtpResponseDTO
-//                .builder()
-//                .email(user.getEmail())
-//                .maskedPhoneNumber(maskPhoneNumber(user.getPhoneNumber()))
-//                .otp(returnOtpInResponse ? otp : null)
-//                .otpRequired(true)
-//                .build();
-//
-//    }
-
-
     @Transactional(noRollbackFor = InvalidCredentialsException.class)
     @Override
     public LoginOtpResponseDTO login(
@@ -536,6 +422,20 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Sanitized email={}", email);
 
+        BigDecimal latitude =
+                resolveLatitude(
+                        request.getLatitude(),
+                        request.getLocation(),
+                        httpRequest
+                );
+
+        BigDecimal longitude =
+                resolveLongitude(
+                        request.getLongitude(),
+                        request.getLocation(),
+                        httpRequest
+                );
+
         User user =
                 userRepository
                         .findByEmail(email)
@@ -548,8 +448,8 @@ public class AuthServiceImpl implements AuthService {
                     email,
                     false,
                     "USER_NOT_FOUND",
-                    request.getLatitude(),
-                    request.getLongitude(),
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -565,8 +465,8 @@ public class AuthServiceImpl implements AuthService {
                     request.getEmail(),
                     false,
                     "USER_BLOCKED",
-                    request.getLatitude(),
-                    request.getLongitude(),
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -575,9 +475,7 @@ public class AuthServiceImpl implements AuthService {
                     user.getId()
             );
 
-            throw new InvalidCredentialsException(
-                    "Account is locked. Please contact admin department."
-            );
+            throw new InvalidCredentialsException("User is blocked. Please contact admin.");
         }
 
         boolean passwordMatches =
@@ -601,8 +499,8 @@ public class AuthServiceImpl implements AuthService {
                     request.getEmail(),
                     false,
                     reason,
-                    request.getLatitude(),
-                    request.getLongitude(),
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -666,6 +564,16 @@ public class AuthServiceImpl implements AuthService {
         smsService.sendLoginOtp(
                 user.getPhoneNumber(),
                 otp
+        );
+
+        loginAttemptService.saveAttempt(
+                user,
+                user.getEmail(),
+                true,
+                "OTP_SENT",
+                latitude,
+                longitude,
+                httpRequest
         );
 
         log.info(
@@ -858,6 +766,20 @@ public class AuthServiceImpl implements AuthService {
         String email =
                 request.getEmail().trim().toLowerCase();
 
+        BigDecimal latitude =
+                resolveLatitude(
+                        request.getLatitude(),
+                        request.getLocation(),
+                        httpRequest
+                );
+
+        BigDecimal longitude =
+                resolveLongitude(
+                        request.getLongitude(),
+                        request.getLocation(),
+                        httpRequest
+                );
+
         User user =
                 userRepository
                         .findByEmail(email)
@@ -877,8 +799,8 @@ public class AuthServiceImpl implements AuthService {
                                     email,
                                     false,
                                     "OTP_NOT_FOUND",
-                                    null,
-                                    null,
+                                    latitude,
+                                    longitude,
                                     httpRequest
                             );
 
@@ -894,8 +816,8 @@ public class AuthServiceImpl implements AuthService {
                     email,
                     false,
                     "OTP_TOO_MANY_ATTEMPTS",
-                    null,
-                    null,
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -911,8 +833,8 @@ public class AuthServiceImpl implements AuthService {
                     email,
                     false,
                     "OTP_ALREADY_USED",
-                    null,
-                    null,
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -931,8 +853,8 @@ public class AuthServiceImpl implements AuthService {
                     email,
                     false,
                     "OTP_EXPIRED",
-                    null,
-                    null,
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -959,8 +881,8 @@ public class AuthServiceImpl implements AuthService {
                         email,
                         false,
                         "OTP_TOO_MANY_ATTEMPTS",
-                        null,
-                        null,
+                        latitude,
+                        longitude,
                         httpRequest
                 );
 
@@ -974,8 +896,8 @@ public class AuthServiceImpl implements AuthService {
                     email,
                     false,
                     "INVALID_OTP",
-                    null,
-                    null,
+                    latitude,
+                    longitude,
                     httpRequest
             );
 
@@ -1001,8 +923,8 @@ public class AuthServiceImpl implements AuthService {
                 email,
                 true,
                 "LOGIN_SUCCESS",
-                null,
-                null,
+                latitude,
+                longitude,
                 httpRequest
         );
 
@@ -1013,7 +935,9 @@ public class AuthServiceImpl implements AuthService {
                 resolveMacAddress(
                         request.getMacAddress(),
                         emailOtp.getMacAddress()
-                )
+                ),
+                latitude,
+                longitude
         );
 
         return LoginResponseDTO
@@ -1024,6 +948,76 @@ public class AuthServiceImpl implements AuthService {
                 .role(user.getUserType())
                 .token(token)
                 .build();
+    }
+
+    private BigDecimal resolveLatitude(
+            BigDecimal requestLatitude,
+            ClientLocationDTO location,
+            HttpServletRequest httpRequest
+    ) {
+
+        return resolveCoordinate(
+                requestLatitude,
+                location != null
+                        ? location.getLatitude()
+                        : null,
+                httpRequest,
+                "X-Client-Latitude"
+        );
+    }
+
+    private BigDecimal resolveLongitude(
+            BigDecimal requestLongitude,
+            ClientLocationDTO location,
+            HttpServletRequest httpRequest
+    ) {
+
+        return resolveCoordinate(
+                requestLongitude,
+                location != null
+                        ? location.getLongitude()
+                        : null,
+                httpRequest,
+                "X-Client-Longitude"
+        );
+    }
+
+    private BigDecimal resolveCoordinate(
+            BigDecimal requestValue,
+            BigDecimal nestedValue,
+            HttpServletRequest httpRequest,
+            String headerName
+    ) {
+
+        if (requestValue != null) {
+            return requestValue;
+        }
+
+        if (nestedValue != null) {
+            return nestedValue;
+        }
+
+        String headerValue =
+                httpRequest.getHeader(
+                        headerName
+                );
+
+        if (headerValue == null || headerValue.isBlank()) {
+            return null;
+        }
+
+        try {
+            return new BigDecimal(
+                    headerValue.trim()
+            );
+        } catch (NumberFormatException ex) {
+            log.warn(
+                    "Invalid coordinate header ignored, headerName={}, value={}",
+                    headerName,
+                    headerValue
+            );
+            return null;
+        }
     }
 
     private String buildFullName(
