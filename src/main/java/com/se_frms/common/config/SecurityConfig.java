@@ -132,6 +132,15 @@ public class SecurityConfig {
                         .authenticated()
 
                         .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/users",
+                                "/api/v1/users/"
+                        )
+                        .hasRole(
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
 
                                 "/api/v1/auth/**"
 

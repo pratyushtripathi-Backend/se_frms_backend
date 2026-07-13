@@ -5,6 +5,7 @@ package com.se_frms.user.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.lang.Integer;
 
 @Data
@@ -22,4 +23,12 @@ public class UserResponseDTO {
     private String phoneNumber;
 
     private String role;
+
+    private Boolean status;
+
+    private Integer createdBy;
+
+    private LocalDateTime createdDate;
+
+    private LocalDateTime updatedAt;
 }

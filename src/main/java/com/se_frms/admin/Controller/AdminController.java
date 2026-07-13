@@ -166,7 +166,7 @@ public class AdminController {
 
             @PathVariable
             Integer employeeId,
-
+            @Valid
             @RequestBody
             UpdateEmployeePatchRequest request
     ) {

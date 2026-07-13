@@ -1,8 +1,8 @@
 package com.se_frms.admin.dto;
 
-
-
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,13 +10,19 @@ import lombok.Setter;
 @Setter
 public class UpdateEmployeePatchRequest {
 
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+    @Pattern(regexp = "^[A-Za-z]+(?: [A-Za-z]+)*$", message = "First name must contain only alphabets")
     private String firstName;
 
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
+    @Pattern(regexp = "^[A-Za-z]+(?: [A-Za-z]+)*$", message = "Last name must contain only alphabets")
     private String lastName;
 
-    @Email
+    @Email(message = "Invalid email format")
+    @Size(max = 150, message = "Email must not exceed 150 characters")
     private String email;
 
+    @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Invalid Indian phone number")
     private String phoneNumber;
 
     private Boolean isActive;
