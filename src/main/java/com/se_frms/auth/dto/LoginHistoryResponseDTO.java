@@ -15,7 +15,7 @@ public class LoginHistoryResponseDTO {
 
     private Long id;
 
-    private String userId;
+    private String name;
 
     private LocalDate loginDate;
 

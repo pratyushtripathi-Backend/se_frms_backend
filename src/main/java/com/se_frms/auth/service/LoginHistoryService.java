@@ -46,4 +46,9 @@ public interface LoginHistoryService {
             int size,
             Map<String, String> filters
     );
+    Page<LoginHistoryResponseDTO> getAllLoginHistory(
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 }

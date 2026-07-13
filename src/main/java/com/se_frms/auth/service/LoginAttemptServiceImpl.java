@@ -19,7 +19,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.HashMap;
+import java.util.Locale;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -166,11 +167,21 @@ public class LoginAttemptServiceImpl
 
         log.info("Fetch all login attempts service started");
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "attemptedAt",
                         Sort.Direction.DESC
@@ -178,9 +189,17 @@ public class LoginAttemptServiceImpl
 
         Specification<LoginAttempt> specification =
                 DynamicFilterSpecification.build(
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS
                 );
+
+        Specification<LoginAttempt> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
 
         Page<LoginAttemptResponseDTO> response =
                 repository
@@ -196,6 +215,40 @@ public class LoginAttemptServiceImpl
         );
 
         return response;
+    }
+
+    private Specification<LoginAttempt> buildSearchSpecification(
+            String search
+    ) {
+
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
+        String keyword =
+                "%"
+                        + search.trim().toLowerCase(Locale.ROOT)
+                        + "%";
+
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("email")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("failureReason")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("ipAddress")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("url")),
+                                keyword
+                        )
+                );
     }
 
     private LoginAttemptResponseDTO mapToDTO(
@@ -242,12 +295,10 @@ public class LoginAttemptServiceImpl
     @Override
     public Page<LoginAttemptResponseDTO>
     getLoginAttemptsByUserId(
-
             Integer userId,
             int page,
             int size,
             Map<String, String> filters
-
     ) {
 
         log.info(
@@ -255,26 +306,37 @@ public class LoginAttemptServiceImpl
                 userId
         );
 
-        User user = userRepository
-                .findById(userId)
-                .orElseThrow(
-                        () -> {
-                            log.warn(
-                                    "Fetch login attempts failed because user was not found, userId={}",
-                                    userId
-                            );
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(
+                                () -> {
+                                    log.warn(
+                                            "Fetch login attempts failed because user was not found, userId={}",
+                                            userId
+                                    );
 
-                            return new RuntimeException(
-                                    "User not found"
-                            );
-                        }
+                                    return new RuntimeException(
+                                            "User not found"
+                                    );
+                                }
+                        );
+
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
                 );
+
+        String search =
+                workingFilters.remove("search");
 
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "attemptedAt",
                         Sort.Direction.DESC
@@ -288,10 +350,18 @@ public class LoginAttemptServiceImpl
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        workingFilters,
                                         FILTER_FIELDS
                                 )
                         );
+
+        Specification<LoginAttempt> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
 
         Page<LoginAttemptResponseDTO> response =
                 repository

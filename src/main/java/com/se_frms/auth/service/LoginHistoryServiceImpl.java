@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.lang.Integer;
 
@@ -229,6 +231,7 @@ public class LoginHistoryServiceImpl
                 .getRemoteAddr();
     }
 
+
     @Override
     public Page<LoginHistoryResponseDTO>
     getLoginHistory(
@@ -243,11 +246,21 @@ public class LoginHistoryServiceImpl
                 user.getId()
         );
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "createdDate",
                         Sort.Direction.DESC
@@ -261,10 +274,18 @@ public class LoginHistoryServiceImpl
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        workingFilters,
                                         FILTER_FIELDS
                                 )
                         );
+
+        Specification<LoginHistory> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
 
         Page<LoginHistoryResponseDTO> response =
                 loginHistoryRepository
@@ -284,14 +305,71 @@ public class LoginHistoryServiceImpl
     }
 
     @Override
+    public Page<LoginHistoryResponseDTO> getAllLoginHistory(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
+
+        log.info("Fetch all login history service started");
+
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        workingFilters,
+                        FILTER_FIELDS,
+                        "createdDate",
+                        Sort.Direction.DESC
+                );
+
+        Specification<LoginHistory> specification =
+                DynamicFilterSpecification.build(
+                        workingFilters,
+                        FILTER_FIELDS
+                );
+
+        Specification<LoginHistory> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
+
+        Page<LoginHistoryResponseDTO> response =
+                loginHistoryRepository
+                        .findAll(
+                                specification,
+                                pageable
+                        )
+                        .map(this::mapToDTO);
+
+        log.info(
+                "All login history fetched successfully, count={}",
+                response.getNumberOfElements()
+        );
+
+        return response;
+    }
+
+    @Override
     public Page<LoginHistoryResponseDTO>
     getLoginHistoryByUserId(
-
             Integer userId,
             int page,
             int size,
             Map<String, String> filters
-
     ) {
 
         log.info(
@@ -299,11 +377,21 @@ public class LoginHistoryServiceImpl
                 userId
         );
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "createdDate",
                         Sort.Direction.DESC
@@ -317,10 +405,18 @@ public class LoginHistoryServiceImpl
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        workingFilters,
                                         FILTER_FIELDS
                                 )
                         );
+
+        Specification<LoginHistory> searchSpecification =
+                buildSearchSpecification(search);
+
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
 
         Page<LoginHistoryResponseDTO> response =
                 loginHistoryRepository
@@ -339,6 +435,49 @@ public class LoginHistoryServiceImpl
         return response;
     }
 
+
+    private Specification<LoginHistory> buildSearchSpecification(
+            String search
+    ) {
+
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
+        String keyword =
+                "%"
+                        + search.trim().toLowerCase(Locale.ROOT)
+                        + "%";
+
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("user").get("email")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("user").get("firstName")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("user").get("lastName")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("ipAddress")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("macAddress")),
+                                keyword
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(root.get("url")),
+                                keyword
+                        )
+                );
+    }
+
     private LoginHistoryResponseDTO mapToDTO(
             LoginHistory history
     ) {
@@ -348,11 +487,9 @@ public class LoginHistoryServiceImpl
                 .id(
                         history.getId()
                 )
-                .userId(
-                        String.valueOf(
-                                history
-                                        .getUser()
-                                        .getId()
+                .name(
+                        buildFullName(
+                                history.getUser()
                         )
                 )
                 .loginDate(
@@ -386,5 +523,26 @@ public class LoginHistoryServiceImpl
                         history.getUpdatedAt()
                 )
                 .build();
+    }
+
+    private String buildFullName(
+            User user
+    ) {
+
+        if (user == null) {
+            return null;
+        }
+
+        String firstName =
+                user.getFirstName() == null
+                        ? ""
+                        : user.getFirstName().trim();
+
+        String lastName =
+                user.getLastName() == null
+                        ? ""
+                        : user.getLastName().trim();
+
+        return (firstName + " " + lastName).trim();
     }
 }

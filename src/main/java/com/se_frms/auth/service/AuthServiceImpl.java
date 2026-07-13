@@ -1066,31 +1066,19 @@ public class AuthServiceImpl implements AuthService {
             Map<String, String> filters
     ) {
 
-        log.info("Get login history service started");
-
-        String email =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName();
-
-        User user =
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow(() -> {
-                            log.warn("Login history fetch failed because user was not found");
-                            return new RuntimeException("User not found");
-                        });
+        log.info("Get all login history service started");
 
         Page<LoginHistoryResponseDTO> response =
-                loginHistoryService.getLoginHistory(
-                        user,
+                loginHistoryService.getAllLoginHistory(
                         page,
                         size,
                         filters
                 );
 
-        log.info("Login history fetched successfully, userId={}, count={}", user.getId(), response.getNumberOfElements());
+        log.info(
+                "All login history fetched successfully, count={}",
+                response.getNumberOfElements()
+        );
 
         return response;
     }
