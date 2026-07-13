@@ -129,7 +129,7 @@ public class SessionStoreServiceImpl
         return SessionStatusResponseDTO
                 .builder()
                 .active(sessionStore.getStatus())
-                .userId(user.getId())
+                .name(buildFullName(user))
                 .email(user.getEmail())
                 .role(user.getUserType())
                 .sessionActiveDate(
@@ -241,11 +241,36 @@ public class SessionStoreServiceImpl
         return SessionStatusResponseDTO
                 .builder()
                 .active(sessionStore.getStatus())
-                .userId(user.getId())
+                .name(buildFullName(user))
                 .email(user.getEmail())
                 .role(user.getUserType())
                 .sessionActiveDate(sessionStore.getSessionActiveDate())
                 .sessionActiveTime(sessionStore.getSessionActiveTime())
                 .build();
+    }
+
+    private String buildFullName(
+            User user
+    ) {
+
+        if (user == null) {
+            return null;
+        }
+
+        String firstName =
+                user.getFirstName() == null
+                        ? ""
+                        : user.getFirstName().trim();
+
+        String lastName =
+                user.getLastName() == null
+                        ? ""
+                        : user.getLastName().trim();
+
+        return (
+                firstName
+                        + " "
+                        + lastName
+        ).trim();
     }
 }

@@ -13,7 +13,7 @@ public class SessionStatusResponseDTO {
 
     private Boolean active;
 
-    private Integer userId;
+    private String name;
 
     private String email;
 

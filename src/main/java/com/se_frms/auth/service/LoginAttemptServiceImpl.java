@@ -7,6 +7,8 @@ import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -230,11 +232,18 @@ public class LoginAttemptServiceImpl
                         + search.trim().toLowerCase(Locale.ROOT)
                         + "%";
 
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.or(
-                        criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("email")),
-                                keyword
+        return (root, query, criteriaBuilder) -> {
+
+            Join<LoginAttempt, User> userJoin =
+                    root.join(
+                            "user",
+                            JoinType.LEFT
+                    );
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("email")),
+                            keyword
                         ),
                         criteriaBuilder.like(
                                 criteriaBuilder.lower(root.get("failureReason")),
@@ -244,11 +253,20 @@ public class LoginAttemptServiceImpl
                                 criteriaBuilder.lower(root.get("ipAddress")),
                                 keyword
                         ),
-                        criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("url")),
-                                keyword
-                        )
-                );
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("url")),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(userJoin.get("firstName")),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(userJoin.get("lastName")),
+                            keyword
+                    )
+            );
+        };
     }
 
     private LoginAttemptResponseDTO mapToDTO(
@@ -260,10 +278,8 @@ public class LoginAttemptServiceImpl
                 .id(
                         entity.getId()
                 )
-                .userId(
-                        entity.getUser() != null
-                                ? entity.getUser().getId()
-                                : null
+                .name(
+                        buildFullName(entity.getUser())
                 )
                 .email(
                         entity.getEmail()
@@ -290,6 +306,32 @@ public class LoginAttemptServiceImpl
                         entity.getAttemptedAt()
                 )
                 .build();
+    }
+
+
+    private String buildFullName(
+            User user
+    ) {
+
+        if (user == null) {
+            return null;
+        }
+
+        String firstName =
+                user.getFirstName() == null
+                        ? ""
+                        : user.getFirstName().trim();
+
+        String lastName =
+                user.getLastName() == null
+                        ? ""
+                        : user.getLastName().trim();
+
+        return (
+                firstName
+                        + " "
+                        + lastName
+        ).trim();
     }
 
     @Override
