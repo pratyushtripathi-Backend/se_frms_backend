@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
+import com.se_frms.common.security.CurrentUserService;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,6 +37,7 @@ public class AccessServiceImpl
             );
 
     private final AccessMasterRepository repository;
+    private final CurrentUserService currentUserService;
 
     @Override
     public AccessResponseDTO create(
@@ -70,6 +71,9 @@ public class AccessServiceImpl
 
                         .status(
                                 true
+                        )
+                        .createdBy(
+                                currentUserService.getCurrentUserId()
                         )
 
                         .build();
@@ -389,6 +393,9 @@ public class AccessServiceImpl
 
                 .status(
                         entity.getStatus()
+                )
+                .createdBy(
+                        entity.getCreatedBy()
                 )
 
                 .createdDate(

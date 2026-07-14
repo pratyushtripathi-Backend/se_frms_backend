@@ -15,6 +15,8 @@ public class AccessResponseDTO {
 
     private Boolean status;
 
+    private Integer createdBy;
+
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedAt;
