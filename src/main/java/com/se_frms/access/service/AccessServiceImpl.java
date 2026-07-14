@@ -16,6 +16,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
@@ -100,21 +102,39 @@ public class AccessServiceImpl
                 size
         );
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove(
+                        "search"
+                );
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "accessName",
                         Sort.Direction.ASC
                 );
 
         Specification<AccessMaster> specification =
-                DynamicFilterSpecification.build(
-                        filters,
-                        FILTER_FIELDS
-                );
+                DynamicFilterSpecification
+                        .<AccessMaster>build(
+                                workingFilters,
+                                FILTER_FIELDS
+                        )
+                        .and(
+                                buildSearchSpecification(
+                                        search
+                                )
+                        );
 
         Page<AccessResponseDTO> response =
                 repository
@@ -131,6 +151,32 @@ public class AccessServiceImpl
 
         return response;
 
+    }
+
+    private Specification<AccessMaster> buildSearchSpecification(
+            String search
+    ) {
+
+        return (root, query, criteriaBuilder) -> {
+
+            if (search == null || search.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String keyword =
+                    "%"
+                            + search
+                            .trim()
+                            .toLowerCase(Locale.ROOT)
+                            + "%";
+
+            return criteriaBuilder.like(
+                    criteriaBuilder.lower(
+                            root.get("accessName")
+                    ),
+                    keyword
+            );
+        };
     }
 
     @Override

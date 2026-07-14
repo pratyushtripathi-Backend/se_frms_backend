@@ -19,7 +19,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -156,11 +158,23 @@ public class RoleAccessServiceImpl
             Map<String, String> filters
     ) {
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove(
+                        "search"
+                );
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "role.roleName",
                         Sort.Direction.ASC
@@ -173,9 +187,15 @@ public class RoleAccessServiceImpl
                                 true
                         )
                         .and(
-                                DynamicFilterSpecification.build(
-                                        filters,
+                                DynamicFilterSpecification
+                                        .<RoleAccess>build(
+                                        workingFilters,
                                         FILTER_FIELDS
+                                )
+                        )
+                        .and(
+                                buildSearchSpecification(
+                                        search
                                 )
                         );
 
@@ -226,6 +246,40 @@ public class RoleAccessServiceImpl
 
                 );
 
+    }
+
+    private Specification<RoleAccess> buildSearchSpecification(
+            String search
+    ) {
+
+        return (root, query, criteriaBuilder) -> {
+
+            if (search == null || search.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String keyword =
+                    "%"
+                            + search
+                            .trim()
+                            .toLowerCase(Locale.ROOT)
+                            + "%";
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(
+                                    root.get("role").get("roleName")
+                            ),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(
+                                    root.get("access").get("accessName")
+                            ),
+                            keyword
+                    )
+            );
+        };
     }
 
     @Override
