@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
+import com.se_frms.common.security.CurrentUserService;
 @Service
 @RequiredArgsConstructor
 public class RoleAccessServiceImpl
@@ -46,6 +46,7 @@ public class RoleAccessServiceImpl
     private final RoleMasterRepository roleRepository;
 
     private final AccessMasterRepository accessRepository;
+    private final CurrentUserService currentUserService;
 
     @Override
     public RoleAccessResponseDTO create(
@@ -134,6 +135,9 @@ public class RoleAccessServiceImpl
                             .status(
                                     true
                             )
+                            .createdBy(
+                                    currentUserService.getCurrentUserId()
+                            )
 
                             .createdDate(
                                     LocalDateTime.now()
@@ -214,32 +218,42 @@ public class RoleAccessServiceImpl
 
                                         .builder()
 
+                                        .id(
+                                                v.getId()
+                                        )
+
                                         .roleId(
-
-                                                v.getRole()
-
-                                                        .getRoleId()
-
+                                                v.getRole().getRoleId()
                                         )
 
                                         .roleName(
+                                                v.getRole().getRoleName()
+                                        )
 
-                                                v.getRole()
-
-                                                        .getRoleName()
-
+                                        .accessId(
+                                                v.getAccess().getId()
                                         )
 
                                         .accessNames(
-
                                                 List.of(
-
-                                                        v.getAccess()
-
-                                                                .getAccessName()
-
+                                                        v.getAccess().getAccessName()
                                                 )
+                                        )
 
+                                        .status(
+                                                v.getStatus()
+                                        )
+
+                                        .createdBy(
+                                                v.getCreatedBy()
+                                        )
+
+                                        .createdDate(
+                                                v.getCreatedDate()
+                                        )
+
+                                        .updatedAt(
+                                                v.getUpdatedAt()
                                         )
 
                                         .build()

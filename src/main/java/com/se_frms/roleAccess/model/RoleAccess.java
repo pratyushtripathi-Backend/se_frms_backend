@@ -57,6 +57,9 @@ public class RoleAccess {
 
     private Boolean status;
 
+    @Column(name = "created_by")
+    private Integer createdBy;
+
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedAt;
