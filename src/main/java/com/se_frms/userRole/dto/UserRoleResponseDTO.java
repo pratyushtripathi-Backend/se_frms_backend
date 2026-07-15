@@ -23,6 +23,8 @@ public class UserRoleResponseDTO {
 
     private Boolean status;
 
+    private Integer createdBy;
+
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedAt;

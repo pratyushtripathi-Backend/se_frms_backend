@@ -167,9 +167,7 @@ public class AdminServiceImpl implements AdminService {
                         .role(user.getUserType())
                         .status(user.getStatus())
                         .createdBy(
-                                user.getCreatedBy() != null
-                                        ? user.getCreatedBy().getId()
-                                        : null
+                                buildCreatedBy(user.getCreatedBy())
                         )
                         .createdDate(user.getCreatedDate())
                         .updatedAt(user.getUpdatedAt())
@@ -266,9 +264,7 @@ public class AdminServiceImpl implements AdminService {
                                 .role(user.getUserType())
                                 .status(user.getStatus())
                                 .createdBy(
-                                        user.getCreatedBy() != null
-                                                ? user.getCreatedBy().getId()
-                                                : null
+                                        buildCreatedBy(user.getCreatedBy())
                                 )
                                 .createdDate(user.getCreatedDate())
                                 .updatedAt(user.getUpdatedAt())
@@ -283,6 +279,26 @@ public class AdminServiceImpl implements AdminService {
         );
 
         return employees;
+    }
+
+    private String buildCreatedBy(User createdBy) {
+
+        if (createdBy == null) {
+            return null;
+        }
+
+        String createdByName =
+                (
+                        (createdBy.getFirstName() != null ? createdBy.getFirstName() : "")
+                                + " "
+                                + (createdBy.getLastName() != null ? createdBy.getLastName() : "")
+                ).trim();
+
+        if (createdByName.isBlank()) {
+            return String.valueOf(createdBy.getId());
+        }
+
+        return createdBy.getId() + " - " + createdByName;
     }
 
     private Specification<User> buildEmployeeSearchSpecification(

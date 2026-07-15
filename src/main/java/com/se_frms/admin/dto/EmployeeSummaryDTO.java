@@ -25,7 +25,7 @@ public class EmployeeSummaryDTO {
 
     private Boolean status;
 
-    private Integer createdBy;
+    private String createdBy;
 
     private LocalDateTime createdDate;
 

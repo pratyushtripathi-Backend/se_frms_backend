@@ -302,6 +302,7 @@ public class UserRoleServiceImpl
                 .roleId(userRole.getRole().getRoleId())
                 .roleName(userRole.getRole().getRoleName())
                 .status(userRole.getStatus())
+                .createdBy(userRole.getCreatedBy())
                 .createdDate(userRole.getCreatedDate())
                 .updatedAt(userRole.getUpdatedAt())
                 .build();
