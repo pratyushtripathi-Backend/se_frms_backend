@@ -3,6 +3,7 @@ package com.se_frms.auth.service;
 import com.se_frms.auth.dto.LoginAttemptResponseDTO;
 import com.se_frms.auth.model.LoginAttempt;
 import com.se_frms.auth.repository.LoginAttemptRepository;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
@@ -54,6 +55,8 @@ public class LoginAttemptServiceImpl
     private final LoginAttemptRepository repository;
 
     private final UserRepository userRepository;
+
+    private final CreatedByResolver createdByResolver;
 
     @Transactional(
             propagation = Propagation.REQUIRES_NEW
@@ -109,6 +112,7 @@ public class LoginAttemptServiceImpl
                                         "X-Client-Longitude"
                                 )
                         )
+                        .createdBy(user)
                         .url(
                                 request
                                         .getRequestURL()
@@ -301,6 +305,13 @@ public class LoginAttemptServiceImpl
                 )
                 .url(
                         entity.getUrl()
+                )
+                .createdBy(
+                        createdByResolver.resolve(
+                                entity.getCreatedBy() != null
+                                        ? entity.getCreatedBy()
+                                        : entity.getUser()
+                        )
                 )
                 .attemptedAt(
                         entity.getAttemptedAt()

@@ -25,7 +25,7 @@ public class BlackListUserResponseDTO {
 
     private String riskType;
 
-    private Integer createdBy;
+    private String createdBy;
 
     private LocalDateTime createdDate;
 

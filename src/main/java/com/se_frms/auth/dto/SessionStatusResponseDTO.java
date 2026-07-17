@@ -19,6 +19,8 @@ public class SessionStatusResponseDTO {
 
     private String role;
 
+    private String createdBy;
+
     private LocalDate sessionActiveDate;
 
     private LocalTime sessionActiveTime;

@@ -6,6 +6,7 @@ import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
 import com.se_frms.common.security.CurrentUserService;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class RoleMasterServiceImpl
         implements RoleMasterService {
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
 
     private static final String ROLE_NAME_PATTERN =
             "^[A-Z][A-Z0-9_]*$";
@@ -241,7 +243,7 @@ public class RoleMasterServiceImpl
                 .roleId(roleMaster.getRoleId())
                 .roleName(roleMaster.getRoleName())
                 .status(roleMaster.getStatus())
-                .createdBy(roleMaster.getCreatedBy())
+                .createdBy(createdByResolver.resolve(roleMaster.getCreatedBy()))
                 .createdDate(roleMaster.getCreatedDate())
                 .updatedAt(roleMaster.getUpdatedAt())
                 .build();

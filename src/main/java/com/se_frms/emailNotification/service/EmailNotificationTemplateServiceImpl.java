@@ -1,6 +1,7 @@
 package com.se_frms.emailNotification.service;
 
 import com.se_frms.auth.exception.InvalidRequestException;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
@@ -43,6 +44,7 @@ public class EmailNotificationTemplateServiceImpl
 
     private final EmailNotificationTemplateRepository repository;
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public EmailNotificationTemplateResponseDTO createTemplate(
@@ -325,7 +327,7 @@ public class EmailNotificationTemplateServiceImpl
                 .subject(template.getSubject())
                 .body(template.getBody())
                 .status(template.getStatus())
-                .createdBy(template.getCreatedBy())
+                .createdBy(createdByResolver.resolve(template.getCreatedBy()))
                 .createdDate(template.getCreatedDate())
                 .updatedAt(template.getUpdatedAt())
                 .build();

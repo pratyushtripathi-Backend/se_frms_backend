@@ -33,6 +33,8 @@ public class LoginHistoryResponseDTO {
 
     private Boolean status;
 
+    private String createdBy;
+
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedAt;

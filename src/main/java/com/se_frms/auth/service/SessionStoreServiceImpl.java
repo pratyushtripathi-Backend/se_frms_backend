@@ -3,6 +3,7 @@ package com.se_frms.auth.service;
 import com.se_frms.auth.dto.SessionStatusResponseDTO;
 import com.se_frms.auth.model.SessionStore;
 import com.se_frms.auth.repository.SessionStoreRepository;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class SessionStoreServiceImpl
         implements SessionStoreService {
 
     private final SessionStoreRepository sessionStoreRepository;
+    private final CreatedByResolver createdByResolver;
     private static final Map<String, String> FILTER_FIELDS =
             Map.ofEntries(
                     Map.entry("id", "id"),
@@ -37,6 +39,7 @@ public class SessionStoreServiceImpl
                     Map.entry("role", "user.userType"),
                     Map.entry("active", "status"),
                     Map.entry("status", "status"),
+                    Map.entry("createdBy", "createdBy.id"),
                     Map.entry("sessionActiveDate", "sessionActiveDate"),
                     Map.entry("sessionActiveTime", "sessionActiveTime"),
                     Map.entry("createdDate", "createdDate"),
@@ -132,6 +135,7 @@ public class SessionStoreServiceImpl
                 .name(buildFullName(user))
                 .email(user.getEmail())
                 .role(user.getUserType())
+                .createdBy(createdByResolver.resolve(sessionStore.getCreatedBy()))
                 .sessionActiveDate(
                         sessionStore.getSessionActiveDate()
                 )
@@ -244,6 +248,7 @@ public class SessionStoreServiceImpl
                 .name(buildFullName(user))
                 .email(user.getEmail())
                 .role(user.getUserType())
+                .createdBy(createdByResolver.resolve(sessionStore.getCreatedBy()))
                 .sessionActiveDate(sessionStore.getSessionActiveDate())
                 .sessionActiveTime(sessionStore.getSessionActiveTime())
                 .build();

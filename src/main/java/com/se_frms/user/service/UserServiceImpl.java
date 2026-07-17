@@ -7,6 +7,7 @@ import com.se_frms.auth.exception.DuplicatePhoneException;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.common.security.CurrentUserService;
 import com.se_frms.common.security.XssUtil;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.dto.UpdateUserRequest;
 
@@ -58,6 +59,7 @@ public class UserServiceImpl
     private final UserRepository userRepository;
 
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public Page<UserResponseDTO> getAllUsers(
@@ -227,9 +229,7 @@ public class UserServiceImpl
                 .role(user.getUserType())
                 .status(user.getStatus())
                 .createdBy(
-                        user.getCreatedBy() != null
-                                ? user.getCreatedBy().getId()
-                                : null
+                        createdByResolver.resolve(user.getCreatedBy())
                 )
                 .createdDate(user.getCreatedDate())
                 .updatedAt(user.getUpdatedAt())

@@ -5,6 +5,7 @@ import com.se_frms.auth.exception.InvalidRequestException;
 
 import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.fraudRule.dto.FraudRuleRequestDTO;
 import com.se_frms.fraudRule.dto.FraudRuleResponseDTO;
@@ -66,6 +67,8 @@ public class FraudRuleServiceImpl
     private final CurrentUserService currentUserService;
 
     private final AccessPermissionService accessPermissionService;
+
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public FraudRuleResponseDTO create(
@@ -504,7 +507,7 @@ FraudRuleUpdateDTO request
                 )
 
                 .createdBy(
-                        entity.getCreatedBy()
+                        createdByResolver.resolve(entity.getCreatedBy())
                 )
 
                 .createdAt(

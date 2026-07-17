@@ -4,6 +4,7 @@ import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
 import com.se_frms.common.security.XssUtil;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.PaginationUtil;
 import com.se_frms.ruleCategory.dto.*;
 import com.se_frms.ruleCategory.model.RuleCategory;
@@ -42,6 +43,8 @@ public class RuleCategoryServiceImpl
     private final CurrentUserService currentUserService;
 
     private final AccessPermissionService accessPermissionService;
+
+    private final CreatedByResolver createdByResolver;
     private static final Map<String, String> FILTER_FIELDS =
             Map.ofEntries(
                     Map.entry("id", "id"),
@@ -293,7 +296,7 @@ public class RuleCategoryServiceImpl
                 .id(category.getId())
                 .categoryName(category.getCategoryName())
                 .status(category.getStatus())
-                .createdBy(category.getCreatedBy())
+                .createdBy(createdByResolver.resolve(category.getCreatedBy()))
                 .createdDate(category.getCreatedDate())
                 .updatedAt(category.getUpdatedAt())
                 .build();

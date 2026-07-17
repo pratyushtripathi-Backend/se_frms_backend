@@ -3,6 +3,7 @@ package com.se_frms.ruleScore.service;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.common.security.AccessPermissionService;
 import com.se_frms.common.security.CurrentUserService;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.fraudRule.model.FraudRule;
 import com.se_frms.fraudRule.repository.FraudRuleRepository;
 import com.se_frms.ruleScore.dto.*;
@@ -43,6 +44,8 @@ public class RuleScoreServiceImpl
     private final CurrentUserService currentUserService;
 
     private final AccessPermissionService accessPermissionService;
+
+    private final CreatedByResolver createdByResolver;
     private static final Map<String, String> FILTER_FIELDS =
             Map.ofEntries(
                     Map.entry("id", "id"),
@@ -420,7 +423,7 @@ public class RuleScoreServiceImpl
                 )
                 .score(ruleScore.getScore())
                 .status(ruleScore.getStatus())
-                .createdBy(ruleScore.getCreatedBy())
+                .createdBy(createdByResolver.resolve(ruleScore.getCreatedBy()))
                 .createdAt(ruleScore.getCreatedAt())
                 .updatedAt(ruleScore.getUpdatedAt())
                 .build();

@@ -8,6 +8,7 @@ import com.se_frms.blackListUser.model.BlackListUser;
 import com.se_frms.blackListUser.repository.BlackListUserRepository;
 import com.se_frms.common.security.CurrentUserService;
 import com.se_frms.common.security.XssUtil;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
@@ -49,6 +50,7 @@ public class BlackListUserServiceImpl
     private final BlackListUserRepository blackListUserRepository;
     private final UserRepository userRepository;
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public BlackListUserResponseDTO blackListUser(
@@ -393,9 +395,7 @@ public class BlackListUserServiceImpl
                 .reason(blackListUser.getReason())
                 .riskType(blackListUser.getRiskType())
                 .createdBy(
-                        blackListUser.getCreatedBy() != null
-                                ? blackListUser.getCreatedBy().getId()
-                                : null
+                        createdByResolver.resolve(blackListUser.getCreatedBy())
                 )
                 .createdDate(blackListUser.getCreatedDate())
                 .updatedAt(blackListUser.getUpdatedAt())

@@ -3,6 +3,7 @@ package com.se_frms.auth.service;
 import com.se_frms.auth.dto.LoginHistoryResponseDTO;
 import com.se_frms.auth.model.LoginHistory;
 import com.se_frms.auth.repository.LoginHistoryRepository;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.security.XssUtil;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
@@ -52,6 +53,7 @@ public class LoginHistoryServiceImpl
             );
 
     private final LoginHistoryRepository loginHistoryRepository;
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public void saveLoginHistory(
@@ -515,6 +517,9 @@ public class LoginHistoryServiceImpl
                 )
                 .status(
                         history.getStatus()
+                )
+                .createdBy(
+                        createdByResolver.resolve(history.getCreatedBy())
                 )
                 .createdDate(
                         history.getCreatedDate()

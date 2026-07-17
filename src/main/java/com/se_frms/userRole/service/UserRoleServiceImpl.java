@@ -3,6 +3,7 @@ package com.se_frms.userRole.service;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
@@ -49,6 +50,7 @@ public class UserRoleServiceImpl
     private final RoleMasterRepository roleMasterRepository;
     private final UserRoleRepository userRoleRepository;
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
     @Override
     public UserRoleResponseDTO assignRole(
             UserRoleRequestDTO request
@@ -302,7 +304,7 @@ public class UserRoleServiceImpl
                 .roleId(userRole.getRole().getRoleId())
                 .roleName(userRole.getRole().getRoleName())
                 .status(userRole.getStatus())
-                .createdBy(userRole.getCreatedBy())
+                .createdBy(createdByResolver.resolve(userRole.getCreatedBy()))
                 .createdDate(userRole.getCreatedDate())
                 .updatedAt(userRole.getUpdatedAt())
                 .build();

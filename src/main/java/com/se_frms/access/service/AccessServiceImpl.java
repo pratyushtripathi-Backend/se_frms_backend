@@ -4,6 +4,7 @@ import com.se_frms.access.dto.AccessRequestDTO;
 import com.se_frms.access.dto.AccessResponseDTO;
 import com.se_frms.access.model.AccessMaster;
 import com.se_frms.access.repository.AccessMasterRepository;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class AccessServiceImpl
 
     private final AccessMasterRepository repository;
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public AccessResponseDTO create(
@@ -395,7 +397,7 @@ public class AccessServiceImpl
                         entity.getStatus()
                 )
                 .createdBy(
-                        entity.getCreatedBy()
+                        createdByResolver.resolve(entity.getCreatedBy())
                 )
 
                 .createdDate(

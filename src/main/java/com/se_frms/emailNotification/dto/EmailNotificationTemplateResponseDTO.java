@@ -21,7 +21,7 @@ public class EmailNotificationTemplateResponseDTO {
 
     private Boolean status;
 
-    private Integer createdBy;
+    private String createdBy;
 
     private LocalDateTime createdDate;
 

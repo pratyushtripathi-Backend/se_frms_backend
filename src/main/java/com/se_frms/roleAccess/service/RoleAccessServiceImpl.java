@@ -2,6 +2,7 @@ package com.se_frms.roleAccess.service;
 
 import com.se_frms.access.model.AccessMaster;
 import com.se_frms.access.repository.AccessMasterRepository;
+import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.roleAccess.dto.RoleAccessRequestDTO;
 import com.se_frms.roleAccess.dto.RoleAccessResponseDTO;
@@ -45,8 +46,9 @@ public class RoleAccessServiceImpl
 
     private final RoleMasterRepository roleRepository;
 
-    private final AccessMasterRepository accessRepository;
+private final AccessMasterRepository accessRepository;
     private final CurrentUserService currentUserService;
+    private final CreatedByResolver createdByResolver;
 
     @Override
     public RoleAccessResponseDTO create(
@@ -245,7 +247,7 @@ public class RoleAccessServiceImpl
                                         )
 
                                         .createdBy(
-                                                v.getCreatedBy()
+                                                createdByResolver.resolve(v.getCreatedBy())
                                         )
 
                                         .createdDate(
@@ -329,6 +331,10 @@ public class RoleAccessServiceImpl
 
                 .builder()
 
+                .id(
+                        mappings.get(0).getId()
+                )
+
                 .roleId(
                         roleId
                 )
@@ -343,6 +349,10 @@ public class RoleAccessServiceImpl
 
                                 .getRoleName()
 
+                )
+
+                .accessId(
+                        mappings.get(0).getAccess().getId()
                 )
 
                 .accessNames(
@@ -363,6 +373,22 @@ public class RoleAccessServiceImpl
 
                                 .toList()
 
+                )
+
+                .status(
+                        mappings.get(0).getStatus()
+                )
+
+                .createdBy(
+                        createdByResolver.resolve(mappings.get(0).getCreatedBy())
+                )
+
+                .createdDate(
+                        mappings.get(0).getCreatedDate()
+                )
+
+                .updatedAt(
+                        mappings.get(0).getUpdatedAt()
                 )
 
                 .build();

@@ -295,10 +295,10 @@ public class AdminServiceImpl implements AdminService {
                 ).trim();
 
         if (createdByName.isBlank()) {
-            return String.valueOf(createdBy.getId());
+            return null;
         }
 
-        return createdBy.getId() + " - " + createdByName;
+        return createdByName;
     }
 
     private Specification<User> buildEmployeeSearchSpecification(
@@ -499,9 +499,7 @@ public class AdminServiceImpl implements AdminService {
                 .role(user.getUserType())
                 .status(user.getStatus())
                 .createdBy(
-                        user.getCreatedBy() != null
-                                ? user.getCreatedBy().getId()
-                                : null
+                        buildCreatedBy(user.getCreatedBy())
                 )
                 .createdDate(user.getCreatedDate())
                 .updatedAt(user.getUpdatedAt())

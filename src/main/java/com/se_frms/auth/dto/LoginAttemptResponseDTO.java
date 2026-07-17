@@ -31,6 +31,8 @@ public class LoginAttemptResponseDTO {
 
     private String url;
 
+    private String createdBy;
+
     private LocalDateTime attemptedAt;
 
     private LocalDateTime createdDate;
