@@ -17,6 +17,11 @@ public interface EmailNotificationTemplateService {
             EmailNotificationTemplateRequestDTO request
     );
 
+    EmailNotificationTemplateResponseDTO updateTemplateStatus(
+            String templateCode,
+            Boolean status
+    );
+
     EmailNotificationTemplateResponseDTO getTemplateByCode(
             String templateCode
     );

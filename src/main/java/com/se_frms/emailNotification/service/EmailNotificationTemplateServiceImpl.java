@@ -159,6 +159,55 @@ public class EmailNotificationTemplateServiceImpl
     }
 
     @Override
+    public EmailNotificationTemplateResponseDTO updateTemplateStatus(
+            String templateCode,
+            Boolean status
+    ) {
+
+        String normalizedTemplateCode =
+                templateCode.trim().toUpperCase();
+
+        log.info(
+                "Update email notification template status service started, templateCode={}, status={}",
+                normalizedTemplateCode,
+                status
+        );
+
+        EmailNotificationTemplate template =
+                repository
+                        .findByTemplateCode(
+                                normalizedTemplateCode
+                        )
+                        .orElseThrow(
+                                () -> {
+                                    log.warn(
+                                            "Update email template status failed because template was not found, templateCode={}",
+                                            normalizedTemplateCode
+                                    );
+
+                                    return new InvalidRequestException(
+                                            "Template not found"
+                                    );
+                                }
+                        );
+
+        template.setStatus(status);
+
+        EmailNotificationTemplate savedTemplate =
+                repository.save(template);
+
+        log.info(
+                "Email notification template status updated successfully, templateCode={}, status={}",
+                savedTemplate.getTemplateCode(),
+                savedTemplate.getStatus()
+        );
+
+        return mapToResponse(
+                savedTemplate
+        );
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public EmailNotificationTemplateResponseDTO getTemplateByCode(
             String templateCode

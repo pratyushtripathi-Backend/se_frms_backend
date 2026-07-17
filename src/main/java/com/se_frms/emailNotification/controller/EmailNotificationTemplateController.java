@@ -3,6 +3,7 @@ package com.se_frms.emailNotification.controller;
 import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateRequestDTO;
 import com.se_frms.emailNotification.dto.EmailNotificationTemplateResponseDTO;
+import com.se_frms.emailNotification.dto.EmailNotificationTemplateStatusRequestDTO;
 import com.se_frms.emailNotification.service.EmailNotificationTemplateService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
@@ -169,6 +170,47 @@ public class EmailNotificationTemplateController {
                         .responseCode(200)
                         .responseMessage(
                                 "Email notification template updated successfully"
+                        )
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{templateCode}/status")
+    public ResponseEntity<AuthResponseDTO<EmailNotificationTemplateResponseDTO>>
+    updateEmailNotificationTemplateStatus(
+            @PathVariable
+            String templateCode,
+
+            @Valid
+            @RequestBody
+            EmailNotificationTemplateStatusRequestDTO request
+    ) {
+
+        log.info(
+                "Update email notification template status request received, templateCode={}, status={}",
+                templateCode,
+                request.getStatus()
+        );
+
+        EmailNotificationTemplateResponseDTO responseData =
+                emailNotificationTemplateService.updateTemplateStatus(
+                        templateCode,
+                        request.getStatus()
+                );
+
+        log.info(
+                "Email notification template status updated successfully, templateCode={}",
+                templateCode
+        );
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<EmailNotificationTemplateResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Email notification template status updated successfully"
                         )
                         .responseData(responseData)
                         .build()
