@@ -86,6 +86,7 @@ public class UserRoleServiceImpl
                 });
         Integer loggedInAdminId =
                 currentUserService.getCurrentUserId();
+
         UserRole userRole =
                 userRoleRepository
                         .findByUserAndRole(user, roleMaster)
@@ -96,6 +97,7 @@ public class UserRoleServiceImpl
                                         .createdBy(loggedInAdminId)
                                         .build()
                         );
+
         if (userRole.getCreatedBy() == null) {
             userRole.setCreatedBy(loggedInAdminId);
         }
