@@ -13,7 +13,7 @@ import com.se_frms.roleMaster.repository.RoleMasterRepository;
 import com.se_frms.roleAccess.dto.RoleAccessUpdateRequestDTO;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-
+import com.se_frms.auth.exception.InvalidRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -53,109 +53,73 @@ private final AccessMasterRepository accessRepository;
 
     @Override
     public RoleAccessResponseDTO create(
-
             RoleAccessRequestDTO request
-
     ) {
 
         RoleMaster role =
-
                 roleRepository
-
-                        .findById(
-                                request.getRoleId()
-                        )
-
+                        .findById(request.getRoleId())
                         .orElseThrow(
-
-                                () ->
-
-                                        new RuntimeException(
-                                                "Role not found"
-                                        )
-
+                                () -> new InvalidRequestException("Role not found")
                         );
 
-        for (
-
-                Integer accessId
-
-                :
-
+        List<Integer> requestedAccessIds =
                 request.getAccessIds()
+                        .stream()
+                        .distinct()
+                        .toList();
 
-        ) {
+        List<RoleAccess> existingMappings =
+                repository.findByRoleRoleId(role.getRoleId());
 
-            AccessMaster access =
+        List<Integer> alreadyExistingAccessIds =
+                requestedAccessIds
+                        .stream()
+                        .filter(accessId ->
+                                existingMappings
+                                        .stream()
+                                        .anyMatch(mapping ->
+                                                mapping.getAccess().getId().equals(accessId)
+                                        )
+                        )
+                        .toList();
 
-                    accessRepository
-
-                            .findById(
-                                    accessId
-                            )
-
-                            .orElseThrow(
-
-                                    () ->
-
-                                            new RuntimeException(
-                                                    "Access not found"
-                                            )
-
-                            );
-
-            if (
-
-                    repository
-
-                            .existsByRoleRoleIdAndAccessId(
-
-                                    role.getRoleId(),
-
-                                    accessId
-
-                            )
-
-            ) {
-
-                continue;
-
-            }
-
-            repository.save(
-
-                    RoleAccess
-                            .builder()
-
-                            .role(
-                                    role
-                            )
-
-                            .access(
-                                    access
-                            )
-
-                            .status(
-                                    true
-                            )
-                            .createdBy(
-                                    currentUserService.getCurrentUserId()
-                            )
-
-                            .createdDate(
-                                    LocalDateTime.now()
-                            )
-
-                            .build()
-
+        if (!alreadyExistingAccessIds.isEmpty()) {
+            throw new InvalidRequestException(
+                    "Role access already exists for access ids: "
+                            + alreadyExistingAccessIds
             );
-
         }
 
-        return getByRole(
-                role.getRoleId()
-        );
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
 
+        LocalDateTime now =
+                LocalDateTime.now();
+
+        for (Integer accessId : requestedAccessIds) {
+
+            AccessMaster access =
+                    accessRepository
+                            .findById(accessId)
+                            .orElseThrow(
+                                    () -> new InvalidRequestException("Access not found")
+                            );
+
+            repository.save(
+                    RoleAccess
+                            .builder()
+                            .role(role)
+                            .access(access)
+                            .status(true)
+                            .createdBy(loggedInAdminId)
+                            .createdDate(now)
+                            .updatedAt(now)
+                            .build()
+            );
+        }
+
+        return getByRole(role.getRoleId());
     }
 
     @Override
@@ -434,6 +398,11 @@ private final AccessMasterRepository accessRepository;
         entity.setStatus(
                 status
         );
+        if (entity.getCreatedBy() == null) {
+            entity.setCreatedBy(
+                    currentUserService.getCurrentUserId()
+            );
+        }
 
         entity.setUpdatedAt(
                 LocalDateTime.now()
@@ -501,6 +470,12 @@ private final AccessMasterRepository accessRepository;
         Map<Integer, RoleAccess> existingMappingByAccessId =
                 new HashMap<>();
 
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
+
+        LocalDateTime now =
+                LocalDateTime.now();
+
         for (RoleAccess mapping : existingMappings) {
 
             existingMappingByAccessId.put(
@@ -514,13 +489,15 @@ private final AccessMasterRepository accessRepository;
                     );
 
             mapping.setStatus(shouldBeActive);
-            mapping.setUpdatedAt(LocalDateTime.now());
+
+            if (mapping.getCreatedBy() == null) {
+                mapping.setCreatedBy(loggedInAdminId);
+            }
+
+            mapping.setUpdatedAt(now);
 
             repository.save(mapping);
         }
-
-        Integer loggedInAdminId =
-                currentUserService.getCurrentUserId();
 
         for (Map.Entry<Integer, AccessMaster> entry : selectedAccessMap.entrySet()) {
 
@@ -538,8 +515,8 @@ private final AccessMasterRepository accessRepository;
                             .access(entry.getValue())
                             .status(true)
                             .createdBy(loggedInAdminId)
-                            .createdDate(LocalDateTime.now())
-                            .updatedAt(LocalDateTime.now())
+                            .createdDate(now)
+                            .updatedAt(now)
                             .build();
 
             repository.save(newMapping);
@@ -556,11 +533,10 @@ private final AccessMasterRepository accessRepository;
                     .createdBy(
                             createdByResolver.resolve(loggedInAdminId)
                     )
-                    .updatedAt(LocalDateTime.now())
+                    .updatedAt(now)
                     .build();
         }
 
         return getByRole(roleId);
     }
-
 }

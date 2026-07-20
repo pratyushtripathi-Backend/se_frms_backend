@@ -21,6 +21,7 @@ public class RoleAccessController {
 
     @PostMapping
     public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> create(
+            @Valid
             @RequestBody
             RoleAccessRequestDTO request
     ) {
