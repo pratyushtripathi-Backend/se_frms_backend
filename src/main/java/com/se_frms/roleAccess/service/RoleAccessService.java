@@ -6,6 +6,7 @@ import com.se_frms.roleAccess.dto.RoleAccessResponseDTO;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
+import com.se_frms.roleAccess.dto.RoleAccessUpdateRequestDTO;
 
 public interface RoleAccessService {
 
@@ -33,6 +34,11 @@ public interface RoleAccessService {
 
             Boolean status
 
+    );
+
+    RoleAccessResponseDTO updateRoleAccess(
+            Integer roleId,
+            RoleAccessUpdateRequestDTO request
     );
 
 }

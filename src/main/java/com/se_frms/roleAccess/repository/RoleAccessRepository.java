@@ -49,5 +49,8 @@ public interface RoleAccessRepository
             Integer accessId
 
     );
+    List<RoleAccess> findByRoleRoleId(
+            Integer roleId
+    );
 
 }

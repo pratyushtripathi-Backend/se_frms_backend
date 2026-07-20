@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.se_frms.roleAccess.dto.RoleAccessUpdateRequestDTO;
+import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/role-access")
 @RequiredArgsConstructor
@@ -116,6 +117,33 @@ public class RoleAccessController {
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role access status updated successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @PutMapping("/{roleId}")
+    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> updateRoleAccess(
+            @PathVariable
+            Integer roleId,
+
+            @Valid
+            @RequestBody
+            RoleAccessUpdateRequestDTO request
+    ) {
+
+        RoleAccessResponseDTO responseData =
+                service.updateRoleAccess(
+                        roleId,
+                        request
+                );
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<RoleAccessResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role access updated successfully")
                         .responseData(responseData)
                         .build()
         );

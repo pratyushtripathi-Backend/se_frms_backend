@@ -10,7 +10,8 @@ import com.se_frms.roleAccess.model.RoleAccess;
 import com.se_frms.roleAccess.repository.RoleAccessRepository;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
-
+import com.se_frms.roleAccess.dto.RoleAccessUpdateRequestDTO;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -452,6 +453,114 @@ private final AccessMasterRepository accessRepository;
 
                 "Access revoked successfully";
 
+    }
+
+    @Override
+    public RoleAccessResponseDTO updateRoleAccess(
+            Integer roleId,
+            RoleAccessUpdateRequestDTO request
+    ) {
+
+        RoleMaster role =
+                roleRepository
+                        .findById(roleId)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Role not found"
+                                )
+                        );
+
+        Set<Integer> selectedAccessIds =
+                Set.copyOf(
+                        request.getAccessIds()
+                );
+
+        Map<Integer, AccessMaster> selectedAccessMap =
+                new HashMap<>();
+
+        for (Integer accessId : selectedAccessIds) {
+
+            AccessMaster access =
+                    accessRepository
+                            .findById(accessId)
+                            .orElseThrow(
+                                    () -> new RuntimeException(
+                                            "Access not found"
+                                    )
+                            );
+
+            selectedAccessMap.put(
+                    accessId,
+                    access
+            );
+        }
+
+        List<RoleAccess> existingMappings =
+                repository.findByRoleRoleId(roleId);
+
+        Map<Integer, RoleAccess> existingMappingByAccessId =
+                new HashMap<>();
+
+        for (RoleAccess mapping : existingMappings) {
+
+            existingMappingByAccessId.put(
+                    mapping.getAccess().getId(),
+                    mapping
+            );
+
+            Boolean shouldBeActive =
+                    selectedAccessIds.contains(
+                            mapping.getAccess().getId()
+                    );
+
+            mapping.setStatus(shouldBeActive);
+            mapping.setUpdatedAt(LocalDateTime.now());
+
+            repository.save(mapping);
+        }
+
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
+
+        for (Map.Entry<Integer, AccessMaster> entry : selectedAccessMap.entrySet()) {
+
+            Integer accessId =
+                    entry.getKey();
+
+            if (existingMappingByAccessId.containsKey(accessId)) {
+                continue;
+            }
+
+            RoleAccess newMapping =
+                    RoleAccess
+                            .builder()
+                            .role(role)
+                            .access(entry.getValue())
+                            .status(true)
+                            .createdBy(loggedInAdminId)
+                            .createdDate(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .build();
+
+            repository.save(newMapping);
+        }
+
+        if (selectedAccessIds.isEmpty()) {
+
+            return RoleAccessResponseDTO
+                    .builder()
+                    .roleId(role.getRoleId())
+                    .roleName(role.getRoleName())
+                    .accessNames(List.of())
+                    .status(false)
+                    .createdBy(
+                            createdByResolver.resolve(loggedInAdminId)
+                    )
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+        }
+
+        return getByRole(roleId);
     }
 
 }
