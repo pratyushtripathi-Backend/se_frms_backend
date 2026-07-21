@@ -18,7 +18,11 @@ import com.se_frms.fraudRule.repository.FraudRuleRepository;
 
 import com.se_frms.ruleCategory.model.RuleCategory;
 import com.se_frms.ruleCategory.repository.RuleCategoryRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 
+import java.util.HashMap;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -356,11 +360,21 @@ FraudRuleUpdateDTO request
                 FRAUD_RULE_VIEW
         );
 
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove("search");
+
         Pageable pageable =
                 DynamicFilterSpecification.createPageable(
                         page,
                         size,
-                        filters,
+                        workingFilters,
                         FILTER_FIELDS,
                         "ruleName",
                         Sort.Direction.ASC
@@ -374,22 +388,69 @@ FraudRuleUpdateDTO request
                         )
                         .and(
                                 DynamicFilterSpecification.build(
-                                        filters,
+                                        workingFilters,
                                         FILTER_FIELDS
                                 )
                         );
 
-        return repository
+        Specification<FraudRule> searchSpecification =
+                buildSearchSpecification(search);
 
+        if (searchSpecification != null) {
+            specification =
+                    specification.and(searchSpecification);
+        }
+
+        return repository
                 .findAll(
                         specification,
                         pageable
                 )
-
                 .map(
                         this::map
                 );
+    }
 
+    private Specification<FraudRule> buildSearchSpecification(
+            String search
+    ) {
+
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+
+        String keyword =
+                "%"
+                        + search.trim().toLowerCase(Locale.ROOT)
+                        + "%";
+
+        return (root, query, criteriaBuilder) -> {
+
+            Join<FraudRule, RuleCategory> categoryJoin =
+                    root.join(
+                            "category",
+                            JoinType.LEFT
+                    );
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("ruleCode")),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("ruleName")),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("ruleDescription")),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(categoryJoin.get("categoryName")),
+                            keyword
+                    )
+            );
+        };
     }
 
     @Override

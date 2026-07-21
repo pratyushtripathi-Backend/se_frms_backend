@@ -40,16 +40,14 @@ public class LoginAttemptServiceImpl
                     Map.entry("id", "id"),
                     Map.entry("userId", "user.id"),
                     Map.entry("email", "email"),
-                    Map.entry("attemptStatus", "attemptStatus"),
-                    Map.entry("status", "attemptStatus"),
-                    Map.entry("failureReason", "failureReason"),
-                    Map.entry("attemptReason", "failureReason"),
+                    Map.entry("status", "status"),
+                    Map.entry("reason", "reason"),
                     Map.entry("ipAddress", "ipAddress"),
-                    Map.entry("latitude", "latitude"),
-                    Map.entry("longitude", "longitude"),
-                    Map.entry("url", "url"),
-                    Map.entry("attemptedAt", "attemptedAt"),
-                    Map.entry("createdBy", "createdBy.id")
+                    Map.entry("attemptDate", "attemptDate"),
+                    Map.entry("attemptTime", "attemptTime"),
+                    Map.entry("createdBy", "createdBy.id"),
+                    Map.entry("createdDate", "createdDate"),
+                    Map.entry("updatedAt", "updatedAt")
             );
 
     private final LoginAttemptRepository repository;
@@ -95,34 +93,13 @@ public class LoginAttemptServiceImpl
                         .builder()
                         .user(user)
                         .email(email)
-                        .attemptStatus(status)
-                        .failureReason(reason)
+                        .status(true)
+                        .reason(reason)
                         .ipAddress(ip)
-                        .latitude(
-                                resolveCoordinate(
-                                        latitude,
-                                        request,
-                                        "X-Client-Latitude"
-                                )
-                        )
-                        .longitude(
-                                resolveCoordinate(
-                                        longitude,
-                                        request,
-                                        "X-Client-Longitude"
-                                )
-                        )
                         .createdBy(user)
-                        .url(
-                                request
-                                        .getRequestURL()
-                                        .toString()
-                        )
                         .build();
 
-        repository.save(
-                entity
-        );
+        repository.save(entity);
 
         log.info(
                 "Login attempt saved successfully, userId={}, status={}",
@@ -189,7 +166,7 @@ public class LoginAttemptServiceImpl
                         size,
                         workingFilters,
                         FILTER_FIELDS,
-                        "attemptedAt",
+                        "createdDate",
                         Sort.Direction.DESC
                 );
 
@@ -245,67 +222,25 @@ public class LoginAttemptServiceImpl
                     );
 
             return criteriaBuilder.or(
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get("email")),
-                            keyword
-                        ),
-                        criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("failureReason")),
-                                keyword
-                        ),
-                        criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("ipAddress")),
-                                keyword
-                        ),
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(root.get("url")),
-                            keyword
-                    ),
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(userJoin.get("firstName")),
-                            keyword
-                    ),
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(userJoin.get("lastName")),
-                            keyword
-                    )
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), keyword),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("reason")), keyword),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("ipAddress")), keyword),
+                    criteriaBuilder.like(criteriaBuilder.lower(userJoin.get("firstName")), keyword),
+                    criteriaBuilder.like(criteriaBuilder.lower(userJoin.get("lastName")), keyword)
             );
         };
     }
 
-    private LoginAttemptResponseDTO mapToDTO(
-            LoginAttempt entity
-    ) {
+    private LoginAttemptResponseDTO mapToDTO(LoginAttempt entity) {
 
         return LoginAttemptResponseDTO
                 .builder()
-                .id(
-                        entity.getId()
-                )
-                .name(
-                        buildFullName(entity.getUser())
-                )
-                .email(
-                        entity.getEmail()
-                )
-                .attemptStatus(
-                        entity.getAttemptStatus()
-                )
-                .attemptReason(
-                        entity.getFailureReason()
-                )
-                .ipAddress(
-                        entity.getIpAddress()
-                )
-                .latitude(
-                        entity.getLatitude()
-                )
-                .longitude(
-                        entity.getLongitude()
-                )
-                .url(
-                        entity.getUrl()
-                )
+                .id(entity.getId())
+                .name(buildFullName(entity.getUser()))
+                .email(entity.getEmail())
+                .status(entity.getStatus())
+                .reason(entity.getReason())
+                .ipAddress(entity.getIpAddress())
                 .createdBy(
                         createdByResolver.resolve(
                                 entity.getCreatedBy() != null
@@ -313,9 +248,10 @@ public class LoginAttemptServiceImpl
                                         : entity.getUser()
                         )
                 )
-                .attemptedAt(
-                        entity.getAttemptedAt()
-                )
+                .attemptDate(entity.getAttemptDate())
+                .attemptTime(entity.getAttemptTime())
+                .createdDate(entity.getCreatedDate())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 
@@ -391,7 +327,7 @@ public class LoginAttemptServiceImpl
                         size,
                         workingFilters,
                         FILTER_FIELDS,
-                        "attemptedAt",
+                        "createdDate",
                         Sort.Direction.DESC
                 );
 

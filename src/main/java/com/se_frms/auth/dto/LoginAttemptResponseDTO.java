@@ -2,9 +2,9 @@ package com.se_frms.auth.dto;
 
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.lang.Integer;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -19,21 +19,19 @@ public class LoginAttemptResponseDTO {
 
     private String email;
 
-    private Boolean attemptStatus;
+    private Boolean status;
 
-    private String attemptReason;
+    private String reason;
 
     private String ipAddress;
 
-    private BigDecimal latitude;
-
-    private BigDecimal longitude;
-
-    private String url;
-
     private String createdBy;
 
-    private LocalDateTime attemptedAt;
+    private LocalDate attemptDate;
+
+    private LocalTime attemptTime;
 
     private LocalDateTime createdDate;
+
+    private LocalDateTime updatedAt;
 }
