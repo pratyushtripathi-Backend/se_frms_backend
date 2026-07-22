@@ -18,7 +18,7 @@ import com.se_frms.user.model.User;
 import com.se_frms.user.repository.UserRepository;
 
 import com.se_frms.user.service.UserService;
-
+import com.se_frms.user.dto.UserStatusRequestDTO;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -214,6 +214,35 @@ public class UserServiceImpl
         return mapToResponse(
                 savedUser
         );
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDTO updateUserStatus(
+            Integer id,
+            UserStatusRequestDTO request
+    ) {
+
+        if (id == null) {
+            throw new InvalidRequestException(
+                    "User id cannot be null"
+            );
+        }
+
+        User user =
+                userRepository.findById(id)
+                        .orElseThrow(() ->
+                                new InvalidRequestException(
+                                        "User not found with id: " + id
+                                )
+                        );
+
+        user.setStatus(request.getStatus());
+
+        User savedUser =
+                userRepository.save(user);
+
+        return mapToResponse(savedUser);
     }
 
     private UserResponseDTO mapToResponse(

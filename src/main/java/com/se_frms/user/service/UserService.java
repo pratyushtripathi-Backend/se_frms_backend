@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 
 import java.lang.Integer;
 import java.util.Map;
-
+import com.se_frms.user.dto.UserStatusRequestDTO;
 public interface UserService {
 
     Page<UserResponseDTO> getAllUsers(
@@ -23,5 +23,10 @@ public interface UserService {
     UserResponseDTO updateUser(
             Integer id,
             UpdateUserRequest request
+    );
+
+    UserResponseDTO updateUserStatus(
+            Integer id,
+            UserStatusRequestDTO request
     );
 }

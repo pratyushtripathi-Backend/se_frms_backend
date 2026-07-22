@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.se_frms.roleMaster.dto.RoleMasterStatusRequestDTO;
 import java.util.List;
 import java.util.Map;
 
@@ -210,6 +210,48 @@ public class RoleMasterServiceImpl
                 "Role updated successfully, roleId={}, roleName={}",
                 savedRole.getRoleId(),
                 savedRole.getRoleName()
+        );
+
+        return mapToResponse(savedRole);
+    }
+
+
+    @Override
+    public RoleMasterResponseDTO updateRoleStatus(
+            Integer roleId,
+            RoleMasterStatusRequestDTO request
+    ) {
+
+        log.info(
+                "Update role status service started, roleId={}, status={}",
+                roleId,
+                request.getStatus()
+        );
+
+        RoleMaster roleMaster =
+                roleMasterRepository.findById(roleId)
+                        .orElseThrow(
+                                () -> {
+                                    log.warn(
+                                            "Update role status failed because role was not found, roleId={}",
+                                            roleId
+                                    );
+
+                                    return new InvalidRequestException(
+                                            "Role not found"
+                                    );
+                                }
+                        );
+
+        roleMaster.setStatus(request.getStatus());
+
+        RoleMaster savedRole =
+                roleMasterRepository.save(roleMaster);
+
+        log.info(
+                "Role status updated successfully, roleId={}, status={}",
+                savedRole.getRoleId(),
+                savedRole.getStatus()
         );
 
         return mapToResponse(savedRole);

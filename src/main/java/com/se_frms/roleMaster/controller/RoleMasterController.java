@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+import com.se_frms.roleMaster.dto.RoleMasterStatusRequestDTO;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/roles")
@@ -162,6 +162,38 @@ public class RoleMasterController {
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role updated successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{roleId}/status")
+    public ResponseEntity<AuthResponseDTO<RoleMasterResponseDTO>>
+    updateRoleStatus(
+            @PathVariable
+            Integer roleId,
+
+            @Valid
+            @RequestBody
+            RoleMasterStatusRequestDTO request
+    ) {
+
+        log.info("Update role status request received, roleId={}", roleId);
+
+        RoleMasterResponseDTO responseData =
+                roleMasterService.updateRoleStatus(
+                        roleId,
+                        request
+                );
+
+        log.info("Role status updated successfully, roleId={}", roleId);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<RoleMasterResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role status updated successfully")
                         .responseData(responseData)
                         .build()
         );

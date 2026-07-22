@@ -17,7 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
-
+import com.se_frms.user.dto.UserStatusRequestDTO;
 import java.util.Map;
 
 @RestController
@@ -110,6 +110,37 @@ public class UserController {
                         .responseCode(200)
                         .responseMessage(
                                 "User updated successfully"
+                        )
+                        .responseData(responseData)
+                        .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<AuthResponseDTO<UserResponseDTO>>
+    updateUserStatus(
+            @PathVariable
+            Integer id,
+
+            @Valid
+            @RequestBody
+            UserStatusRequestDTO request
+    ) {
+
+        UserResponseDTO responseData =
+                userService.updateUserStatus(
+                        id,
+                        request
+                );
+
+        AuthResponseDTO<UserResponseDTO> response =
+                AuthResponseDTO
+                        .<UserResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "User status updated successfully"
                         )
                         .responseData(responseData)
                         .build();

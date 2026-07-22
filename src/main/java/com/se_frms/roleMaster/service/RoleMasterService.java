@@ -5,7 +5,7 @@ import com.se_frms.roleMaster.dto.RoleMasterResponseDTO;
 import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Map;
-
+import com.se_frms.roleMaster.dto.RoleMasterStatusRequestDTO;
 public interface RoleMasterService {
 
     RoleMasterResponseDTO createRole(RoleMasterRequestDTO request);
@@ -24,5 +24,9 @@ public interface RoleMasterService {
     RoleMasterResponseDTO updateRole(
             Integer roleId,
             RoleMasterRequestDTO request
+    );
+    RoleMasterResponseDTO updateRoleStatus(
+            Integer roleId,
+            RoleMasterStatusRequestDTO request
     );
 }
