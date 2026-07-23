@@ -5,7 +5,7 @@ import com.se_frms.userRole.dto.UserRoleResponseDTO;
 import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Map;
-
+import com.se_frms.userRole.dto.UserRoleStatusRequestDTO;
 public interface UserRoleService {
 
     UserRoleResponseDTO assignRole(UserRoleRequestDTO request);
@@ -20,5 +20,8 @@ public interface UserRoleService {
 
     List<UserRoleResponseDTO> getRolesByUser(Integer userId);
 
-    UserRoleResponseDTO updateStatus(Integer id, Boolean status);
+    UserRoleResponseDTO updateStatus(
+            Integer id,
+            UserRoleStatusRequestDTO request
+    );
 }

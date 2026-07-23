@@ -161,7 +161,7 @@ public class UserRoleController {
     ) {
 
         log.info(
-                "Update user role status request received, id={}, status={}",
+                "Update user role request received, id={}, status={}",
                 id,
                 request.getStatus()
         );
@@ -169,11 +169,11 @@ public class UserRoleController {
         UserRoleResponseDTO responseData =
                 userRoleService.updateStatus(
                         id,
-                        request.getStatus()
+                        request
                 );
 
         log.info(
-                "User role status updated successfully, id={}, status={}",
+                "User role updated successfully, id={}, status={}",
                 id,
                 request.getStatus()
         );
@@ -183,7 +183,7 @@ public class UserRoleController {
                         .<UserRoleResponseDTO>builder()
                         .status(true)
                         .responseCode(200)
-                        .responseMessage("User role status updated successfully")
+                        .responseMessage("User role updated successfully")
                         .responseData(responseData)
                         .build()
         );

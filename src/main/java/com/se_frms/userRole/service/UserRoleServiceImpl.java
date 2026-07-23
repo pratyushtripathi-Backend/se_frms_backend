@@ -20,7 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.se_frms.userRole.dto.UserRoleStatusRequestDTO;
 import java.util.List;
 import java.util.Map;
 
@@ -228,13 +228,14 @@ public class UserRoleServiceImpl
     @Override
     public UserRoleResponseDTO updateStatus(
             Integer id,
-            Boolean status
+            UserRoleStatusRequestDTO request
     ) {
 
         log.info(
-                "Update user role status service started, userRoleId={}, status={}",
+                "Update user role service started, userRoleId={}, status={}, roleName={}",
                 id,
-                status
+                request.getStatus(),
+                request.getRoleName()
         );
 
         UserRole userRole =
@@ -242,7 +243,7 @@ public class UserRoleServiceImpl
                         .orElseThrow(
                                 () -> {
                                     log.warn(
-                                            "Update user role status failed because user role was not found, userRoleId={}",
+                                            "Update user role failed because user role was not found, userRoleId={}",
                                             id
                                     );
 
@@ -252,7 +253,74 @@ public class UserRoleServiceImpl
                                 }
                         );
 
-        userRole.setStatus(status);
+        User user =
+                userRole.getUser();
+
+        Integer loggedInAdminId =
+                currentUserService.getCurrentUserId();
+
+        if (request.getRoleName() != null
+                && !request.getRoleName().isBlank()) {
+
+            RoleMaster roleMaster =
+                    getActiveRoleMaster(request.getRoleName());
+
+            UserRole targetUserRole =
+                    userRoleRepository
+                            .findByUserAndRole(
+                                    user,
+                                    roleMaster
+                            )
+                            .orElse(userRole);
+
+            for (UserRole existingRole :
+                    userRoleRepository.findByUserAndStatus(user, true)) {
+
+                if (!existingRole.getId().equals(targetUserRole.getId())) {
+                    existingRole.setStatus(false);
+                    userRoleRepository.save(existingRole);
+                }
+            }
+
+            if (!targetUserRole.getId().equals(userRole.getId())) {
+                userRole.setStatus(false);
+                userRoleRepository.save(userRole);
+            }
+
+            targetUserRole.setRole(roleMaster);
+            targetUserRole.setStatus(
+                    request.getStatus() != null
+                            ? request.getStatus()
+                            : true
+            );
+
+            if (targetUserRole.getCreatedBy() == null) {
+                targetUserRole.setCreatedBy(loggedInAdminId);
+            }
+
+            UserRole savedUserRole =
+                    userRoleRepository.save(targetUserRole);
+
+            if (Boolean.TRUE.equals(savedUserRole.getStatus())) {
+                user.setUserType(roleMaster.getRoleName());
+                userRepository.save(user);
+            }
+
+            log.info(
+                    "User role updated successfully, userId={}, roleName={}, status={}",
+                    user.getId(),
+                    roleMaster.getRoleName(),
+                    savedUserRole.getStatus()
+            );
+
+            return mapToResponse(savedUserRole);
+        }
+
+        userRole.setStatus(request.getStatus());
+
+        if (userRole.getCreatedBy() == null) {
+            userRole.setCreatedBy(loggedInAdminId);
+        }
 
         UserRole savedUserRole =
                 userRoleRepository.save(userRole);
