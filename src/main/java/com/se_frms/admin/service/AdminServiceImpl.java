@@ -507,15 +507,21 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private RoleMaster getRoleMasterForCreateUser(String roleName) {
-        String finalRoleName = roleName == null || roleName.isBlank()
-                ? EMPLOYEE_ROLE_NAME
-                : roleName.trim().toUpperCase(Locale.ROOT);
+
+        String finalRoleName =
+                roleName.trim().toUpperCase(Locale.ROOT);
 
         return roleMasterRepository
                 .findByRoleNameAndStatus(finalRoleName, true)
                 .orElseThrow(() -> {
-                    log.warn("Create employee failed because role is invalid or inactive, roleName={}", finalRoleName);
-                    return new InvalidRequestException("Invalid or inactive role");
+                    log.warn(
+                            "Create employee failed because role is invalid or inactive, roleName={}",
+                            finalRoleName
+                    );
+
+                    return new InvalidRequestException(
+                            "Invalid or inactive role"
+                    );
                 });
     }
 

@@ -90,7 +90,10 @@ public class AuthServiceImpl implements AuthService {
         validateDuplicateEmail(email);
         validateDuplicatePhone(phoneNumber);
 
-        RoleMaster roleMaster = getDefaultEmployeeRoleMaster();
+        RoleMaster roleMaster =
+                getRoleMasterForRegistration(
+                        request.getRoleName()
+                );
         //Role role = validateAndAssignRole();
 
 
@@ -151,16 +154,28 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private RoleMaster getDefaultEmployeeRoleMaster() {
+
+    private RoleMaster getRoleMasterForRegistration(
+            String roleName
+    ) {
+
+        String normalizedRoleName =
+                roleName.trim().toUpperCase(Locale.ROOT);
 
         return roleMasterRepository
                 .findByRoleNameAndStatus(
-                        EMPLOYEE_ROLE_NAME,
+                        normalizedRoleName,
                         true
                 )
                 .orElseThrow(() -> {
-                    log.warn("Registration failed because employee role is not configured or inactive");
-                    return new InvalidRoleException("Employee role is not configured");
+                    log.warn(
+                            "Registration failed because role is invalid or inactive, roleName={}",
+                            normalizedRoleName
+                    );
+
+                    return new InvalidRoleException(
+                            "Invalid or inactive role"
+                    );
                 });
     }
 

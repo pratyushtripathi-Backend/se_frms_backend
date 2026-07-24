@@ -39,6 +39,7 @@ public class LoginAttemptCountServiceImpl implements LoginAttemptCountService {
                                         .failedAttempts(0)
                                         .locked(false)
                                         .status(true)
+                                        .createdBy(user)
                                         .build()
                         );
 
@@ -85,6 +86,7 @@ public class LoginAttemptCountServiceImpl implements LoginAttemptCountService {
                         .failedAttempts(0)
                         .locked(false)
                         .status(true)
+                        .createdBy(user)
                         .build();
 
         repository.save(count);
@@ -126,6 +128,7 @@ public class LoginAttemptCountServiceImpl implements LoginAttemptCountService {
                                         .failedAttempts(0)
                                         .locked(false)
                                         .status(true)
+                                        .createdBy(user)
                                         .build()
                         );
 

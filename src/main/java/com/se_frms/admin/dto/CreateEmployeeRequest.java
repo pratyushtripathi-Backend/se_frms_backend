@@ -30,5 +30,6 @@ public class CreateEmployeeRequest {
     @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Invalid Indian phone number")
     private String phoneNumber;
 
+    @NotBlank(message = "Role name is required")
     private String roleName;
 }

@@ -61,6 +61,8 @@ public class UserRegistrationRequest {
     )
     private String phoneNumber;
 
+    @NotBlank(message = "Role name is required")
+    private String roleName;
 
     @Size(
             min = 8,
