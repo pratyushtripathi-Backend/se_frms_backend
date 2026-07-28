@@ -153,16 +153,9 @@ private final AccessMasterRepository accessRepository;
 
         Specification<RoleAccess> specification =
                 DynamicFilterSpecification
-                        .<RoleAccess>equal(
-                                "status",
-                                true
-                        )
-                        .and(
-                                DynamicFilterSpecification
-                                        .<RoleAccess>build(
-                                        workingFilters,
-                                        FILTER_FIELDS
-                                )
+                        .<RoleAccess>build(
+                                workingFilters,
+                                FILTER_FIELDS
                         )
                         .and(
                                 buildSearchSpecification(

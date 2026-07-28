@@ -232,12 +232,6 @@ public class AdminServiceImpl implements AdminService {
                                 EMPLOYEE_ROLE_NAME
                         )
                         .and(
-                                DynamicFilterSpecification.equal(
-                                        "status",
-                                        true
-                                )
-                        )
-                        .and(
                                 DynamicFilterSpecification.build(
                                         employeeFilters,
                                         EMPLOYEE_FILTER_FIELDS
@@ -400,7 +394,7 @@ public class AdminServiceImpl implements AdminService {
             throw new InvalidRequestException("Only employee can be updated");
         }
 
-        validateActiveEmployee(user, employeeId);
+       // validateActiveEmployee(user, employeeId);
 
         validateUniqueEmailForPatch(user, request.getEmail(), employeeId);
         validateUniquePhoneForPatch(user, request.getPhoneNumber(), employeeId);
