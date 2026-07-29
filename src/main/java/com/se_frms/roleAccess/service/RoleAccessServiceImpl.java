@@ -267,7 +267,7 @@ private final AccessMasterRepository accessRepository;
 
                 repository
 
-                        .findByRoleRoleIdAndStatusTrueOrderByAccessAccessNameAsc(
+                        .findByRoleRoleIdOrderByAccessAccessNameAsc(
                                 roleId
                         );
 
@@ -279,7 +279,7 @@ private final AccessMasterRepository accessRepository;
 
             throw new RuntimeException(
 
-                    "No active access found"
+                    "No access found"
 
             );
 

@@ -52,5 +52,8 @@ public interface RoleAccessRepository
     List<RoleAccess> findByRoleRoleId(
             Integer roleId
     );
+    List<RoleAccess> findByRoleRoleIdOrderByAccessAccessNameAsc(
+            Integer roleId
+    );
 
 }
