@@ -192,6 +192,7 @@ FraudRuleUpdateDTO request
         entity.setStatus(
                 request.getStatus()
         );
+        entity.setUpdatedAt(LocalDateTime.now());
 
         repository.save(
                 entity

@@ -10,7 +10,7 @@ import com.se_frms.ruleCategory.dto.*;
 import com.se_frms.ruleCategory.model.RuleCategory;
 import com.se_frms.ruleCategory.repository.RuleCategoryRepository;
 import com.se_frms.common.util.DynamicFilterSpecification;
-
+import java.time.LocalDateTime;
 import org.springframework.data.jpa.domain.Specification;
 import java.util.HashMap;
 import java.util.Locale;
@@ -128,6 +128,7 @@ public class RuleCategoryServiceImpl
         if (request.getStatus() != null) {
             category.setStatus(request.getStatus());
         }
+        category.setUpdatedAt(LocalDateTime.now());
 
         RuleCategory updatedCategory =
                 ruleCategoryRepository.save(category);
@@ -156,6 +157,7 @@ public class RuleCategoryServiceImpl
                 getCategoryEntity(id);
 
         category.setStatus(request.getStatus());
+        category.setUpdatedAt(LocalDateTime.now());
 
         RuleCategory updatedCategory =
                 ruleCategoryRepository.save(category);
@@ -180,6 +182,7 @@ public class RuleCategoryServiceImpl
                 getCategoryEntity(id);
 
         category.setStatus(false);
+        category.setUpdatedAt(LocalDateTime.now());
 
         ruleCategoryRepository.save(category);
 

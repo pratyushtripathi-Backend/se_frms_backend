@@ -28,7 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -350,6 +350,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         employee.setStatus(false);
+        employee.setUpdatedAt(LocalDateTime.now());
         userRepository.save(employee);
 
         log.info("Employee deleted successfully, employeeId={}", employeeId);
@@ -376,7 +377,7 @@ public class AdminServiceImpl implements AdminService {
         user.setEmail(XssUtil.clean(request.getEmail()));
         user.setPhoneNumber(XssUtil.clean(request.getPhoneNumber()));
         user.setStatus(request.getIsActive());
-
+        user.setUpdatedAt(LocalDateTime.now());
         User savedUser = userRepository.save(user);
 
         log.info("Employee updated successfully, employeeId={}", employeeId);
@@ -418,7 +419,7 @@ public class AdminServiceImpl implements AdminService {
         if (request.getIsActive() != null) {
             user.setStatus(request.getIsActive());
         }
-
+        user.setUpdatedAt(LocalDateTime.now());
         User savedUser = userRepository.save(user);
 
         log.info("Employee patched successfully, employeeId={}", employeeId);

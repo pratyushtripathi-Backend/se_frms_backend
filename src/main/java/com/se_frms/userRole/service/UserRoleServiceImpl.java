@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.userRole.dto.UserRoleStatusRequestDTO;
 import java.util.List;
 import java.util.Map;
-
+import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -79,11 +79,15 @@ public class UserRoleServiceImpl
         RoleMaster roleMaster =
                 getActiveRoleMaster(request.getRoleName());
 
+        LocalDateTime now = LocalDateTime.now();
+
         userRoleRepository.findByUserAndStatus(user, true)
                 .forEach(existingRole -> {
                     existingRole.setStatus(false);
+                    existingRole.setUpdatedAt(now);
                     userRoleRepository.save(existingRole);
                 });
+
         Integer loggedInAdminId =
                 currentUserService.getCurrentUserId();
 
@@ -103,11 +107,13 @@ public class UserRoleServiceImpl
         }
 
         userRole.setStatus(true);
+        userRole.setUpdatedAt(now);
 
         UserRole savedUserRole =
                 userRoleRepository.save(userRole);
 
         user.setUserType(roleMaster.getRoleName());
+        user.setUpdatedAt(now);
         userRepository.save(user);
 
         log.info(
@@ -259,6 +265,8 @@ public class UserRoleServiceImpl
         Integer loggedInAdminId =
                 currentUserService.getCurrentUserId();
 
+        LocalDateTime now = LocalDateTime.now();
+
         if (request.getRoleName() != null
                 && !request.getRoleName().isBlank()) {
 
@@ -278,12 +286,14 @@ public class UserRoleServiceImpl
 
                 if (!existingRole.getId().equals(targetUserRole.getId())) {
                     existingRole.setStatus(false);
+                    existingRole.setUpdatedAt(now);
                     userRoleRepository.save(existingRole);
                 }
             }
 
             if (!targetUserRole.getId().equals(userRole.getId())) {
                 userRole.setStatus(false);
+                userRole.setUpdatedAt(now);
                 userRoleRepository.save(userRole);
             }
 
@@ -298,11 +308,14 @@ public class UserRoleServiceImpl
                 targetUserRole.setCreatedBy(loggedInAdminId);
             }
 
+            targetUserRole.setUpdatedAt(now);
+
             UserRole savedUserRole =
                     userRoleRepository.save(targetUserRole);
 
             if (Boolean.TRUE.equals(savedUserRole.getStatus())) {
                 user.setUserType(roleMaster.getRoleName());
+                user.setUpdatedAt(now);
                 userRepository.save(user);
             }
 
@@ -321,6 +334,8 @@ public class UserRoleServiceImpl
         if (userRole.getCreatedBy() == null) {
             userRole.setCreatedBy(loggedInAdminId);
         }
+
+        userRole.setUpdatedAt(now);
 
         UserRole savedUserRole =
                 userRoleRepository.save(userRole);

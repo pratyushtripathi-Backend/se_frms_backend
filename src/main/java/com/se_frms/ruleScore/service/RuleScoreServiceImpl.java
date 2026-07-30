@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import org.springframework.data.jpa.domain.Specification;
@@ -145,7 +145,7 @@ public class RuleScoreServiceImpl
         if (request.getStatus() != null) {
             ruleScore.setStatus(request.getStatus());
         }
-
+        ruleScore.setUpdatedAt(LocalDateTime.now());
         RuleScore updatedRuleScore =
                 ruleScoreRepository.save(ruleScore);
 
@@ -177,7 +177,7 @@ public class RuleScoreServiceImpl
                 getRuleScoreEntity(id);
 
         ruleScore.setStatus(request.getStatus());
-
+        ruleScore.setUpdatedAt(LocalDateTime.now());
         RuleScore updatedRuleScore =
                 ruleScoreRepository.save(ruleScore);
 
@@ -207,7 +207,7 @@ public class RuleScoreServiceImpl
                 getRuleScoreEntity(id);
 
         ruleScore.setStatus(false);
-
+        ruleScore.setUpdatedAt(LocalDateTime.now());
         ruleScoreRepository.save(ruleScore);
 
         log.info(

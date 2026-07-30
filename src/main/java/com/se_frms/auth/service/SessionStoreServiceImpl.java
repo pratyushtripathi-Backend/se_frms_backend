@@ -17,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import org.springframework.data.jpa.domain.Specification;
-
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -87,6 +87,7 @@ public class SessionStoreServiceImpl
                 .ifPresentOrElse(
                         sessionStore -> {
                             sessionStore.setStatus(false);
+                            sessionStore.setUpdatedAt(LocalDateTime.now());
                             sessionStoreRepository.save(sessionStore);
 
                             log.info(

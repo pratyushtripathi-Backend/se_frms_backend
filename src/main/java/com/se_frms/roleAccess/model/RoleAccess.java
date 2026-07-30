@@ -64,4 +64,20 @@ public class RoleAccess {
 
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (createdDate == null) {
+            createdDate = now;
+        }
+
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
 }

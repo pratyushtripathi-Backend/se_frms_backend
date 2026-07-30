@@ -14,7 +14,7 @@ import com.se_frms.user.dto.UpdateUserRequest;
 import com.se_frms.user.dto.UserResponseDTO;
 
 import com.se_frms.user.model.User;
-
+import java.time.LocalDateTime;
 import com.se_frms.user.repository.UserRepository;
 
 import com.se_frms.user.service.UserService;
@@ -207,7 +207,7 @@ public class UserServiceImpl
         user.setPhoneNumber(
                 XssUtil.clean(phoneNumber)
         );
-
+        user.setUpdatedAt(LocalDateTime.now());
         User savedUser =
                 userRepository.save(user);
 
@@ -238,7 +238,7 @@ public class UserServiceImpl
                         );
 
         user.setStatus(request.getStatus());
-
+        user.setUpdatedAt(LocalDateTime.now());
         User savedUser =
                 userRepository.save(user);
 

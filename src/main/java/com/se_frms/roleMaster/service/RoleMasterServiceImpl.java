@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.se_frms.roleMaster.dto.RoleMasterStatusRequestDTO;
 import java.util.List;
 import java.util.Map;
-
+import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -202,6 +202,7 @@ public class RoleMasterServiceImpl
         if (request.getStatus() != null) {
             roleMaster.setStatus(request.getStatus());
         }
+        roleMaster.setUpdatedAt(LocalDateTime.now());
 
         RoleMaster savedRole =
                 roleMasterRepository.save(roleMaster);
@@ -244,6 +245,7 @@ public class RoleMasterServiceImpl
                         );
 
         roleMaster.setStatus(request.getStatus());
+        roleMaster.setUpdatedAt(LocalDateTime.now());
 
         RoleMaster savedRole =
                 roleMasterRepository.save(roleMaster);

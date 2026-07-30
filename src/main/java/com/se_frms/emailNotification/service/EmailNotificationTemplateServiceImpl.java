@@ -18,7 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -144,7 +144,7 @@ public class EmailNotificationTemplateServiceImpl
         if (request.getStatus() != null) {
             template.setStatus(request.getStatus());
         }
-
+        template.setUpdatedAt(LocalDateTime.now());
         EmailNotificationTemplate savedTemplate =
                 repository.save(template);
 
@@ -192,7 +192,7 @@ public class EmailNotificationTemplateServiceImpl
                         );
 
         template.setStatus(status);
-
+        template.setUpdatedAt(LocalDateTime.now());
         EmailNotificationTemplate savedTemplate =
                 repository.save(template);
 

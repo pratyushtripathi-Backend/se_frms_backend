@@ -20,7 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -121,10 +121,12 @@ public class BlackListUserServiceImpl
                 blackListUser.getUser();
 
         blackListUser.setStatus(false);
+        blackListUser.setUpdatedAt(LocalDateTime.now());
         BlackListUser savedBlackListUser =
                 blackListUserRepository.save(blackListUser);
 
         user.setStatus(true);
+        user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
 
         log.info("User blacklist removed successfully, userId={}", user.getId());
