@@ -383,15 +383,9 @@ FraudRuleUpdateDTO request
 
         Specification<FraudRule> specification =
                 DynamicFilterSpecification
-                        .<FraudRule>equal(
-                                "status",
-                                true
-                        )
-                        .and(
-                                DynamicFilterSpecification.build(
-                                        workingFilters,
-                                        FILTER_FIELDS
-                                )
+                        .<FraudRule>build(
+                                workingFilters,
+                                FILTER_FIELDS
                         );
 
         Specification<FraudRule> searchSpecification =

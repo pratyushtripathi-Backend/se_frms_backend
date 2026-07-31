@@ -274,16 +274,6 @@ public class RuleScoreServiceImpl
                     specification.and(searchSpecification);
         }
 
-        if (!workingFilters.containsKey("status")) {
-            specification =
-                    DynamicFilterSpecification
-                            .<RuleScore>equal(
-                                    "status",
-                                    true
-                            )
-                            .and(specification);
-        }
-
         return ruleScoreRepository
                 .findAll(
                         specification,

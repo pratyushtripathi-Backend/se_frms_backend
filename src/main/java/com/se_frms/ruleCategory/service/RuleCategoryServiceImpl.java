@@ -244,16 +244,6 @@ public class RuleCategoryServiceImpl
                     specification.and(searchSpecification);
         }
 
-        if (!workingFilters.containsKey("status")) {
-            specification =
-                    DynamicFilterSpecification
-                            .<RuleCategory>equal(
-                                    "status",
-                                    true
-                            )
-                            .and(specification);
-        }
-
         return ruleCategoryRepository
                 .findAll(
                         specification,
