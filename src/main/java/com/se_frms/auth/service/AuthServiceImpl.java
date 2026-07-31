@@ -184,6 +184,13 @@ public class AuthServiceImpl implements AuthService {
             RoleMaster roleMaster
     ) {
 
+        LocalDateTime now = LocalDateTime.now();
+
+        Integer createdById =
+                user.getCreatedBy() != null
+                        ? user.getCreatedBy().getId()
+                        : user.getId();
+
         UserRole userRole =
                 userRoleRepository
                         .findByUserAndRole(user, roleMaster)
@@ -191,10 +198,17 @@ public class AuthServiceImpl implements AuthService {
                                 UserRole.builder()
                                         .user(user)
                                         .role(roleMaster)
+                                        .createdBy(createdById)
                                         .build()
                         );
 
+        if (userRole.getCreatedBy() == null) {
+            userRole.setCreatedBy(createdById);
+        }
+
         userRole.setStatus(true);
+        userRole.setUpdatedAt(now);
+
         userRoleRepository.save(userRole);
     }
 
@@ -635,138 +649,6 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(false);
         userRepository.save(user);
     }
-
-
-//    @Override
-//    public LoginResponseDTO verifyOtp(
-//            VerifyOtpRequestDTO request,
-//            HttpServletRequest httpRequest
-//    ) {
-//
-//        String email =
-//                request.getEmail().trim().toLowerCase();
-//
-//        User user =
-//                userRepository
-//                        .findByEmail(email)
-//                        .orElseThrow(
-//                                () -> new InvalidCredentialsException(
-//                                        "User not found"
-//                                )
-//                        );
-//
-//        EmailOtp emailOtp =
-//                emailOtpRepository
-//                        .findTopByEmailOrderByIdDesc(email)
-//                        .orElseThrow(() -> {
-//
-//                            loginAttemptService.saveAttempt(
-//                                    user,
-//                                    email,
-//                                    false,
-//                                    "OTP_NOT_FOUND",
-//                                    null,
-//                                    null,
-//                                    httpRequest
-//                            );
-//
-//                            return new InvalidTokenException(
-//                                    "OTP not found"
-//                            );
-//                        });
-//
-//        if (Boolean.TRUE.equals(emailOtp.getVerified())) {
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    email,
-//                    false,
-//                    "OTP_ALREADY_USED",
-//                    null,
-//                    null,
-//                    httpRequest
-//            );
-//
-//            throw new InvalidTokenException(
-//                    "OTP already used"
-//            );
-//        }
-//
-//        if (emailOtp.getExpiryTime().isBefore(LocalDateTime.now())) {
-//
-//            emailOtp.setVerified(true);
-//            emailOtpRepository.save(emailOtp);
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    email,
-//                    false,
-//                    "OTP_EXPIRED",
-//                    null,
-//                    null,
-//                    httpRequest
-//            );
-//
-//            throw new TokenExpiredException(
-//                    "OTP expired"
-//            );
-//        }
-//
-//        if (!emailOtp.getOtp().equals(request.getOtp())) {
-//
-//            loginAttemptService.saveAttempt(
-//                    user,
-//                    email,
-//                    false,
-//                    "INVALID_OTP",
-//                    null,
-//                    null,
-//                    httpRequest
-//            );
-//
-//            throw new InvalidTokenException(
-//                    "Invalid OTP"
-//            );
-//        }
-//
-//        emailOtp.setVerified(true);
-//        emailOtpRepository.save(emailOtp);
-//
-//        String token = jwtUtil.generateToken(
-//                user.getEmail(),
-//                user.getUserType()
-//        );
-//
-//        sessionStoreService.createSession(user, token);
-//
-//        loginAttemptService.saveAttempt(
-//                user,
-//                email,
-//                true,
-//                "LOGIN_SUCCESS",
-//                null,
-//                null,
-//                httpRequest
-//        );
-//
-//        loginHistoryService.saveLoginHistory(
-//                user,
-//                httpRequest,
-//                true,
-//                resolveMacAddress(
-//                        request.getMacAddress(),
-//                        emailOtp.getMacAddress()
-//                )
-//        );
-//
-//        return LoginResponseDTO
-//                .builder()
-//                .userId(user.getId())
-//                .email(user.getEmail())
-//                .role(user.getUserType())
-//                .token(token)
-//                .build();
-//    }
 
     @Transactional(noRollbackFor = {
             InvalidTokenException.class,

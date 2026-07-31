@@ -521,15 +521,30 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private void saveUserRole(User user, RoleMaster roleMaster) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Integer createdById =
+                user.getCreatedBy() != null
+                        ? user.getCreatedBy().getId()
+                        : null;
+
         UserRole userRole = userRoleRepository
                 .findByUserAndRole(user, roleMaster)
                 .orElse(UserRole.builder()
                         .user(user)
                         .role(roleMaster)
+                        .createdBy(createdById)
                         .build()
                 );
 
+        if (userRole.getCreatedBy() == null) {
+            userRole.setCreatedBy(createdById);
+        }
+
         userRole.setStatus(true);
+        userRole.setUpdatedAt(now);
+
         userRoleRepository.save(userRole);
     }
 }
