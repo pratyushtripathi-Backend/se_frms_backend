@@ -10,9 +10,7 @@ import com.se_frms.roleAccess.dto.RoleAccessUpdateRequestDTO;
 
 public interface RoleAccessService {
 
-    RoleAccessResponseDTO create(
-            RoleAccessRequestDTO request
-    );
+    List<RoleAccessResponseDTO> create(RoleAccessRequestDTO request);
 
     Page<RoleAccessResponseDTO> getAll(
             int page,
@@ -20,11 +18,8 @@ public interface RoleAccessService {
             Map<String, String> filters
     );
 
-    RoleAccessResponseDTO getByRole(
-
-            Integer roleId
-
-    );
+    List<RoleAccessResponseDTO> getByRole(Integer roleId);
+    RoleAccessResponseDTO updateStatusById(Integer id, Boolean status);
 
     String updateAccessStatus(
 
@@ -36,9 +31,8 @@ public interface RoleAccessService {
 
     );
 
-    RoleAccessResponseDTO updateRoleAccess(
+    List<RoleAccessResponseDTO> updateRoleAccess(
             Integer roleId,
             RoleAccessUpdateRequestDTO request
     );
-
 }

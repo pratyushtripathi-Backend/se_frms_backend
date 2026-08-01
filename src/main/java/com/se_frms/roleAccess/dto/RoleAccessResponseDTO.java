@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 @Getter
@@ -18,7 +17,7 @@ public class RoleAccessResponseDTO {
 
     private Integer accessId;
 
-    private List<String> accessNames;
+    private String accessName;
 
     private Boolean status;
 

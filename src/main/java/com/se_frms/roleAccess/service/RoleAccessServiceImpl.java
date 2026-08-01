@@ -52,9 +52,7 @@ private final AccessMasterRepository accessRepository;
     private final CreatedByResolver createdByResolver;
 
     @Override
-    public RoleAccessResponseDTO create(
-            RoleAccessRequestDTO request
-    ) {
+    public List<RoleAccessResponseDTO> create(RoleAccessRequestDTO request) {
 
         RoleMaster role =
                 roleRepository
@@ -170,55 +168,7 @@ private final AccessMasterRepository accessRepository;
                         pageable
                 )
 
-                .map(
-
-                        v ->
-
-                                RoleAccessResponseDTO
-
-                                        .builder()
-
-                                        .id(
-                                                v.getId()
-                                        )
-
-                                        .roleId(
-                                                v.getRole().getRoleId()
-                                        )
-
-                                        .roleName(
-                                                v.getRole().getRoleName()
-                                        )
-
-                                        .accessId(
-                                                v.getAccess().getId()
-                                        )
-
-                                        .accessNames(
-                                                List.of(
-                                                        v.getAccess().getAccessName()
-                                                )
-                                        )
-
-                                        .status(
-                                                v.getStatus()
-                                        )
-
-                                        .createdBy(
-                                                createdByResolver.resolve(v.getCreatedBy())
-                                        )
-
-                                        .createdDate(
-                                                v.getCreatedDate()
-                                        )
-
-                                        .updatedAt(
-                                                v.getUpdatedAt()
-                                        )
-
-                                        .build()
-
-                );
+                .map(this::mapToResponse);
 
     }
 
@@ -257,100 +207,19 @@ private final AccessMasterRepository accessRepository;
     }
 
     @Override
-    public RoleAccessResponseDTO getByRole(
-
-            Integer roleId
-
-    ) {
+    public List<RoleAccessResponseDTO> getByRole(Integer roleId) {
 
         List<RoleAccess> mappings =
+                repository.findByRoleRoleIdOrderByAccessAccessNameAsc(roleId);
 
-                repository
-
-                        .findByRoleRoleIdOrderByAccessAccessNameAsc(
-                                roleId
-                        );
-
-        if (
-
-                mappings.isEmpty()
-
-        ) {
-
-            throw new RuntimeException(
-
-                    "No access found"
-
-            );
-
+        if (mappings.isEmpty()) {
+            throw new RuntimeException("No access found");
         }
 
-        return RoleAccessResponseDTO
-
-                .builder()
-
-                .id(
-                        mappings.get(0).getId()
-                )
-
-                .roleId(
-                        roleId
-                )
-
-                .roleName(
-
-                        mappings
-
-                                .get(0)
-
-                                .getRole()
-
-                                .getRoleName()
-
-                )
-
-                .accessId(
-                        mappings.get(0).getAccess().getId()
-                )
-
-                .accessNames(
-
-                        mappings
-
-                                .stream()
-
-                                .map(
-
-                                        x ->
-
-                                                x.getAccess()
-
-                                                        .getAccessName()
-
-                                )
-
-                                .toList()
-
-                )
-
-                .status(
-                        mappings.get(0).getStatus()
-                )
-
-                .createdBy(
-                        createdByResolver.resolve(mappings.get(0).getCreatedBy())
-                )
-
-                .createdDate(
-                        mappings.get(0).getCreatedDate()
-                )
-
-                .updatedAt(
-                        mappings.get(0).getUpdatedAt()
-                )
-
-                .build();
-
+        return mappings
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -418,7 +287,7 @@ private final AccessMasterRepository accessRepository;
     }
 
     @Override
-    public RoleAccessResponseDTO updateRoleAccess(
+    public List<RoleAccessResponseDTO> updateRoleAccess(
             Integer roleId,
             RoleAccessUpdateRequestDTO request
     ) {
@@ -515,21 +384,42 @@ private final AccessMasterRepository accessRepository;
             repository.save(newMapping);
         }
 
-        if (selectedAccessIds.isEmpty()) {
-
-            return RoleAccessResponseDTO
-                    .builder()
-                    .roleId(role.getRoleId())
-                    .roleName(role.getRoleName())
-                    .accessNames(List.of())
-                    .status(false)
-                    .createdBy(
-                            createdByResolver.resolve(loggedInAdminId)
-                    )
-                    .updatedAt(now)
-                    .build();
-        }
-
         return getByRole(roleId);
+    }
+    private RoleAccessResponseDTO mapToResponse(RoleAccess v) {
+        return RoleAccessResponseDTO
+                .builder()
+                .id(v.getId())
+                .roleId(v.getRole().getRoleId())
+                .roleName(v.getRole().getRoleName())
+                .accessId(v.getAccess().getId())
+                .accessName(v.getAccess().getAccessName())
+                .status(v.getStatus())
+                .createdBy(createdByResolver.resolve(v.getCreatedBy()))
+                .createdDate(v.getCreatedDate())
+                .updatedAt(v.getUpdatedAt())
+                .build();
+    }
+
+    @Override
+    public RoleAccessResponseDTO updateStatusById(
+            Integer id,
+            Boolean status
+    ) {
+
+        RoleAccess entity =
+                repository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new InvalidRequestException("Role access not found")
+                        );
+
+        entity.setStatus(status);
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        RoleAccess saved =
+                repository.save(entity);
+
+        return mapToResponse(saved);
     }
 }

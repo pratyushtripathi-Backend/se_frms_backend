@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.se_frms.roleAccess.dto.RoleAccessUpdateRequestDTO;
 import jakarta.validation.Valid;
+import com.se_frms.roleAccess.dto.RoleAccessStatusRequestDTO;
+import java.util.List;
 @RestController
 @RequestMapping("/api/v1/role-access")
 @RequiredArgsConstructor
@@ -20,18 +22,18 @@ public class RoleAccessController {
     private final RoleAccessService service;
 
     @PostMapping
-    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> create(
+    public ResponseEntity<AuthResponseDTO<List<RoleAccessResponseDTO>>> create(
             @Valid
             @RequestBody
             RoleAccessRequestDTO request
     ) {
 
-        RoleAccessResponseDTO responseData =
+        List<RoleAccessResponseDTO> responseData =
                 service.create(request);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<RoleAccessResponseDTO>builder()
+                        .<List<RoleAccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role access created successfully")
@@ -74,17 +76,16 @@ public class RoleAccessController {
     }
 
     @GetMapping("/{roleId}")
-    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> getByRole(
-            @PathVariable
-            Integer roleId
+    public ResponseEntity<AuthResponseDTO<List<RoleAccessResponseDTO>>> getByRole(
+            @PathVariable Integer roleId
     ) {
 
-        RoleAccessResponseDTO responseData =
+        List<RoleAccessResponseDTO> responseData =
                 service.getByRole(roleId);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<RoleAccessResponseDTO>builder()
+                        .<List<RoleAccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role access fetched successfully")
@@ -124,7 +125,7 @@ public class RoleAccessController {
     }
 
     @PutMapping("/{roleId}")
-    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> updateRoleAccess(
+    public ResponseEntity<AuthResponseDTO<List<RoleAccessResponseDTO>>> updateRoleAccess(
             @PathVariable
             Integer roleId,
 
@@ -133,7 +134,7 @@ public class RoleAccessController {
             RoleAccessUpdateRequestDTO request
     ) {
 
-        RoleAccessResponseDTO responseData =
+        List<RoleAccessResponseDTO> responseData =
                 service.updateRoleAccess(
                         roleId,
                         request
@@ -141,10 +142,34 @@ public class RoleAccessController {
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<RoleAccessResponseDTO>builder()
+                        .<List<RoleAccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role access updated successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<AuthResponseDTO<RoleAccessResponseDTO>> updateStatusById(
+            @PathVariable Integer id,
+
+            @Valid
+            @RequestBody RoleAccessStatusRequestDTO request
+    ) {
+
+        RoleAccessResponseDTO responseData =
+                service.updateStatusById(
+                        id,
+                        request.getStatus()
+                );
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<RoleAccessResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Role access status updated successfully")
                         .responseData(responseData)
                         .build()
         );
