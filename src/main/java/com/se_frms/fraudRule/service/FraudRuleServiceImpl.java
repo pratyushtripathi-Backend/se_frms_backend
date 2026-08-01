@@ -377,8 +377,8 @@ FraudRuleUpdateDTO request
                         size,
                         workingFilters,
                         FILTER_FIELDS,
-                        "ruleName",
-                        Sort.Direction.ASC
+                        "createdAt",
+                        Sort.Direction.DESC
                 );
 
         Specification<FraudRule> specification =

@@ -256,8 +256,8 @@ public class RuleScoreServiceImpl
                         pageSize,
                         workingFilters,
                         FILTER_FIELDS,
-                        "rule.ruleName",
-                        Sort.Direction.ASC
+                        "createdAt",
+                        Sort.Direction.DESC
                 );
 
         Specification<RuleScore> specification =

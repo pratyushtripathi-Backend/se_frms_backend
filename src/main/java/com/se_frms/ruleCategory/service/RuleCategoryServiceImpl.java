@@ -226,8 +226,8 @@ public class RuleCategoryServiceImpl
                         pageSize,
                         workingFilters,
                         FILTER_FIELDS,
-                        "categoryName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<RuleCategory> specification =
