@@ -144,8 +144,8 @@ public class UserRoleServiceImpl
                         size,
                         filters,
                         FILTER_FIELDS,
-                        "user.firstName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<UserRole> specification =

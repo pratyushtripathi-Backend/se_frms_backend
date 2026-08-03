@@ -86,8 +86,8 @@ public class UserServiceImpl
                         size,
                         userFilters,
                         USER_FILTER_FIELDS,
-                        "firstName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<User> specification =

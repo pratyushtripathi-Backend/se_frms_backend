@@ -145,8 +145,8 @@ private final AccessMasterRepository accessRepository;
                         size,
                         workingFilters,
                         FILTER_FIELDS,
-                        "role.roleName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<RoleAccess> specification =

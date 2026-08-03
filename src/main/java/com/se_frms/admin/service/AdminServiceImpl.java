@@ -221,8 +221,8 @@ public class AdminServiceImpl implements AdminService {
                         size,
                         employeeFilters,
                         EMPLOYEE_FILTER_FIELDS,
-                        "firstName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<User> specification =

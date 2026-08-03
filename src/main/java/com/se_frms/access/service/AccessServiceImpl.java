@@ -126,8 +126,8 @@ public class AccessServiceImpl
                         size,
                         workingFilters,
                         FILTER_FIELDS,
-                        "accessName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<AccessMaster> specification =

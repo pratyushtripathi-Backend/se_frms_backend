@@ -99,8 +99,8 @@ public class RoleMasterServiceImpl
                         size,
                         filters,
                         FILTER_FIELDS,
-                        "roleName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<RoleMaster> specification =

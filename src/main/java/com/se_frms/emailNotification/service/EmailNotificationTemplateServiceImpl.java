@@ -267,8 +267,8 @@ public class EmailNotificationTemplateServiceImpl
                         size,
                         filters,
                         FILTER_FIELDS,
-                        "templateCode",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<EmailNotificationTemplate> specification =

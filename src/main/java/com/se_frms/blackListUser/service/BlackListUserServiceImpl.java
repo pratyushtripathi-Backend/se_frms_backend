@@ -164,8 +164,8 @@ public class BlackListUserServiceImpl
                         size,
                         blackListFilters,
                         FILTER_FIELDS,
-                        "employeeName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<BlackListUser> specification =
@@ -255,8 +255,8 @@ public class BlackListUserServiceImpl
                         size,
                         blackListFilters,
                         FILTER_FIELDS,
-                        "employeeName",
-                        Sort.Direction.ASC
+                        "createdDate",
+                        Sort.Direction.DESC
                 );
 
         Specification<BlackListUser> specification =
