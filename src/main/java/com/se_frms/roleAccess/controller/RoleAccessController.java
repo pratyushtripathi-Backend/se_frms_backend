@@ -76,16 +76,33 @@ public class RoleAccessController {
     }
 
     @GetMapping("/{roleId}")
-    public ResponseEntity<AuthResponseDTO<List<RoleAccessResponseDTO>>> getByRole(
-            @PathVariable Integer roleId
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<RoleAccessResponseDTO>>> getByRole(
+            @PathVariable Integer roleId,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
     ) {
 
-        List<RoleAccessResponseDTO> responseData =
-                service.getByRole(roleId);
+        Page<RoleAccessResponseDTO> pageData =
+                service.getByRole(
+                        roleId,
+                        page,
+                        size,
+                        filters
+                );
+
+        PagedResponseDTO<RoleAccessResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
 
         return ResponseEntity.ok(
                 AuthResponseDTO
-                        .<List<RoleAccessResponseDTO>>builder()
+                        .<PagedResponseDTO<RoleAccessResponseDTO>>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Role access fetched successfully")

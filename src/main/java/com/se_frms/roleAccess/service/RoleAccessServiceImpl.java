@@ -223,6 +223,62 @@ private final AccessMasterRepository accessRepository;
     }
 
     @Override
+    public Page<RoleAccessResponseDTO> getByRole(
+            Integer roleId,
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
+
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove(
+                        "search"
+                );
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        workingFilters,
+                        FILTER_FIELDS,
+                        "createdDate",
+                        Sort.Direction.DESC
+                );
+
+        Specification<RoleAccess> specification =
+                DynamicFilterSpecification
+                        .<RoleAccess>equal(
+                                "role.roleId",
+                                roleId
+                        )
+                        .and(
+                                DynamicFilterSpecification.build(
+                                        workingFilters,
+                                        FILTER_FIELDS
+                                )
+                        )
+                        .and(
+                                buildSearchSpecification(
+                                        search
+                                )
+                        );
+
+        return repository
+                .findAll(
+                        specification,
+                        pageable
+                )
+                .map(this::mapToResponse);
+    }
+
+    @Override
     public String updateAccessStatus(
 
             Integer roleId,

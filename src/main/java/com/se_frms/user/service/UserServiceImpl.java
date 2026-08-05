@@ -111,6 +111,64 @@ public class UserServiceImpl
     }
 
     @Override
+    public Page<UserResponseDTO> getAllNonAdminUsers(
+            int page,
+            int size,
+            Map<String, String> filters
+    ) {
+
+        Map<String, String> userFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                userFilters.remove(
+                        "search"
+                );
+
+        Pageable pageable =
+                DynamicFilterSpecification.createPageable(
+                        page,
+                        size,
+                        userFilters,
+                        USER_FILTER_FIELDS,
+                        "createdDate",
+                        Sort.Direction.DESC
+                );
+
+        Specification<User> specification =
+                DynamicFilterSpecification
+                        .<User>build(
+                                userFilters,
+                                USER_FILTER_FIELDS
+                        )
+                        .and(
+                                (root, query, criteriaBuilder) ->
+                                        criteriaBuilder.notEqual(
+                                                criteriaBuilder.upper(
+                                                        root.get("userType")
+                                                ),
+                                                "ADMIN"
+                                        )
+                        )
+                        .and(
+                                buildUserSearchSpecification(
+                                        search
+                                )
+                        );
+
+        return userRepository
+                .findAll(
+                        specification,
+                        pageable
+                )
+                .map(this::mapToResponse);
+    }
+
+    @Override
     public UserResponseDTO getUserById(
             Integer id
     ) {

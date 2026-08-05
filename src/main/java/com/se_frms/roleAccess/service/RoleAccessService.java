@@ -19,6 +19,12 @@ public interface RoleAccessService {
     );
 
     List<RoleAccessResponseDTO> getByRole(Integer roleId);
+    Page<RoleAccessResponseDTO> getByRole(
+            Integer roleId,
+            int page,
+            int size,
+            Map<String, String> filters
+    );
     RoleAccessResponseDTO updateStatusById(Integer id, Boolean status);
 
     String updateAccessStatus(

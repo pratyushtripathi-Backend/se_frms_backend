@@ -29,4 +29,9 @@ public interface UserService {
             Integer id,
             UserStatusRequestDTO request
     );
+    Page<UserResponseDTO> getAllNonAdminUsers(
+            int page,
+            int size,
+            Map<String, String> filters
+    );
 }

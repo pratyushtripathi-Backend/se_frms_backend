@@ -264,9 +264,11 @@ public class AccessServiceImpl
                 request.getAccessName()
         );
 
-        entity.setStatus(
-                request.getStatus()
-        );
+        if (request.getStatus() != null) {
+            entity.setStatus(
+                    request.getStatus()
+            );
+        }
 
         entity.setUpdatedAt(
                 LocalDateTime.now()

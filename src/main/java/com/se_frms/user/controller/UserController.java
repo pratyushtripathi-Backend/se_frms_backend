@@ -64,6 +64,43 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/non-admin")
+    public ResponseEntity<AuthResponseDTO<PagedResponseDTO<UserResponseDTO>>>
+    getAllNonAdminUsers(
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam
+            Map<String, String> filters
+    ) {
+
+        Page<UserResponseDTO> pageData =
+                userService.getAllNonAdminUsers(
+                        page,
+                        size,
+                        filters
+                );
+
+        PagedResponseDTO<UserResponseDTO> responseData =
+                PagedResponseDTO.from(pageData);
+
+        AuthResponseDTO<PagedResponseDTO<UserResponseDTO>> response =
+                AuthResponseDTO
+                        .<PagedResponseDTO<UserResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage(
+                                "Non-admin users fetched successfully"
+                        )
+                        .responseData(responseData)
+                        .build();
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AuthResponseDTO<UserResponseDTO>>
     getUserById(
