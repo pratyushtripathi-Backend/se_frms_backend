@@ -31,4 +31,6 @@ public class UserResponseDTO {
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedAt;
+
+    private Boolean logoutRequired;
 }

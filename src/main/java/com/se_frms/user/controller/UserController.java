@@ -3,6 +3,7 @@ package com.se_frms.user.controller;
 
 
 import com.se_frms.auth.dto.AuthResponseDTO;
+import com.se_frms.auth.service.AuthService;
 
 import com.se_frms.common.dto.PagedResponseDTO;
 import com.se_frms.user.dto.UpdateUserRequest;
@@ -26,6 +27,8 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+
+    private final AuthService authService;
 
     @GetMapping
     public ResponseEntity<AuthResponseDTO<PagedResponseDTO<UserResponseDTO>>>
@@ -131,7 +134,9 @@ public class UserController {
 
             @Valid
             @RequestBody
-            UpdateUserRequest request
+            UpdateUserRequest request,
+
+            jakarta.servlet.http.HttpServletRequest httpRequest
     ) {
 
         UserResponseDTO responseData =
@@ -140,13 +145,21 @@ public class UserController {
                         request
                 );
 
+        if (Boolean.TRUE.equals(responseData.getLogoutRequired())) {
+            authService.logout(
+                    extractBearerToken(httpRequest)
+            );
+        }
+
         AuthResponseDTO<UserResponseDTO> response =
                 AuthResponseDTO
                         .<UserResponseDTO>builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(
-                                "User updated successfully"
+                                Boolean.TRUE.equals(responseData.getLogoutRequired())
+                                        ? "User updated successfully. Please login again."
+                                        : "User updated successfully"
                         )
                         .responseData(responseData)
                         .build();
@@ -183,5 +196,20 @@ public class UserController {
                         .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    private String extractBearerToken(
+            jakarta.servlet.http.HttpServletRequest request
+    ) {
+
+        String authHeader =
+                request.getHeader("Authorization");
+
+        if (authHeader == null
+                || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Token not found");
+        }
+
+        return authHeader.substring(7);
     }
 }

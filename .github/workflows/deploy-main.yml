@@ -1,0 +1,86 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: backend-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build and deploy to server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
+
+      - name: Build application
+        run: ./mvnw clean package -DskipTests
+
+      - name: Resolve artifact name
+        id: artifact
+        shell: bash
+        run: |
+          jar_file="$(find target -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' | head -n 1)"
+          if [ -z "$jar_file" ]; then
+            echo "No deployable JAR found in target/"
+            exit 1
+          fi
+          echo "path=$jar_file" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release directory
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            set -e
+            mkdir -p "${{ secrets.APP_DIR }}/releases"
+
+      - name: Upload JAR to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: ${{ steps.artifact.outputs.path }}
+          target: ${{ secrets.APP_DIR }}/releases/${{ github.sha }}
+          strip_components: 1
+
+      - name: Activate release and restart service
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            set -e
+            release_dir="${{ secrets.APP_DIR }}/releases/${{ github.sha }}"
+            jar_file="$(find "$release_dir" -maxdepth 1 -type f -name '*.jar' | head -n 1)"
+            if [ -z "$jar_file" ]; then
+              echo "Uploaded JAR not found in $release_dir"
+              exit 1
+            fi
+
+            ln -sfn "$jar_file" "${{ secrets.APP_DIR }}/app.jar"
+            sudo systemctl restart "${{ secrets.SERVICE_NAME }}"
+            sudo systemctl status "${{ secrets.SERVICE_NAME }}" --no-pager

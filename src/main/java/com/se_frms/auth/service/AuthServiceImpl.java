@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
     @Value("${sms.otp.return-in-response:false}")
     private boolean returnOtpInResponse;
 
-    @Value("${app.frontend.reset-password-url:http://localhost:5173/create-new-password}")
+    @Value("${app.frontend.reset-password-url}")
     private String resetPasswordUrl;
 
     @Override

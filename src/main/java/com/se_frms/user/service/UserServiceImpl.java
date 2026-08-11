@@ -249,6 +249,16 @@ public class UserServiceImpl
             );
         }
 
+        boolean emailChanged =
+                !Objects.equals(
+                        user.getEmail(),
+                        email
+                );
+
+        boolean logoutRequired =
+                currentUser.getId().equals(id)
+                        && emailChanged;
+
         user.setFirstName(
                 XssUtil.clean(
                         request.getFirstName().trim()
@@ -269,9 +279,16 @@ public class UserServiceImpl
         User savedUser =
                 userRepository.save(user);
 
-        return mapToResponse(
-                savedUser
+        UserResponseDTO response =
+                mapToResponse(
+                        savedUser
+                );
+
+        response.setLogoutRequired(
+                logoutRequired
         );
+
+        return response;
     }
 
     @Override
@@ -320,6 +337,7 @@ public class UserServiceImpl
                 )
                 .createdDate(user.getCreatedDate())
                 .updatedAt(user.getUpdatedAt())
+                .logoutRequired(false)
                 .build();
     }
 

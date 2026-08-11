@@ -277,19 +277,30 @@ public class AuthController {
     changePassword(
             @Valid
             @RequestBody
-            ChangePasswordRequest request
+            ChangePasswordRequest request,
+
+            HttpServletRequest httpRequest
     ) {
 
         authService.changePassword(request);
+
+        authService.logout(
+                extractBearerToken(httpRequest)
+        );
 
         return ResponseEntity.ok(
                 AuthResponseDTO.builder()
                         .status(true)
                         .responseCode(200)
                         .responseMessage(
-                                "Password changed successfully"
+                                "Password changed successfully. Please login again."
                         )
-                        .responseData(null)
+                        .responseData(
+                                Map.of(
+                                        "logoutRequired",
+                                        true
+                                )
+                        )
                         .build()
         );
     }
@@ -423,6 +434,21 @@ public class AuthController {
                         .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    private String extractBearerToken(
+            HttpServletRequest request
+    ) {
+
+        String authHeader =
+                request.getHeader("Authorization");
+
+        if (authHeader == null
+                || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Token not found");
+        }
+
+        return authHeader.substring(7);
     }
 
     @GetMapping("/login-attempt/{userId}")
