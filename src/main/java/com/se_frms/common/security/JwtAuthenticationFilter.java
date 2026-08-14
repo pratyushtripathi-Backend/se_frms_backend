@@ -38,6 +38,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String uri = request.getRequestURI();
+        if (uri.startsWith("/api/v1/internal/")) {
+
+            log.debug("Authentication skipped for internal endpoint, uri={}", uri);
+
+            filterChain.doFilter(request, response);
+
+            return;
+        }
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
