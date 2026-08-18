@@ -23,6 +23,8 @@ public class FraudRuleResponseDTO {
 
     private String ruleDescription;
 
+    private String ruleExpression;
+
     private Boolean status;
 
     private String createdBy;

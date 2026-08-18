@@ -66,6 +66,7 @@ public class InternalRuleCacheServiceImpl implements InternalRuleCacheService {
                                 ? ""
                                 : fraudRule.getRuleDescription()
                 )
+                .ruleExpression(fraudRule.getRuleExpression())
                 .categoryName(category.getCategoryName())
                 .ruleScore(ruleScore.getScore())
                 .status(true)

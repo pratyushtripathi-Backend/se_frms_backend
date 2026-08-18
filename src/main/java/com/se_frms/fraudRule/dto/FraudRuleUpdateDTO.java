@@ -28,6 +28,8 @@ public class FraudRuleUpdateDTO {
     @Size(max = 500, message = "Rule description must not exceed 500 characters")
     private String ruleDescription;
 
+    private String ruleExpression;
+
     @NotNull(message = "Status is required")
     private Boolean status;
 

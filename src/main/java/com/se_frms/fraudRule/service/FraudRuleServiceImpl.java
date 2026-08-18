@@ -58,6 +58,7 @@ public class FraudRuleServiceImpl
                     Map.entry("ruleCode", "ruleCode"),
                     Map.entry("ruleName", "ruleName"),
                     Map.entry("ruleDescription", "ruleDescription"),
+                    Map.entry("ruleExpression", "ruleExpression"),
                     Map.entry("status", "status"),
                     Map.entry("createdBy", "createdBy"),
                     Map.entry("createdAt", "createdAt"),
@@ -113,6 +114,10 @@ public class FraudRuleServiceImpl
 
                         .ruleDescription(
                                 request.getRuleDescription()
+                        )
+
+                        .ruleExpression(
+                                request.getRuleExpression()
                         )
 
                         .status(true)
@@ -187,6 +192,10 @@ FraudRuleUpdateDTO request
 
         entity.setRuleDescription(
                 request.getRuleDescription()
+        );
+
+        entity.setRuleExpression(
+                request.getRuleExpression()
         );
 
         entity.setStatus(
@@ -441,6 +450,10 @@ FraudRuleUpdateDTO request
                             keyword
                     ),
                     criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("ruleExpression")),
+                            keyword
+                    ),
+                    criteriaBuilder.like(
                             criteriaBuilder.lower(categoryJoin.get("categoryName")),
                             keyword
                     )
@@ -556,6 +569,10 @@ FraudRuleUpdateDTO request
 
                 .ruleDescription(
                         entity.getRuleDescription()
+                )
+
+                .ruleExpression(
+                        entity.getRuleExpression()
                 )
 
                 .status(

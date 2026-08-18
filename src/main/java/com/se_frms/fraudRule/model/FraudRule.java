@@ -35,6 +35,9 @@ public class FraudRule {
 
     private String ruleDescription;
 
+    @Column(columnDefinition = "TEXT")
+    private String ruleExpression;
+
     private Boolean status;
 
     private LocalDateTime createdAt;

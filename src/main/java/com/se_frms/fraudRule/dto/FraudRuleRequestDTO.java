@@ -27,4 +27,6 @@ public class FraudRuleRequestDTO {
     @Size(max = 500, message = "Rule description must not exceed 500 characters")
     private String ruleDescription;
 
+    private String ruleExpression;
+
 }
