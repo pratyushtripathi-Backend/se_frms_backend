@@ -1,347 +1,266 @@
-2026-08-11 10:17:36 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3d9h45m27s822ms861µs400ns).
-2026-08-11 10:43:26 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:43:26 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:43:26 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 10:43:26 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=1, status=false, reason=INVALID_PASSWORD
-2026-08-11 10:43:26 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=1, status=false
-2026-08-11 10:43:26 WARN  c.s.auth.service.AuthServiceImpl - Login failed because password was invalid, userId=1
-2026-08-11 10:43:26 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:43:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:43:44 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:43:44 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 10:43:45 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=1, status=false, reason=INVALID_PASSWORD
-2026-08-11 10:43:45 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=1, status=false
-2026-08-11 10:43:45 WARN  c.s.auth.service.AuthServiceImpl - Login failed because password was invalid, userId=1
-2026-08-11 10:43:45 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:43:53 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:43:53 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:43:53 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 10:43:53 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=1, status=false, reason=INVALID_PASSWORD
-2026-08-11 10:43:53 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=1, status=false
-2026-08-11 10:43:53 WARN  c.s.auth.service.AuthServiceImpl - Login failed because password was invalid, userId=1
-2026-08-11 10:43:53 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:44:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:44:06 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:44:06 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 10:44:17 ERROR c.se_frms.sms.service.SmsServiceImpl - Login OTP SMS sending failed, mobile=******7509
-org.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://control.msg24x7.com/api/v2/SendSMS": control.msg24x7.com
-	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:926)
-	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:906)
-	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:801)
-	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:683)
-	at com.se_frms.sms.service.SmsServiceImpl.sendLoginOtp(SmsServiceImpl.java:104)
-	at com.se_frms.auth.service.AuthServiceImpl.login(AuthServiceImpl.java:593)
-	at jdk.internal.reflect.GeneratedMethodAccessor104.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380)
-	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727)
-	at com.se_frms.auth.service.AuthServiceImpl$$SpringCGLIB$$0.login(<generated>)
-	at com.se_frms.auth.controller.AuthController.login(AuthController.java:80)
-	at jdk.internal.reflect.GeneratedMethodAccessor103.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:257)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
-	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:181)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at com.se_frms.common.security.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:49)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
-	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: java.net.UnknownHostException: control.msg24x7.com
-	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:572)
-	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
-	at java.base/java.net.Socket.connect(Socket.java:633)
-	at java.base/sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:304)
-	at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178)
-	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:533)
-	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:638)
-	at java.base/sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:266)
-	at java.base/sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:380)
-	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:193)
-	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1262)
-	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1148)
-	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:179)
-	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.connect(HttpsURLConnectionImpl.java:142)
-	at org.springframework.http.client.SimpleClientHttpRequest.executeInternal(SimpleClientHttpRequest.java:79)
-	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:71)
-	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
-	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:900)
-	... 121 common frames omitted
-2026-08-11 10:44:18 WARN  c.s.c.e.GlobalExceptionHandler - Runtime exception handled: Unable to send OTP SMS
-2026-08-11 10:47:11 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:47:11 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:47:11 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 10:47:23 ERROR c.se_frms.sms.service.SmsServiceImpl - Login OTP SMS sending failed, mobile=******7509
-org.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://control.msg24x7.com/api/v2/SendSMS": control.msg24x7.com
-	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:926)
-	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:906)
-	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:801)
-	at org.springframework.web.client.RestTemplate.exchange(RestTemplate.java:683)
-	at com.se_frms.sms.service.SmsServiceImpl.sendLoginOtp(SmsServiceImpl.java:104)
-	at com.se_frms.auth.service.AuthServiceImpl.login(AuthServiceImpl.java:593)
-	at jdk.internal.reflect.GeneratedMethodAccessor104.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380)
-	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727)
-	at com.se_frms.auth.service.AuthServiceImpl$$SpringCGLIB$$0.login(<generated>)
-	at com.se_frms.auth.controller.AuthController.login(AuthController.java:80)
-	at jdk.internal.reflect.GeneratedMethodAccessor103.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:257)
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
-	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:181)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at com.se_frms.common.security.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:49)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
-	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
-	at java.base/java.lang.Thread.run(Thread.java:840)
-Caused by: java.net.UnknownHostException: control.msg24x7.com
-	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:572)
-	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
-	at java.base/java.net.Socket.connect(Socket.java:633)
-	at java.base/sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:304)
-	at java.base/sun.net.NetworkClient.doConnect(NetworkClient.java:178)
-	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:533)
-	at java.base/sun.net.www.http.HttpClient.openServer(HttpClient.java:638)
-	at java.base/sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:266)
-	at java.base/sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:380)
-	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:193)
-	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1262)
-	at java.base/sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1148)
-	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:179)
-	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.connect(HttpsURLConnectionImpl.java:142)
-	at org.springframework.http.client.SimpleClientHttpRequest.executeInternal(SimpleClientHttpRequest.java:79)
-	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:71)
-	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
-	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:900)
-	... 121 common frames omitted
-2026-08-11 10:47:23 WARN  c.s.c.e.GlobalExceptionHandler - Runtime exception handled: Unable to send OTP SMS
-2026-08-11 10:49:26 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 10:49:26 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 10:49:26 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 10:49:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 10:49:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 10:49:43 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 25436 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 10:49:43 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 10:49:43 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 10:49:45 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 10:49:45 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 255 ms. Found 17 JPA repository interfaces.
-2026-08-11 10:49:46 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 10:49:46 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 10:49:46 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 10:49:46 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 10:49:46 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3268 ms
-2026-08-11 10:49:47 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 10:49:47 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 10:49:47 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 10:49:47 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 10:49:47 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 10:49:48 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2e8b24a1
-2026-08-11 10:49:48 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 10:49:48 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 10:49:48 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+2026-08-20 00:15:37 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5h38m18s689ms98µs700ns).
+2026-08-20 10:22:28 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10h6m55s530ms511µs500ns).
+2026-08-20 10:23:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:23:43 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:28:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:28:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:33:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:33:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:38:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:38:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:43:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:43:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:48:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:48:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:50:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
+2026-08-20 10:50:10 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
+2026-08-20 10:50:11 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
+2026-08-20 10:50:12 INFO  c.se_frms.sms.service.SmsServiceImpl - MSG24x7 SMS API response: {"ErrorCode":0,"ErrorDescription":null,"Data":[{"MessageErrorCode":0,"MessageErrorDescription":"Success","MobileNumber":"919999999999","MessageId":"719438f8-e2d5-453f-92bc-7e41cb7909eb","Custom":null}]}
+2026-08-20 10:50:12 INFO  c.se_frms.sms.service.SmsServiceImpl - Login OTP SMS sent successfully, mobile=******9999
+2026-08-20 10:50:12 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=24, status=true, reason=OTP_SENT
+2026-08-20 10:50:12 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=24, status=true
+2026-08-20 10:50:12 INFO  c.s.auth.service.AuthServiceImpl - Login OTP SMS service completed, userId=24
+2026-08-20 10:50:12 INFO  c.s.auth.controller.AuthController - Password verified and OTP generated, ip=0:0:0:0:0:0:0:1
+2026-08-20 10:50:53 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/verify-otp
+2026-08-20 10:50:53 INFO  c.s.auth.controller.AuthController - Verify OTP request received
+2026-08-20 10:50:53 INFO  c.s.a.s.SessionStoreServiceImpl - Create session service started, userId=24
+2026-08-20 10:50:53 INFO  c.s.a.s.SessionStoreServiceImpl - Session created successfully, userId=24
+2026-08-20 10:50:53 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=24, status=true, reason=LOGIN_SUCCESS
+2026-08-20 10:50:53 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=24, status=true
+2026-08-20 10:50:53 INFO  c.s.a.s.LoginHistoryServiceImpl - Saving login history, userId=24, status=true
+2026-08-20 10:50:53 INFO  c.s.a.s.LoginHistoryServiceImpl - Login history saved successfully, userId=24, status=true
+2026-08-20 10:50:53 INFO  c.s.auth.controller.AuthController - OTP verified and login successful
+2026-08-20 10:51:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:51:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 10:51:10 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 10:51:10 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 10:51:10 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 10:51:10 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 10:51:10 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 10:51:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 10:51:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:51:10 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 10:51:10 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 10:51:10 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 10:51:10 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 10:51:10 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 10:51:14 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/role-access/1
+2026-08-20 10:52:29 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:52:29 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 10:52:29 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 10:52:29 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 10:52:29 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 10:52:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:52:36 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=20
+2026-08-20 10:52:36 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=20
+2026-08-20 10:52:36 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=2
+2026-08-20 10:52:36 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=2
+2026-08-20 10:53:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/access-name
+2026-08-20 10:53:02 INFO  c.s.a.controller.AccessController - Create access request received
+2026-08-20 10:53:02 INFO  c.s.access.service.AccessServiceImpl - Create access service started, accessName=DECISION_POLICY_VIEW
+2026-08-20 10:53:02 INFO  c.s.access.service.AccessServiceImpl - Access created successfully, accessName=DECISION_POLICY_VIEW
+2026-08-20 10:53:02 INFO  c.s.a.controller.AccessController - Access created successfully
+2026-08-20 10:53:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:53:02 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=20
+2026-08-20 10:53:02 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=20
+2026-08-20 10:53:02 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=3
+2026-08-20 10:53:02 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=3
+2026-08-20 10:53:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:53:10 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 10:53:10 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 10:53:10 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 10:53:10 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 10:53:43 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/access-name
+2026-08-20 10:53:43 INFO  c.s.a.controller.AccessController - Create access request received
+2026-08-20 10:53:43 INFO  c.s.access.service.AccessServiceImpl - Create access service started, accessName=DECISION_POLICY_CREATE
+2026-08-20 10:53:43 INFO  c.s.access.service.AccessServiceImpl - Access created successfully, accessName=DECISION_POLICY_CREATE
+2026-08-20 10:53:43 INFO  c.s.a.controller.AccessController - Access created successfully
+2026-08-20 10:53:43 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:53:43 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 10:53:43 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 10:53:43 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 10:53:43 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 10:53:45 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 10:53:45 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 10:53:58 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/access-name
+2026-08-20 10:53:58 INFO  c.s.a.controller.AccessController - Create access request received
+2026-08-20 10:53:58 INFO  c.s.access.service.AccessServiceImpl - Create access service started, accessName=DECISION_POLICY_UPDATE
+2026-08-20 10:53:58 INFO  c.s.access.service.AccessServiceImpl - Access created successfully, accessName=DECISION_POLICY_UPDATE
+2026-08-20 10:53:58 INFO  c.s.a.controller.AccessController - Access created successfully
+2026-08-20 10:53:58 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 10:53:58 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 10:53:58 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 10:53:58 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 10:53:58 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 11:04:29 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m30s272ms105µs900ns).
+2026-08-20 11:04:45 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:04:45 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:05:37 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:05:37 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 11:05:37 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 11:05:37 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 11:05:37 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 11:06:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/access-name
+2026-08-20 11:06:10 INFO  c.s.a.controller.AccessController - Create access request received
+2026-08-20 11:06:10 INFO  c.s.access.service.AccessServiceImpl - Create access service started, accessName=DECISION_POLICY_DELETE
+2026-08-20 11:06:10 INFO  c.s.access.service.AccessServiceImpl - Access created successfully, accessName=DECISION_POLICY_DELETE
+2026-08-20 11:06:10 INFO  c.s.a.controller.AccessController - Access created successfully
+2026-08-20 11:06:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:06:10 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 11:06:10 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 11:06:10 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 11:06:10 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 11:09:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:09:42 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 11:09:42 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 11:09:42 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 11:09:42 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 11:11:22 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m22s823ms940µs800ns).
+2026-08-20 11:11:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:11:27 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 11:11:27 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 11:11:27 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 11:11:27 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 11:11:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:11:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:11:36 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:11:36 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:11:36 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:11:36 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:11:36 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:11:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:11:36 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:11:36 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:11:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:11:36 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:11:36 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:11:36 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:11:38 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:11:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:16:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:16:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:21:10 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=47s753ms768µs900ns).
+2026-08-20 11:22:11 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:22:11 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:22:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:22:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:22:50 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:22:50 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:22:50 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:22:50 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:22:50 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:22:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:22:50 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:22:50 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:22:50 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:22:50 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:22:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:22:50 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:23:17 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:23:17 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=20
+2026-08-20 11:23:17 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=20
+2026-08-20 11:23:18 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=20
+2026-08-20 11:23:18 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=20
+2026-08-20 11:24:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:24:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:24:52 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:24:52 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:24:52 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:24:52 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:24:52 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:24:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:24:52 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:24:52 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:24:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:24:52 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:24:52 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:24:52 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:27:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:27:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:32:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:32:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:37:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:37:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:42:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:42:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:47:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:47:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:48:25 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
+2026-08-20 11:48:25 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
+2026-08-20 11:48:25 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
+2026-08-20 11:48:26 INFO  c.se_frms.sms.service.SmsServiceImpl - MSG24x7 SMS API response: {"ErrorCode":0,"ErrorDescription":null,"Data":[{"MessageErrorCode":0,"MessageErrorDescription":"Success","MobileNumber":"919999999999","MessageId":"70e9f181-cc7a-4325-a723-c8d5626c878d","Custom":null}]}
+2026-08-20 11:48:26 INFO  c.se_frms.sms.service.SmsServiceImpl - Login OTP SMS sent successfully, mobile=******9999
+2026-08-20 11:48:26 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=24, status=true, reason=OTP_SENT
+2026-08-20 11:48:26 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=24, status=true
+2026-08-20 11:48:26 INFO  c.s.auth.service.AuthServiceImpl - Login OTP SMS service completed, userId=24
+2026-08-20 11:48:26 INFO  c.s.auth.controller.AuthController - Password verified and OTP generated, ip=0:0:0:0:0:0:0:1
+2026-08-20 11:48:38 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/verify-otp
+2026-08-20 11:48:38 INFO  c.s.auth.controller.AuthController - Verify OTP request received
+2026-08-20 11:48:38 INFO  c.s.a.s.SessionStoreServiceImpl - Create session service started, userId=24
+2026-08-20 11:48:38 INFO  c.s.a.s.SessionStoreServiceImpl - Session created successfully, userId=24
+2026-08-20 11:48:38 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=24, status=true, reason=LOGIN_SUCCESS
+2026-08-20 11:48:38 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=24, status=true
+2026-08-20 11:48:38 INFO  c.s.a.s.LoginHistoryServiceImpl - Saving login history, userId=24, status=true
+2026-08-20 11:48:38 INFO  c.s.a.s.LoginHistoryServiceImpl - Login history saved successfully, userId=24, status=true
+2026-08-20 11:48:38 INFO  c.s.auth.controller.AuthController - OTP verified and login successful
+2026-08-20 11:49:05 WARN  c.s.c.s.JwtAuthenticationFilter - Authentication failed because token is invalid or expired, uri=/api/v1/access/get-access-list
+2026-08-20 11:49:17 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:49:17 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=0, size=10
+2026-08-20 11:49:17 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=0, size=10
+2026-08-20 11:49:17 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:49:17 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:49:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:49:27 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:49:27 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:49:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:49:27 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:49:27 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:49:27 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:49:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:49:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:49:27 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:49:27 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:49:27 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:49:27 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:49:27 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:49:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:49:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:49:56 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:49:56 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:49:56 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:49:56 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:49:56 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:49:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:49:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-access-list
+2026-08-20 11:49:56 INFO  c.s.a.controller.AccessController - Fetch all access request received, page=1, size=10
+2026-08-20 11:49:56 INFO  c.s.access.service.AccessServiceImpl - Fetch all access service started, page=1, size=10
+2026-08-20 11:49:56 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:49:56 INFO  c.s.access.service.AccessServiceImpl - Access list fetched successfully, count=10
+2026-08-20 11:49:56 INFO  c.s.a.controller.AccessController - Access list fetched successfully, count=10
+2026-08-20 11:50:20 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-20 11:50:20 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-08-20 11:50:20 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-20 11:50:20 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-08-20 11:50:20 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-08-20 11:50:32 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 38480 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
+2026-08-20 11:50:32 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
+2026-08-20 11:50:32 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
+2026-08-20 11:50:33 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-20 11:50:34 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 168 ms. Found 18 JPA repository interfaces.
+2026-08-20 11:50:34 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-08-20 11:50:34 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-08-20 11:50:34 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-08-20 11:50:34 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-08-20 11:50:34 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2146 ms
+2026-08-20 11:50:35 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-20 11:50:35 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
+2026-08-20 11:50:35 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-08-20 11:50:35 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-20 11:50:35 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-08-20 11:50:35 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7f305f34
+2026-08-20 11:50:35 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-08-20 11:50:35 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-20 11:50:35 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 16.14
@@ -349,591 +268,208 @@ Caused by: java.net.UnknownHostException: control.msg24x7.com
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-08-11 10:49:50 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 10:49:53 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 10:49:54 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 10:49:54 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 10:49:55 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 10:49:55 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 10:49:57 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 10:49:57 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 14.59 seconds (process running for 24.982)
-2026-08-11 10:50:31 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 10:50:31 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 10:50:31 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
-2026-08-11 10:50:32 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:50:32 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:50:32 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 10:50:32 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=1, status=false, reason=INVALID_PASSWORD
-2026-08-11 10:50:33 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=1, status=false
-2026-08-11 10:50:33 WARN  c.s.auth.service.AuthServiceImpl - Login failed because password was invalid, userId=1
-2026-08-11 10:50:33 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:50:40 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:50:40 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:50:40 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:50:41 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:50:41 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:50:41 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:50:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:50:42 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:50:42 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:50:42 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:50:42 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:50:42 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:50:47 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:50:47 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:50:47 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:50:47 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:50:47 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:50:47 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:50:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:50:52 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:50:52 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:50:52 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:50:52 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:50:52 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:50:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:50:56 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:50:56 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:50:56 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:50:56 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:50:56 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:51:20 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:51:20 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:51:20 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:51:20 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:51:20 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:51:20 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:53:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:53:56 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:53:56 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:53:56 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:53:56 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:53:56 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:54:14 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:54:14 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:54:14 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:54:14 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:54:14 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:54:14 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:54:19 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:54:19 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:54:19 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:54:19 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:54:19 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:54:19 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:54:22 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:54:22 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:54:22 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:54:22 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:54:22 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:54:22 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:54:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:54:27 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:54:27 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:54:27 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:54:27 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:54:27 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:54:31 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:54:31 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:54:31 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:54:31 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:54:31 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:54:31 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:16 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:16 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:16 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:16 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:16 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:16 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:24 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:24 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:24 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:24 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:24 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:24 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:29 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:29 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:29 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:29 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:29 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:29 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:34 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:34 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:34 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:34 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:34 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:34 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:39 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:39 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:39 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:39 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:39 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:39 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:43 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:43 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:43 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:43 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:43 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:43 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:58:48 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 10:58:48 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 10:58:48 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 10:58:48 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 10:58:48 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 10:58:48 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 10:59:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/forgot-password
-2026-08-11 10:59:42 INFO  c.s.auth.controller.AuthController - Forgot password request received
-2026-08-11 10:59:42 INFO  c.s.auth.service.AuthServiceImpl - Forgot password service started
-2026-08-11 10:59:42 WARN  c.s.auth.service.AuthServiceImpl - Forgot password failed because user was not found
-2026-08-11 10:59:42 WARN  c.s.c.e.GlobalExceptionHandler - Invalid request exception handled: User not found
-2026-08-11 10:59:51 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/forgot-password
-2026-08-11 10:59:51 INFO  c.s.auth.controller.AuthController - Forgot password request received
-2026-08-11 10:59:51 INFO  c.s.auth.service.AuthServiceImpl - Forgot password service started
-2026-08-11 10:59:51 INFO  c.s.auth.service.AuthServiceImpl - Password reset token created, userId=1
-2026-08-11 10:59:51 INFO  c.s.auth.service.AuthServiceImpl - Password reset mail triggered, userId=1
-2026-08-11 10:59:51 INFO  c.s.mail.service.MailServiceImpl - Password reset mail request received, email=admin@frms.com
-2026-08-11 10:59:51 INFO  c.s.auth.controller.AuthController - Password reset link sent successfully
-2026-08-11 10:59:51 DEBUG c.s.e.s.EmailNotificationTemplateServiceImpl - Fetch email template subject started, templateCode=PASSWORD_RESET
-2026-08-11 10:59:51 DEBUG c.s.e.s.EmailNotificationTemplateServiceImpl - Render email template started, templateCode=PASSWORD_RESET
-2026-08-11 10:59:51 DEBUG c.s.e.s.EmailNotificationTemplateServiceImpl - Email template rendered successfully, templateCode=PASSWORD_RESET
-2026-08-11 10:59:51 INFO  c.s.mail.service.MailServiceImpl - Sending mail, to=admin@frms.com, subject=FRMS Password Reset Request
-2026-08-11 10:59:58 INFO  c.s.mail.service.MailServiceImpl - Mail sent successfully, to=admin@frms.com
-2026-08-11 10:59:58 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/forgot-password
-2026-08-11 10:59:58 INFO  c.s.auth.controller.AuthController - Forgot password request received
-2026-08-11 10:59:58 INFO  c.s.auth.service.AuthServiceImpl - Forgot password service started
-2026-08-11 10:59:58 WARN  c.s.auth.service.AuthServiceImpl - Forgot password failed because user was not found
-2026-08-11 10:59:58 WARN  c.s.c.e.GlobalExceptionHandler - Invalid request exception handled: User not found
-2026-08-11 11:01:14 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:01:14 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:01:14 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:01:14 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:01:14 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:01:21 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 32644 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:01:21 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:01:21 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:01:23 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:01:23 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 220 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:01:24 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:01:24 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:01:24 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:01:24 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:01:24 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3145 ms
-2026-08-11 11:01:25 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:01:25 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:01:25 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:01:25 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:01:25 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:01:26 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6ace919c
-2026-08-11 11:01:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:01:26 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:01:26 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:01:29 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:01:32 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:01:32 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:01:32 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:01:34 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:01:34 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:01:35 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:01:35 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 14.736 seconds (process running for 15.91)
-2026-08-11 11:02:22 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 11:02:22 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 11:02:22 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 5 ms
-2026-08-11 11:02:22 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:02:22 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:02:22 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:02:22 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:02:23 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:02:23 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:02:27 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:02:27 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:02:27 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:02:27 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:02:27 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:02:27 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:02:32 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:02:32 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:02:32 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:02:32 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:02:32 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:02:32 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:02:38 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:02:38 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:02:38 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:02:38 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:02:38 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:02:38 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:02:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:02:42 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:02:42 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:02:42 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:02:42 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:02:42 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:17:25 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:17:26 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:17:26 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:17:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:17:26 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:17:52 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 29956 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:17:52 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:17:52 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:17:54 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:17:54 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 250 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:17:56 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:17:56 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:17:56 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:17:56 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:17:56 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3359 ms
-2026-08-11 11:17:56 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:17:56 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:17:56 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:17:57 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:17:57 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:17:57 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@37d6dddc
-2026-08-11 11:17:57 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:17:57 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:17:57 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:17:59 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:18:03 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:18:03 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:18:04 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:18:05 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:18:05 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:18:06 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:18:06 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 15.195 seconds (process running for 16.209)
-2026-08-11 11:22:15 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:22:15 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:22:15 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:22:15 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:22:15 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:22:24 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 28148 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:22:24 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:22:24 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:22:26 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:22:26 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 217 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:22:27 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:22:27 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:22:27 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:22:27 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:22:27 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2940 ms
-2026-08-11 11:22:27 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:22:27 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:22:27 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:22:28 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:22:28 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:22:28 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@59313495
-2026-08-11 11:22:28 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:22:28 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:22:28 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:22:30 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:22:32 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:22:33 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:22:33 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:22:34 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:22:34 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:22:35 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:22:35 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 12.314 seconds (process running for 13.077)
-2026-08-11 11:24:42 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 11:24:42 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 11:24:42 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 5 ms
-2026-08-11 11:24:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:24:43 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:24:43 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:24:43 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:24:43 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:24:43 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:24:52 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:24:52 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:24:52 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:24:52 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:24:52 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:24:57 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 15228 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:24:57 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:24:57 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:24:59 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:25:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 339 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:25:01 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:25:01 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:25:01 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:25:01 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:25:01 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3584 ms
-2026-08-11 11:25:01 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:25:01 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:25:01 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:25:01 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:25:01 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:25:02 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@76b5a559
-2026-08-11 11:25:02 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:25:02 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:25:02 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:25:04 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:25:06 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:25:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:25:07 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:25:08 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:25:08 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:25:09 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:25:09 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 13.104 seconds (process running for 14.055)
-2026-08-11 11:25:57 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 11:25:57 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 11:25:57 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
-2026-08-11 11:25:57 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:25:58 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:25:58 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:25:58 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:25:58 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:25:58 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:26:28 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:26:28 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:26:28 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:26:28 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:26:28 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:26:35 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 17200 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:26:35 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:26:35 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:26:36 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:26:37 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 216 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:26:38 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:26:38 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:26:38 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:26:38 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:26:38 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2826 ms
-2026-08-11 11:26:38 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:26:38 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:26:38 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:26:39 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:26:39 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:26:39 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@74ebd159
-2026-08-11 11:26:39 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:26:39 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:26:39 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:26:41 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:26:44 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:26:44 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:26:44 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:26:46 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:26:46 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:26:46 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:26:46 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 12.933 seconds (process running for 14.159)
-2026-08-11 11:27:41 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 11:27:41 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 11:27:41 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 10 ms
-2026-08-11 11:27:42 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:27:42 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:27:42 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:27:42 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:27:42 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:27:42 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:31:32 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:31:32 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:31:32 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:31:32 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:31:32 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:31:33 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:32:03 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:32:03 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:32:03 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:32:04 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:32:04 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:32:12 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 28980 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:32:12 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:32:12 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:32:14 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:32:14 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 190 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:32:15 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:32:15 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:32:15 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:32:15 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:32:15 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2953 ms
-2026-08-11 11:32:15 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:32:16 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:32:16 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:32:16 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:32:16 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:32:16 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6e517c9e
-2026-08-11 11:32:16 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:32:17 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:32:17 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:32:19 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:32:22 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:32:22 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:32:22 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:32:24 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:32:24 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:32:25 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:32:25 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 13.446 seconds (process running for 14.374)
-2026-08-11 11:32:40 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 11:32:40 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 11:32:40 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
-2026-08-11 11:32:40 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:32:41 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:32:41 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin4@frms.com
-2026-08-11 11:32:41 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=null, status=false, reason=USER_NOT_FOUND
-2026-08-11 11:32:41 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=null, status=false
-2026-08-11 11:32:41 WARN  c.s.c.e.GlobalExceptionHandler - Invalid credentials exception handled: Invalid email or password
-2026-08-11 11:32:56 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:32:56 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:32:56 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:32:56 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:32:56 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:33:06 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 33016 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:33:06 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:33:06 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:33:07 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:33:07 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 222 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:33:08 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:33:08 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:33:08 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:33:08 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:33:08 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2753 ms
-2026-08-11 11:33:09 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:33:09 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:33:09 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:33:09 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:33:09 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:33:10 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@74ebd159
-2026-08-11 11:33:10 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:33:10 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:33:10 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:33:12 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:33:14 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:33:14 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:33:15 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:33:16 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:33:16 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:33:17 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:33:17 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 12.142 seconds (process running for 13.047)
-2026-08-11 11:37:51 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-08-11 11:37:51 INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-08-11 11:37:51 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:37:51 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-08-11 11:37:51 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-08-11 11:37:59 INFO  com.se_frms.FrmsApplication - Starting FrmsApplication using Java 17.0.19 with PID 25040 (D:\Backend-Frms\se_frms_backend\target\classes started by hp in D:\Backend-FRMS\se_frms_backend)
-2026-08-11 11:37:59 DEBUG com.se_frms.FrmsApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
-2026-08-11 11:37:59 INFO  com.se_frms.FrmsApplication - The following 1 profile is active: "dev"
-2026-08-11 11:38:00 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-08-11 11:38:01 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 211 ms. Found 17 JPA repository interfaces.
-2026-08-11 11:38:02 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-08-11 11:38:02 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-08-11 11:38:02 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-08-11 11:38:02 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-08-11 11:38:02 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2772 ms
-2026-08-11 11:38:02 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-08-11 11:38:02 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-08-11 11:38:02 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-08-11 11:38:03 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-08-11 11:38:03 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-08-11 11:38:03 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@38d42ab7
-2026-08-11 11:38:03 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-08-11 11:38:03 WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-08-11 11:38:03 INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 16.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-08-11 11:38:05 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-08-11 11:38:07 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-08-11 11:38:08 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-08-11 11:38:08 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-08-11 11:38:09 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-08-11 11:38:09 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-08-11 11:38:10 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-08-11 11:38:10 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 12.299 seconds (process running for 13.197)
-2026-08-11 11:38:28 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-08-11 11:38:28 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-08-11 11:38:28 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 6 ms
-2026-08-11 11:38:28 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/login
-2026-08-11 11:38:29 INFO  c.s.auth.controller.AuthController - Login request received, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:38:29 INFO  c.s.auth.service.AuthServiceImpl - Sanitized email=admin@frms.com
-2026-08-11 11:38:33 INFO  c.se_frms.sms.service.SmsServiceImpl - MSG24x7 SMS API response: {"ErrorCode":0,"ErrorDescription":null,"Data":[{"MessageErrorCode":0,"MessageErrorDescription":"Success","MobileNumber":"919839307509","MessageId":"3cd94173-e751-4d84-82ef-bdbb9f6f00a2","Custom":null}]}
-2026-08-11 11:38:33 INFO  c.se_frms.sms.service.SmsServiceImpl - Login OTP SMS sent successfully, mobile=******7509
-2026-08-11 11:38:33 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=1, status=true, reason=OTP_SENT
-2026-08-11 11:38:33 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=1, status=true
-2026-08-11 11:38:33 INFO  c.s.auth.service.AuthServiceImpl - Login OTP SMS service completed, userId=1
-2026-08-11 11:38:33 INFO  c.s.auth.controller.AuthController - Password verified and OTP generated, ip=0:0:0:0:0:0:0:1
-2026-08-11 11:38:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for public auth endpoint, uri=/api/v1/auth/verify-otp
-2026-08-11 11:38:52 INFO  c.s.auth.controller.AuthController - Verify OTP request received
-2026-08-11 11:38:52 INFO  c.s.a.s.SessionStoreServiceImpl - Create session service started, userId=1
-2026-08-11 11:38:52 INFO  c.s.a.s.SessionStoreServiceImpl - Session created successfully, userId=1
-2026-08-11 11:38:52 INFO  c.s.a.s.LoginAttemptServiceImpl - Saving login attempt, userId=1, status=true, reason=LOGIN_SUCCESS
-2026-08-11 11:38:52 INFO  c.s.a.s.LoginAttemptServiceImpl - Login attempt saved successfully, userId=1, status=true
-2026-08-11 11:38:52 INFO  c.s.a.s.LoginHistoryServiceImpl - Saving login history, userId=1, status=true
-2026-08-11 11:38:52 INFO  c.s.a.s.LoginHistoryServiceImpl - Login history saved successfully, userId=1, status=true
-2026-08-11 11:38:52 INFO  c.s.auth.controller.AuthController - OTP verified and login successful
-2026-08-11 11:38:58 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/users/1
-2026-08-11 11:38:58 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/users/1
-2026-08-11 11:42:24 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/users/1
-2026-08-11 11:42:25 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/users/1
-2026-08-11 11:43:01 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/users/1
-2026-08-11 11:43:01 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/users/1
-2026-08-11 11:43:06 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m3s113ms921µs).
-2026-08-11 11:43:09 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/fraud-rule
-2026-08-11 11:43:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/admin/rule-category/list
-2026-08-11 11:43:10 WARN  c.s.c.e.GlobalExceptionHandler - Endpoint not found exception handled: No static resource api/v1/admin/rule-category/list.
-2026-08-11 11:43:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/admin/rule-category/list
-2026-08-11 11:43:10 WARN  c.s.c.e.GlobalExceptionHandler - Endpoint not found exception handled: No static resource api/v1/admin/rule-category/list.
-2026-08-11 11:43:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/rule-category/list
-2026-08-11 11:43:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/rule-category/list
-2026-08-11 11:43:10 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/fraud-rule
-2026-08-11 12:02:06 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m29s575ms115µs).
-2026-08-11 12:14:15 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m38s591ms564µs700ns).
-2026-08-11 12:31:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/admin/rule-category/list
-2026-08-11 12:31:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/fraud-rule
-2026-08-11 12:31:12 WARN  c.s.c.e.GlobalExceptionHandler - Endpoint not found exception handled: No static resource api/v1/admin/rule-category/list.
-2026-08-11 12:31:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/admin/rule-category/list
-2026-08-11 12:31:12 WARN  c.s.c.e.GlobalExceptionHandler - Endpoint not found exception handled: No static resource api/v1/admin/rule-category/list.
-2026-08-11 12:31:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/rule-category/list
-2026-08-11 12:31:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/fraud-rule
-2026-08-11 12:31:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=1, uri=/api/v1/rule-category/list
-2026-08-11 14:22:47 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=34m31s315ms58µs300ns).
+2026-08-20 11:50:36 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-20 11:50:37 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-20 11:50:38 DEBUG c.s.c.s.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-08-20 11:50:38 INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-20 11:50:39 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-20 11:50:39 INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-08-20 11:50:39 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-08-20 11:50:39 INFO  com.se_frms.FrmsApplication - Started FrmsApplication in 7.32 seconds (process running for 8.612)
+2026-08-20 11:52:12 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-20 11:52:12 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-08-20 11:52:12 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-08-20 11:52:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:52:12 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:57:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 11:57:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 11:57:28 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:57:28 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:57:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 11:57:36 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 11:57:36 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 11:57:36 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 11:57:36 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 11:57:36 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 11:57:36 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 11:59:05 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/role-access/1
+2026-08-20 11:59:30 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 11:59:30 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 11:59:30 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 11:59:30 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=8
+2026-08-20 11:59:30 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=8
+2026-08-20 11:59:31 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 11:59:31 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 11:59:31 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 11:59:31 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=4
+2026-08-20 11:59:31 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=4
+2026-08-20 11:59:34 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 11:59:34 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 11:59:34 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 11:59:34 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 11:59:34 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:00:47 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/role-access/1
+2026-08-20 12:02:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:02:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:02:21 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:21 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:21 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:21 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=8
+2026-08-20 12:02:21 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=8
+2026-08-20 12:02:23 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:23 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:23 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:23 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:23 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:31 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:31 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:31 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:31 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=8
+2026-08-20 12:02:31 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=8
+2026-08-20 12:02:33 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:33 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:33 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:33 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=4
+2026-08-20 12:02:33 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=4
+2026-08-20 12:02:34 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:34 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:34 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:34 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=4
+2026-08-20 12:02:34 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=4
+2026-08-20 12:02:51 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:51 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:51 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:51 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:51 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:52 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:52 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:52 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:52 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=0
+2026-08-20 12:02:52 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=0
+2026-08-20 12:02:53 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:53 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:53 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:53 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:53 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:54 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:54 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:54 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:54 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:54 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:56 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:56 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:56 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:56 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:56 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:02:59 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:02:59 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:02:59 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:02:59 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=0
+2026-08-20 12:02:59 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=0
+2026-08-20 12:03:00 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:03:00 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:03:00 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:03:00 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=1
+2026-08-20 12:03:00 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=1
+2026-08-20 12:03:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:03:02 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:03:02 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:03:02 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=1
+2026-08-20 12:03:02 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=1
+2026-08-20 12:03:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:03:06 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:03:06 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:03:06 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:03:06 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:03:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/role-access
+2026-08-20 12:03:51 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/role-access/1
+2026-08-20 12:03:51 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/role-access/1
+2026-08-20 12:06:19 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/decision-policy/create
+2026-08-20 12:06:19 INFO  c.s.d.s.DecisionPolicyServiceImpl - Create decision policy started, description=Default FRMS Decision Policy
+2026-08-20 12:06:19 INFO  c.s.d.s.DecisionPolicyServiceImpl - Decision policy created successfully, id=1
+2026-08-20 12:07:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:07:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:12:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:12:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:17:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:17:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:22:01 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:22:01 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:22:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:22:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:27:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:27:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:27:17 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 12:27:17 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:27:17 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:27:17 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:27:17 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 12:27:17 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:27:17 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:27:17 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 12:27:17 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:27:17 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:27:17 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:27:17 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 12:27:17 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:27:17 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:32:13 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:32:14 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:36:09 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 12:36:09 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:36:09 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:36:09 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:36:09 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 12:36:09 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:36:09 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:36:09 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/admin/roles
+2026-08-20 12:36:09 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication successful, userId=24, uri=/api/v1/access/get-all-access
+2026-08-20 12:36:09 INFO  c.s.r.c.RoleMasterController - Roles fetched successfully, totalElements=13
+2026-08-20 12:36:09 INFO  c.s.a.controller.AccessController - Fetch all access for dropdown request received
+2026-08-20 12:36:09 INFO  c.s.access.service.AccessServiceImpl - Fetch all access for dropdown service started
+2026-08-20 12:36:09 INFO  c.s.access.service.AccessServiceImpl - Access dropdown list fetched successfully, count=24
+2026-08-20 12:36:09 INFO  c.s.a.controller.AccessController - Access dropdown list fetched successfully, count=24
+2026-08-20 12:36:28 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m22s179ms444µs700ns).
+2026-08-20 12:38:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:38:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:43:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:43:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:48:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:48:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:53:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:53:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 12:58:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 12:58:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:03:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:03:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:08:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:08:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:13:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:13:06 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:18:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:18:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:23:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:23:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:28:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:28:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 13:33:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 13:33:07 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 14:28:24 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=52m24s594ms648µs700ns).
+2026-08-20 14:30:01 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 14:30:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 14:35:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 14:35:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 14:40:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 14:40:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 14:45:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 14:45:02 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 14:51:35 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m40s501ms751µs).
+2026-08-20 15:07:12 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=13m7s894ms658µs300ns).
+2026-08-20 15:08:49 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 15:08:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 15:13:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 15:13:50 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 15:22:51 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m37s391ms188µs100ns).
+2026-08-20 15:26:57 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-rules
+2026-08-20 15:26:57 DEBUG c.s.c.s.JwtAuthenticationFilter - Authentication skipped for internal endpoint, uri=/api/v1/internal/rule-cache/active-decision-policy
+2026-08-20 15:27:38 WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=47s1ms156µs500ns).

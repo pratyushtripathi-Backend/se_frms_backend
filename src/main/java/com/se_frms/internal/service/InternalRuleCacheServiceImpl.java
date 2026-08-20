@@ -1,7 +1,10 @@
 package com.se_frms.internal.service;
 
 import com.se_frms.common.service.CreatedByResolver;
+import com.se_frms.decisionPolicy.model.DecisionPolicy;
+import com.se_frms.decisionPolicy.repository.DecisionPolicyRepository;
 import com.se_frms.fraudRule.model.FraudRule;
+import com.se_frms.internal.dto.DecisionPolicyCacheResponseDTO;
 import com.se_frms.internal.dto.RuleCacheSyncResponseDTO;
 import com.se_frms.ruleCategory.model.RuleCategory;
 import com.se_frms.ruleScore.model.RuleScore;
@@ -20,6 +23,8 @@ public class InternalRuleCacheServiceImpl implements InternalRuleCacheService {
 
     private final RuleScoreRepository ruleScoreRepository;
 
+    private final DecisionPolicyRepository decisionPolicyRepository;
+
     private final CreatedByResolver createdByResolver;
 
     @Override
@@ -31,6 +36,43 @@ public class InternalRuleCacheServiceImpl implements InternalRuleCacheService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DecisionPolicyCacheResponseDTO getActiveDecisionPolicyForCache() {
+
+        DecisionPolicy decisionPolicy =
+                decisionPolicyRepository
+                        .findFirstByStatusTrueOrderByUpdatedAtDesc()
+                        .orElse(null);
+
+        if (decisionPolicy == null) {
+            return null;
+        }
+
+        String createdBy =
+                createdByResolver.resolve(decisionPolicy.getCreatedBy());
+
+        if (createdBy == null) {
+            createdBy = "SYSTEM";
+        }
+
+        return DecisionPolicyCacheResponseDTO
+                .builder()
+                .policyId(decisionPolicy.getId())
+                .description(decisionPolicy.getDescription())
+                .allowMinScore(decisionPolicy.getAllowMinScore())
+                .allowMaxScore(decisionPolicy.getAllowMaxScore())
+                .reviewMinScore(decisionPolicy.getReviewMinScore())
+                .reviewMaxScore(decisionPolicy.getReviewMaxScore())
+                .blockMinScore(decisionPolicy.getBlockMinScore())
+                .blockMaxScore(decisionPolicy.getBlockMaxScore())
+                .status(decisionPolicy.getStatus())
+                .createdBy(createdBy)
+                .createdAt(decisionPolicy.getCreatedAt())
+                .updatedAt(decisionPolicy.getUpdatedAt())
+                .build();
     }
 
     private RuleCacheSyncResponseDTO mapToResponse(

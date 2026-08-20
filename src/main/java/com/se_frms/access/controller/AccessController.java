@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -96,6 +97,36 @@ public class AccessController {
                         .responseCode(200)
                         .responseMessage("Access list fetched successfully")
                         .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @GetMapping("/get-all-access")
+    public ResponseEntity<AuthResponseDTO<List<AccessResponseDTO>>>
+    getAllForDropdown(
+            @RequestParam
+            Map<String, String> filters
+    ) {
+
+        log.info("Fetch all access for dropdown request received");
+
+        List<AccessResponseDTO> response =
+                accessService.getAllForDropdown(
+                        filters
+                );
+
+        log.info(
+                "Access dropdown list fetched successfully, count={}",
+                response.size()
+        );
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<List<AccessResponseDTO>>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Access dropdown list fetched successfully")
+                        .responseData(response)
                         .build()
         );
     }

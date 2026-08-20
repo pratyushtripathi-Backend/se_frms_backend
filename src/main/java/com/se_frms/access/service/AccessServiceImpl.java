@@ -4,6 +4,7 @@ import com.se_frms.access.dto.AccessRequestDTO;
 import com.se_frms.access.dto.AccessResponseDTO;
 import com.se_frms.access.model.AccessMaster;
 import com.se_frms.access.repository.AccessMasterRepository;
+import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.common.util.DynamicFilterSpecification;
 
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.se_frms.common.security.CurrentUserService;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -157,6 +159,118 @@ public class AccessServiceImpl
 
         return response;
 
+    }
+
+    @Override
+    public List<AccessResponseDTO> getAllForDropdown(
+            Map<String, String> filters
+    ) {
+
+        log.info("Fetch all access for dropdown service started");
+
+        Map<String, String> workingFilters =
+                new HashMap<>(
+                        filters == null
+                                ? Map.of()
+                                : filters
+                );
+
+        String search =
+                workingFilters.remove(
+                        "search"
+                );
+
+        Sort sort =
+                resolveSort(
+                        workingFilters,
+                        "accessName",
+                        Sort.Direction.ASC
+                );
+
+        Specification<AccessMaster> specification =
+                DynamicFilterSpecification
+                        .<AccessMaster>build(
+                                workingFilters,
+                                FILTER_FIELDS
+                        )
+                        .and(
+                                buildSearchSpecification(
+                                        search
+                                )
+                        );
+
+        List<AccessResponseDTO> response =
+                repository
+                        .findAll(
+                                specification,
+                                sort
+                        )
+                        .stream()
+                        .map(this::map)
+                        .toList();
+
+        log.info(
+                "Access dropdown list fetched successfully, count={}",
+                response.size()
+        );
+
+        return response;
+
+    }
+
+    private Sort resolveSort(
+            Map<String, String> requestParams,
+            String defaultSortField,
+            Sort.Direction defaultDirection
+    ) {
+
+        String sortBy =
+                requestParams.get(
+                        "sortBy"
+                );
+
+        String resolvedSortField =
+                defaultSortField;
+
+        if (sortBy != null && !sortBy.isBlank()) {
+            resolvedSortField =
+                    FILTER_FIELDS.get(
+                            sortBy.trim()
+                    );
+
+            if (resolvedSortField == null) {
+                throw new InvalidRequestException(
+                        "Invalid sort field: " + sortBy
+                );
+            }
+        }
+
+        Sort.Direction direction =
+                defaultDirection;
+
+        String sortDir =
+                requestParams.getOrDefault(
+                        "sortDir",
+                        requestParams.get("direction")
+                );
+
+        if (sortDir != null && !sortDir.isBlank()) {
+            try {
+                direction =
+                        Sort.Direction.fromString(
+                                sortDir.trim()
+                        );
+            } catch (IllegalArgumentException ex) {
+                throw new InvalidRequestException(
+                        "Invalid sort direction: " + sortDir
+                );
+            }
+        }
+
+        return Sort.by(
+                direction,
+                resolvedSortField
+        );
     }
 
     private Specification<AccessMaster> buildSearchSpecification(
