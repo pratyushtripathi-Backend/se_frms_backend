@@ -3,6 +3,7 @@ package com.se_frms.admin.service;
 import com.se_frms.admin.dto.CreateEmployeeRequest;
 import com.se_frms.admin.dto.EmployeeResponseDTO;
 import com.se_frms.admin.dto.EmployeeSummaryDTO;
+import com.se_frms.admin.dto.NotificationRecipientResponseDTO;
 import com.se_frms.admin.dto.UpdateEmployeePatchRequest;
 import com.se_frms.admin.dto.UpdateEmployeeRequest;
 import com.se_frms.auth.dto.RegistrationResponseDTO;
@@ -47,5 +48,7 @@ public interface AdminService {
             Integer employeeId,
             UpdateEmployeePatchRequest request
     );
+
+    List<NotificationRecipientResponseDTO> getActiveAdminNotificationRecipients();
 
 }
