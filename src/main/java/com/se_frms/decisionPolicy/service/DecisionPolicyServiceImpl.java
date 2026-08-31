@@ -272,6 +272,25 @@ public class DecisionPolicyServiceImpl
         return mapToResponse(decisionPolicy);
     }
 
+    @Override
+    public DecisionPolicyResponseDTO getLatestDecisionPolicy() {
+
+        accessPermissionService.validateAccess(
+                DECISION_POLICY_VIEW
+        );
+
+        DecisionPolicy decisionPolicy =
+                decisionPolicyRepository
+                        .findFirstByOrderByCreatedAtDesc()
+                        .orElseThrow(
+                                () -> new InvalidRequestException(
+                                        "Decision policy not found"
+                                )
+                        );
+
+        return mapToResponse(decisionPolicy);
+    }
+
     private DecisionPolicy getDecisionPolicyEntity(
             Integer id
     ) {

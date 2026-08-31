@@ -150,7 +150,25 @@ public class DecisionPolicyController {
         );
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/latest")
+    public ResponseEntity<AuthResponseDTO<DecisionPolicyResponseDTO>>
+    getLatestDecisionPolicy() {
+
+        DecisionPolicyResponseDTO responseData =
+                decisionPolicyService.getLatestDecisionPolicy();
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<DecisionPolicyResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Latest decision policy fetched successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<AuthResponseDTO<DecisionPolicyResponseDTO>>
     getDecisionPolicyById(
             @PathVariable

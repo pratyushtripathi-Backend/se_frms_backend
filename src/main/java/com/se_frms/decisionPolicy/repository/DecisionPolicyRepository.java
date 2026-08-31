@@ -11,4 +11,6 @@ public interface DecisionPolicyRepository
         JpaSpecificationExecutor<DecisionPolicy> {
 
     Optional<DecisionPolicy> findFirstByStatusTrueOrderByUpdatedAtDesc();
+
+    Optional<DecisionPolicy> findFirstByOrderByCreatedAtDesc();
 }

@@ -34,4 +34,6 @@ public interface DecisionPolicyService {
     DecisionPolicyResponseDTO getDecisionPolicyById(
             Integer id
     );
+
+    DecisionPolicyResponseDTO getLatestDecisionPolicy();
 }

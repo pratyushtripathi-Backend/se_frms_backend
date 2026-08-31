@@ -85,7 +85,7 @@ public class AdminDataLoader
                         .firstName("System")
                         .lastName("Admin")
                         .email("admin@frms.com")
-                        .phoneNumber("9999999999")
+                        .phoneNumber("9839307509")
                         .passwordHash(
                                 passwordEncoder.encode(
                                         "Admin@123"
