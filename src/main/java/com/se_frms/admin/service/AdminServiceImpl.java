@@ -14,7 +14,6 @@ import com.se_frms.auth.util.PasswordGeneratorUtil;
 import com.se_frms.common.security.XssUtil;
 import com.se_frms.common.util.DynamicFilterSpecification;
 import com.se_frms.mail.service.MailService;
-import com.se_frms.notification.event.AdminRecipientChangedEvent;
 import com.se_frms.roleMaster.model.RoleMaster;
 import com.se_frms.roleMaster.repository.RoleMasterRepository;
 import com.se_frms.user.model.User;
@@ -29,7 +28,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -66,7 +64,6 @@ public class AdminServiceImpl implements AdminService {
     private final RoleMasterRepository roleMasterRepository;
     private final UserRoleRepository userRoleRepository;
     private final CurrentUserService currentUserService;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public RegistrationResponseDTO createEmployee(CreateEmployeeRequest request) {
@@ -113,9 +110,6 @@ public class AdminServiceImpl implements AdminService {
         );
 
         saveUserRole(savedEmployee, roleMaster);
-        if (ADMIN_ROLE_NAME.equals(roleMaster.getRoleName())) {
-            applicationEventPublisher.publishEvent(new AdminRecipientChangedEvent(savedEmployee.getId()));
-        }
         log.info("Employee role mapping saved, employeeId={}", savedEmployee.getId());
 
         mailService.sendLoginCredentials(

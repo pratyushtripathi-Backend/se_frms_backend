@@ -12,7 +12,6 @@ import com.se_frms.userRole.dto.UserRoleResponseDTO;
 import com.se_frms.userRole.model.UserRole;
 import com.se_frms.userRole.repository.UserRoleRepository;
 import com.se_frms.common.security.CurrentUserService;
-import com.se_frms.notification.event.AdminRecipientChangedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.ApplicationEventPublisher;
 import com.se_frms.userRole.dto.UserRoleStatusRequestDTO;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +51,6 @@ public class UserRoleServiceImpl
     private final UserRoleRepository userRoleRepository;
     private final CurrentUserService currentUserService;
     private final CreatedByResolver createdByResolver;
-    private final ApplicationEventPublisher applicationEventPublisher;
     @Override
     public UserRoleResponseDTO assignRole(
             UserRoleRequestDTO request
@@ -118,8 +115,6 @@ public class UserRoleServiceImpl
         user.setUserType(roleMaster.getRoleName());
         user.setUpdatedAt(now);
         userRepository.save(user);
-
-        applicationEventPublisher.publishEvent(new AdminRecipientChangedEvent(user.getId()));
 
         log.info(
                 "Role assigned successfully, userId={}, roleName={}",
@@ -324,8 +319,6 @@ public class UserRoleServiceImpl
                 userRepository.save(user);
             }
 
-            applicationEventPublisher.publishEvent(new AdminRecipientChangedEvent(user.getId()));
-
             log.info(
                     "User role updated successfully, userId={}, roleName={}, status={}",
                     user.getId(),
@@ -346,8 +339,6 @@ public class UserRoleServiceImpl
 
         UserRole savedUserRole =
                 userRoleRepository.save(userRole);
-
-        applicationEventPublisher.publishEvent(new AdminRecipientChangedEvent(user.getId()));
 
         log.info(
                 "User role status updated successfully, userRoleId={}, status={}",
