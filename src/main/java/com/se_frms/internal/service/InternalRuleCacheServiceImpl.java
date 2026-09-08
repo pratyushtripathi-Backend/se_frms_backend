@@ -1,11 +1,14 @@
 package com.se_frms.internal.service;
 
+import com.se_frms.blacklistEntry.model.BlacklistEntry;
+import com.se_frms.blacklistEntry.repository.BlacklistEntryRepository;
 import com.se_frms.common.service.CreatedByResolver;
 import com.se_frms.decisionPolicy.model.DecisionPolicy;
 import com.se_frms.decisionPolicy.repository.DecisionPolicyRepository;
 import com.se_frms.fraudRule.model.FraudRule;
 import com.se_frms.internal.dto.DecisionPolicyCacheResponseDTO;
 import com.se_frms.internal.dto.RuleCacheSyncResponseDTO;
+import com.se_frms.internal.dto.BlacklistCacheSyncResponseDTO;
 import com.se_frms.ruleCategory.model.RuleCategory;
 import com.se_frms.ruleScore.model.RuleScore;
 import com.se_frms.ruleScore.repository.RuleScoreRepository;
@@ -24,6 +27,8 @@ public class InternalRuleCacheServiceImpl implements InternalRuleCacheService {
     private final RuleScoreRepository ruleScoreRepository;
 
     private final DecisionPolicyRepository decisionPolicyRepository;
+
+    private final BlacklistEntryRepository blacklistEntryRepository;
 
     private final CreatedByResolver createdByResolver;
 
@@ -72,6 +77,38 @@ public class InternalRuleCacheServiceImpl implements InternalRuleCacheService {
                 .createdBy(createdBy)
                 .createdAt(decisionPolicy.getCreatedAt())
                 .updatedAt(decisionPolicy.getUpdatedAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BlacklistCacheSyncResponseDTO> getActiveBlacklistEntriesForCache() {
+
+        return blacklistEntryRepository
+                .findByStatusOrderByUpdatedAtDesc(true)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    private BlacklistCacheSyncResponseDTO mapToResponse(
+            BlacklistEntry blacklistEntry
+    ) {
+
+        String createdBy =
+                createdByResolver.resolve(blacklistEntry.getCreatedBy());
+
+        if (createdBy == null) {
+            createdBy = "SYSTEM";
+        }
+
+        return BlacklistCacheSyncResponseDTO
+                .builder()
+                .blacklistId(blacklistEntry.getId())
+                .type(blacklistEntry.getType())
+                .value(blacklistEntry.getValue())
+                .status(true)
+                .createdBy(createdBy)
                 .build();
     }
 
