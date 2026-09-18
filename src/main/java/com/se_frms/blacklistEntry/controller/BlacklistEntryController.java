@@ -37,18 +37,23 @@ public class BlacklistEntryController {
         );
     }
 
-    @PatchMapping("/{id}/remove")
-    public ResponseEntity<AuthResponseDTO<BlacklistEntryResponseDTO>> removeEntry(
-            @PathVariable Integer id
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<AuthResponseDTO<BlacklistEntryResponseDTO>> updateStatus(
+            @PathVariable Integer id,
+            @RequestParam Boolean status
     ) {
 
-        BlacklistEntryResponseDTO responseData = blacklistEntryService.removeEntry(id);
+        BlacklistEntryResponseDTO responseData = blacklistEntryService.updateStatus(id, status);
+
+        String message = Boolean.TRUE.equals(status)
+                ? "Blacklist entry activated successfully"
+                : "Blacklist entry deactivated successfully";
 
         return ResponseEntity.ok(
                 AuthResponseDTO.<BlacklistEntryResponseDTO>builder()
                         .status(true)
                         .responseCode(200)
-                        .responseMessage("Blacklist entry removed successfully")
+                        .responseMessage(message)
                         .responseData(responseData)
                         .build()
         );

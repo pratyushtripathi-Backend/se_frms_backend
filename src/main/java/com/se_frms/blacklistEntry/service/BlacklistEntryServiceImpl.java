@@ -81,22 +81,27 @@ public class BlacklistEntryServiceImpl implements BlacklistEntryService {
     }
 
     @Override
-    public BlacklistEntryResponseDTO removeEntry(Integer id) {
+    public BlacklistEntryResponseDTO updateStatus(Integer id, Boolean status) {
 
-        log.info("Remove blacklist entry service started, id={}", id);
+        log.info("Update blacklist entry status service started, id={}, status={}", id, status);
+
+        if (status == null) {
+            log.warn("Update blacklist entry status failed because status was null, id={}", id);
+            throw new InvalidRequestException("status is required (true or false)");
+        }
 
         BlacklistEntry blacklistEntry =
                 blacklistEntryRepository.findById(id)
                         .orElseThrow(() -> {
-                            log.warn("Remove blacklist entry failed because it was not found, id={}", id);
+                            log.warn("Update blacklist entry status failed because it was not found, id={}", id);
                             return new InvalidRequestException("Blacklist entry not found");
                         });
 
-        blacklistEntry.setStatus(false);
+        blacklistEntry.setStatus(status);
         blacklistEntry.setUpdatedAt(LocalDateTime.now());
         BlacklistEntry saved = blacklistEntryRepository.save(blacklistEntry);
 
-        log.info("Blacklist entry removed successfully, id={}", id);
+        log.info("Blacklist entry status updated successfully, id={}, status={}", id, status);
 
         return mapToResponse(saved);
     }
