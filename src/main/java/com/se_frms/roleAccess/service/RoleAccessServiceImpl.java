@@ -70,22 +70,20 @@ private final AccessMasterRepository accessRepository;
         List<RoleAccess> existingMappings =
                 repository.findByRoleRoleId(role.getRoleId());
 
-        List<Integer> alreadyExistingAccessIds =
-                requestedAccessIds
+        List<String> alreadyExistingAccessNames =
+                existingMappings
                         .stream()
-                        .filter(accessId ->
-                                existingMappings
-                                        .stream()
-                                        .anyMatch(mapping ->
-                                                mapping.getAccess().getId().equals(accessId)
-                                        )
+                        .filter(mapping ->
+                                requestedAccessIds.contains(mapping.getAccess().getId())
                         )
+                        .map(mapping -> mapping.getAccess().getAccessName())
+                        .distinct()
                         .toList();
 
-        if (!alreadyExistingAccessIds.isEmpty()) {
+        if (!alreadyExistingAccessNames.isEmpty()) {
             throw new InvalidRequestException(
-                    "Role access already exists for access ids: "
-                            + alreadyExistingAccessIds
+                    "Role access already exists for: "
+                            + String.join(", ", alreadyExistingAccessNames)
             );
         }
 
