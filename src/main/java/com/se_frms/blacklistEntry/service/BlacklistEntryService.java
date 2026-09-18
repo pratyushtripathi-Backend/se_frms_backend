@@ -10,7 +10,7 @@ public interface BlacklistEntryService {
 
     BlacklistEntryResponseDTO addEntry(BlacklistEntryRequestDTO request);
 
-    BlacklistEntryResponseDTO removeEntry(Integer id);
+    BlacklistEntryResponseDTO updateStatus(Integer id, Boolean status);
 
     Page<BlacklistEntryResponseDTO> getAllEntries(int page, int size, Map<String, String> filters);
 

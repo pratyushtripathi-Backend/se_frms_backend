@@ -90,6 +90,7 @@ public class FraudRuleServiceImpl
         validateFraudRule(
                 request.getRuleCode(),
                 request.getRuleName(),
+                request.getRuleExpression(),
                 null
         );
 
@@ -168,6 +169,8 @@ FraudRuleUpdateDTO request
                 request.getRuleCode(),
 
                 request.getRuleName(),
+
+                request.getRuleExpression(),
 
                 id
 
@@ -250,6 +253,8 @@ FraudRuleUpdateDTO request
 
             String ruleName,
 
+            String ruleExpression,
+
             Integer excludeId
 
     ) {
@@ -286,6 +291,51 @@ FraudRuleUpdateDTO request
             throw new InvalidRequestException(
                     "Fraud Rule with same code or name already exists"
             );
+
+        }
+
+        if (
+
+                ruleExpression != null
+
+                        &&
+
+                        !ruleExpression.isBlank()
+
+        ) {
+
+            Optional<FraudRule> existingExpression =
+
+                    repository.findByRuleExpressionIgnoreCase(
+
+                            ruleExpression.trim()
+
+                    );
+
+            if (
+
+                    existingExpression.isPresent()
+
+                            &&
+
+                            (
+                                    excludeId == null
+
+                                            ||
+
+                                            !existingExpression
+                                                    .get()
+                                                    .getId()
+                                                    .equals(excludeId)
+                            )
+
+            ) {
+
+                throw new InvalidRequestException(
+                        "Fraud Rule with same rule expression already exists"
+                );
+
+            }
 
         }
 

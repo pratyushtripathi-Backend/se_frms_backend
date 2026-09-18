@@ -40,4 +40,8 @@ public interface FraudRuleRepository
             String ruleName
     );
 
+    Optional<FraudRule> findByRuleExpressionIgnoreCase(
+            String ruleExpression
+    );
+
 }
