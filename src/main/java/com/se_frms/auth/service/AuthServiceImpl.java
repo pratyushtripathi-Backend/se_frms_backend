@@ -76,6 +76,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${sms.otp.return-in-response:false}")
     private boolean returnOtpInResponse;
 
+    @Value("${auth.otp.bypass.enabled:false}")
+    private boolean otpBypassEnabled;
+
     @Value("${app.frontend.reset-password-url}")
     private String resetPasswordUrl;
 
@@ -567,6 +570,62 @@ public class AuthServiceImpl implements AuthService {
         }
 
         loginAttemptCountService.resetPasswordAttempts(user);
+
+       // resetPasswordAttempts(user);
+
+        /*
+         * OTP Bypass:
+         * Direct login is allowed only when:
+         * 1. OTP bypass is enabled through backend configuration
+         * 2. The authenticated user is an ADMIN
+         *
+         * EMPLOYEE users will continue through the normal OTP flow.
+         */
+        if (otpBypassEnabled && "ADMIN".equalsIgnoreCase(user.getUserType())) {
+
+            log.warn(
+                    "OTP bypass enabled for ADMIN. Direct login performed for userId={}, email={}",
+                    user.getId(),
+                    user.getEmail()
+            );
+
+            String token = jwtUtil.generateToken(
+                    user.getEmail(),
+                    user.getUserType()
+            );
+
+            sessionStoreService.createSession(user, token);
+
+            loginAttemptService.saveAttempt(
+                    user,
+                    email,
+                    true,
+                    "LOGIN_SUCCESS",
+                    latitude,
+                    longitude,
+                    httpRequest
+            );
+
+            loginHistoryService.saveLoginHistory(
+                    user,
+                    httpRequest,
+                    true,
+                    cleanMacAddress(request.getMacAddress()),
+                    latitude,
+                    longitude
+            );
+
+            return LoginResponseDTO.builder()
+                    .userId(user.getId())
+                    .name(buildFullName(user))
+                    .email(user.getEmail())
+                    .role(user.getUserType())
+                    .token(token)
+                    .otpRequired(false)
+                    .build();
+        }
+
+// Existing OTP flow continues below
 
         String otp =
                 String.valueOf(

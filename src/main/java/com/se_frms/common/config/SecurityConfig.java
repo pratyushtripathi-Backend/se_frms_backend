@@ -1,6 +1,7 @@
 package com.se_frms.common.config;
 
 import com.se_frms.common.security.JwtAuthenticationFilter;
+import com.se_frms.common.security.InternalApiKeyFilter;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final InternalApiKeyFilter internalApiKeyFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -185,6 +187,11 @@ public class SecurityConfig {
 
 
 
+                )
+
+                .addFilterBefore(
+                        internalApiKeyFilter,
+                        UsernamePasswordAuthenticationFilter.class
                 )
 
                 .addFilterBefore(
