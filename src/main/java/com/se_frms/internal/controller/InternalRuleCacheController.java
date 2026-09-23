@@ -8,9 +8,7 @@ import com.se_frms.internal.service.InternalRuleCacheService;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,22 +20,8 @@ public class InternalRuleCacheController {
 
     private final InternalRuleCacheService internalRuleCacheService;
 
-    @Value("${app.internal.api-key:local-internal-key}")
-    private String internalApiKey;
-
     @GetMapping("/active-rules")
-    public ResponseEntity<AuthResponseDTO<List<RuleCacheSyncResponseDTO>>> getActiveRules(
-            @RequestHeader(
-                    value = "X-INTERNAL-API-KEY",
-                    required = false
-            )
-            String apiKey
-    ) {
-
-        if (apiKey == null || !internalApiKey.equals(apiKey)) {
-            throw new AccessDeniedException("Invalid internal API key");
-        }
-
+    public ResponseEntity<AuthResponseDTO<List<RuleCacheSyncResponseDTO>>> getActiveRules() {
         List<RuleCacheSyncResponseDTO> responseData =
                 internalRuleCacheService.getActiveRulesForCache();
 
@@ -53,18 +37,7 @@ public class InternalRuleCacheController {
     }
 
     @GetMapping("/active-blacklist-entries")
-    public ResponseEntity<AuthResponseDTO<List<BlacklistCacheSyncResponseDTO>>> getActiveBlacklistEntries(
-            @RequestHeader(
-                    value = "X-INTERNAL-API-KEY",
-                    required = false
-            )
-            String apiKey
-    ) {
-
-        if (apiKey == null || !internalApiKey.equals(apiKey)) {
-            throw new AccessDeniedException("Invalid internal API key");
-        }
-
+    public ResponseEntity<AuthResponseDTO<List<BlacklistCacheSyncResponseDTO>>> getActiveBlacklistEntries() {
         List<BlacklistCacheSyncResponseDTO> responseData =
                 internalRuleCacheService.getActiveBlacklistEntriesForCache();
 
@@ -80,18 +53,7 @@ public class InternalRuleCacheController {
     }
 
     @GetMapping("/active-decision-policy")
-    public ResponseEntity<AuthResponseDTO<DecisionPolicyCacheResponseDTO>> getActiveDecisionPolicy(
-            @RequestHeader(
-                    value = "X-INTERNAL-API-KEY",
-                    required = false
-            )
-            String apiKey
-    ) {
-
-        if (apiKey == null || !internalApiKey.equals(apiKey)) {
-            throw new AccessDeniedException("Invalid internal API key");
-        }
-
+    public ResponseEntity<AuthResponseDTO<DecisionPolicyCacheResponseDTO>> getActiveDecisionPolicy() {
         DecisionPolicyCacheResponseDTO responseData =
                 internalRuleCacheService.getActiveDecisionPolicyForCache();
 
