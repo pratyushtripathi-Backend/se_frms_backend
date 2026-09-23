@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
+import com.se_frms.auth.dto.LoginResponseDTO;
 
 @Slf4j
 @RestController
@@ -82,6 +83,11 @@ public class AuthController {
                         httpRequest
                 );
 
+        String responseMessage =
+                responseData instanceof LoginResponseDTO
+                        ? "Login successful"
+                        : "OTP sent to registered mobile number";
+
         log.info(
                 "Password verified and OTP generated, ip={}",
                 httpRequest.getRemoteAddr()
@@ -92,7 +98,7 @@ public class AuthController {
                         .<LoginOtpResponseDTO>builder()
                         .status(true)
                         .responseCode(200)
-                        .responseMessage("OTP sent to registered mobile number")
+                        .responseMessage(responseMessage)
                         .responseData(responseData)
                         .build()
         );
