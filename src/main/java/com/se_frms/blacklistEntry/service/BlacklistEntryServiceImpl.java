@@ -3,6 +3,7 @@ package com.se_frms.blacklistEntry.service;
 import com.se_frms.auth.exception.InvalidRequestException;
 import com.se_frms.blacklistEntry.dto.BlacklistEntryRequestDTO;
 import com.se_frms.blacklistEntry.dto.BlacklistEntryResponseDTO;
+import com.se_frms.blacklistEntry.dto.BlacklistEntryUpdateDTO;
 import com.se_frms.blacklistEntry.model.BlacklistEntry;
 import com.se_frms.blacklistEntry.repository.BlacklistEntryRepository;
 import com.se_frms.common.security.CurrentUserService;
@@ -55,7 +56,7 @@ public class BlacklistEntryServiceImpl implements BlacklistEntryService {
         String normalizedType = normalizeType(request.getType());
         String cleanedValue = clean(request.getValue());
 
-        if (blacklistEntryRepository.existsByTypeAndValueAndStatus(normalizedType, cleanedValue, true)) {
+        if (blacklistEntryRepository.existsActiveDuplicate(normalizedType, cleanedValue, -1)) {
             log.warn("Add blacklist entry failed because it already exists, type={}, value={}",
                     normalizedType, cleanedValue);
             throw new InvalidRequestException("This " + normalizedType + " is already blacklisted");
@@ -81,6 +82,91 @@ public class BlacklistEntryServiceImpl implements BlacklistEntryService {
     }
 
     @Override
+    public BlacklistEntryResponseDTO updateEntry(Integer id, BlacklistEntryUpdateDTO request) {
+
+        log.info("Update blacklist entry service started, id={}", id);
+
+        BlacklistEntry blacklistEntry =
+                blacklistEntryRepository.findById(id)
+                        .orElseThrow(() -> {
+                            log.warn("Update blacklist entry failed because it was not found, id={}", id);
+                            return new InvalidRequestException("Blacklist entry not found");
+                        });
+
+        if (request.getType() == null
+                && request.getValue() == null
+                && request.getReason() == null
+                && request.getRiskType() == null) {
+            log.warn("Update blacklist entry failed because no field was sent, id={}", id);
+            throw new InvalidRequestException(
+                    "At least one of type, value, reason or riskType is required to update");
+        }
+
+        // null = not sent = keep the existing value
+        String newType = request.getType() == null
+                ? blacklistEntry.getType()
+                : normalizeType(request.getType());
+
+        String newValue = blacklistEntry.getValue();
+        if (request.getValue() != null) {
+            newValue = clean(request.getValue());
+            if (newValue == null || newValue.isBlank()) {
+                throw new InvalidRequestException("value must not be blank");
+            }
+        }
+
+        // Case-only change of its own value (abc -> ABC) is not a new identity.
+        boolean identityChanged =
+                !newType.equals(blacklistEntry.getType()) || !newValue.equalsIgnoreCase(blacklistEntry.getValue());
+
+        // Same rule as addEntry: only one ACTIVE entry per type + value (ignoring case).
+        // Checked when type/value changes, and also whenever this entry is active - so an
+        // already-existing duplicate is caught even if the same value is sent again.
+        // This very row is excluded from the check (IdNot).
+        if ((identityChanged || Boolean.TRUE.equals(blacklistEntry.getStatus()))
+                && blacklistEntryRepository.existsActiveDuplicate(newType, newValue, id)) {
+            log.warn("Update blacklist entry failed because it already exists, id={}, type={}, value={}",
+                    id, newType, newValue);
+            throw new InvalidRequestException("This " + newType + " is already blacklisted");
+        }
+
+        // Nothing actually changes (same type, value, reason and riskType as already saved):
+        // tell the caller instead of silently saving the same data again.
+        boolean sameReason = request.getReason() == null
+                || java.util.Objects.equals(emptyToNull(clean(request.getReason())), blacklistEntry.getReason());
+        boolean sameRiskType = request.getRiskType() == null
+                || java.util.Objects.equals(emptyToNull(clean(request.getRiskType())), blacklistEntry.getRiskType());
+        if (newType.equals(blacklistEntry.getType())
+                && newValue.equals(blacklistEntry.getValue())
+                && sameReason && sameRiskType) {
+            log.warn("Update blacklist entry skipped because nothing changed, id={}, type={}, value={}",
+                    id, newType, newValue);
+            throw new InvalidRequestException(
+                    "This " + newType + " already exists with the same details, nothing to update");
+        }
+
+        blacklistEntry.setType(newType);
+        blacklistEntry.setValue(newValue);
+
+        if (request.getReason() != null) {
+            String reason = clean(request.getReason());
+            blacklistEntry.setReason(reason == null || reason.isBlank() ? null : reason);
+        }
+
+        if (request.getRiskType() != null) {
+            String riskType = clean(request.getRiskType());
+            blacklistEntry.setRiskType(riskType == null || riskType.isBlank() ? null : riskType);
+        }
+
+        blacklistEntry.setUpdatedAt(LocalDateTime.now());
+        BlacklistEntry saved = blacklistEntryRepository.save(blacklistEntry);
+
+        log.info("Blacklist entry updated successfully, id={}, type={}", id, newType);
+
+        return mapToResponse(saved);
+    }
+
+    @Override
     public BlacklistEntryResponseDTO updateStatus(Integer id, Boolean status) {
 
         log.info("Update blacklist entry status service started, id={}, status={}", id, status);
@@ -96,6 +182,18 @@ public class BlacklistEntryServiceImpl implements BlacklistEntryService {
                             log.warn("Update blacklist entry status failed because it was not found, id={}", id);
                             return new InvalidRequestException("Blacklist entry not found");
                         });
+
+        // Re-activating must not create a second ACTIVE entry for the same type + value.
+        // (Only when it is currently not active, so this very row can never match itself.)
+        if (Boolean.TRUE.equals(status)
+                && !Boolean.TRUE.equals(blacklistEntry.getStatus())
+                && blacklistEntryRepository.existsActiveDuplicate(
+                        blacklistEntry.getType(), blacklistEntry.getValue(), id)) {
+            log.warn("Update blacklist entry status failed because an active entry already exists, id={}, type={}, value={}",
+                    id, blacklistEntry.getType(), blacklistEntry.getValue());
+            throw new InvalidRequestException(
+                    "Cannot activate: this " + blacklistEntry.getType() + " is already blacklisted by another active entry");
+        }
 
         blacklistEntry.setStatus(status);
         blacklistEntry.setUpdatedAt(LocalDateTime.now());
@@ -177,5 +275,9 @@ public class BlacklistEntryServiceImpl implements BlacklistEntryService {
                 .createdDate(blacklistEntry.getCreatedDate())
                 .updatedAt(blacklistEntry.getUpdatedAt())
                 .build();
+    }
+
+    private String emptyToNull(String text) {
+        return text == null || text.isBlank() ? null : text;
     }
 }

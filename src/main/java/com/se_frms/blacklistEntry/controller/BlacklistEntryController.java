@@ -3,6 +3,7 @@ package com.se_frms.blacklistEntry.controller;
 import com.se_frms.auth.dto.AuthResponseDTO;
 import com.se_frms.blacklistEntry.dto.BlacklistEntryRequestDTO;
 import com.se_frms.blacklistEntry.dto.BlacklistEntryResponseDTO;
+import com.se_frms.blacklistEntry.dto.BlacklistEntryUpdateDTO;
 import com.se_frms.blacklistEntry.service.BlacklistEntryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,24 @@ public class BlacklistEntryController {
                         .status(true)
                         .responseCode(200)
                         .responseMessage("Blacklist entry added successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AuthResponseDTO<BlacklistEntryResponseDTO>> updateEntry(
+            @PathVariable Integer id,
+            @Valid @RequestBody BlacklistEntryUpdateDTO request
+    ) {
+
+        BlacklistEntryResponseDTO responseData = blacklistEntryService.updateEntry(id, request);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO.<BlacklistEntryResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Blacklist entry updated successfully")
                         .responseData(responseData)
                         .build()
         );

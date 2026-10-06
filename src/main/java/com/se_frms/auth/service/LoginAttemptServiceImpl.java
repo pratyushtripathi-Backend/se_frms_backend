@@ -93,7 +93,7 @@ public class LoginAttemptServiceImpl
                         .builder()
                         .user(user)
                         .email(email)
-                        .status(true)
+                        .status(status)
                         .reason(reason)
                         .ipAddress(ip)
                         .createdBy(user)
