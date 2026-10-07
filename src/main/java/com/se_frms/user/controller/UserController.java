@@ -15,7 +15,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+import com.se_frms.user.dto.ProfileImageData;
 
 import org.springframework.web.bind.annotation.*;
 import com.se_frms.user.dto.UserStatusRequestDTO;
@@ -165,6 +169,79 @@ public class UserController {
                         .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Uploads or replaces the profile image (multipart/form-data, part name "file").
+     * JPG, PNG or WEBP, up to 2 MB. Only the user themself or an ADMIN.
+     */
+    @PutMapping(
+            value = "/{id}/profile-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<AuthResponseDTO<UserResponseDTO>>
+    uploadProfileImage(
+            @PathVariable Integer id,
+
+            @RequestParam(value = "file", required = false)
+            MultipartFile file
+    ) throws java.io.IOException {
+
+        // A missing "file" part reaches the service as null -> clear 400 message.
+        UserResponseDTO responseData =
+                userService.uploadProfileImage(
+                        id,
+                        file == null ? null : file.getBytes()
+                );
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<UserResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Profile image uploaded successfully")
+                        .responseData(responseData)
+                        .build()
+        );
+    }
+
+    /** Returns the raw image (Content-Type image/jpeg|png|webp), or 404 when the user has none. */
+    @GetMapping("/{id}/profile-image")
+    public ResponseEntity<byte[]> getProfileImage(
+            @PathVariable Integer id
+    ) {
+
+        ProfileImageData image =
+                userService.getProfileImage(id);
+
+        if (image == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(image.contentType()))
+                .cacheControl(CacheControl.noCache().cachePrivate())
+                .body(image.data());
+    }
+
+    @DeleteMapping("/{id}/profile-image")
+    public ResponseEntity<AuthResponseDTO<UserResponseDTO>>
+    deleteProfileImage(
+            @PathVariable Integer id
+    ) {
+
+        UserResponseDTO responseData =
+                userService.deleteProfileImage(id);
+
+        return ResponseEntity.ok(
+                AuthResponseDTO
+                        .<UserResponseDTO>builder()
+                        .status(true)
+                        .responseCode(200)
+                        .responseMessage("Profile image removed successfully")
+                        .responseData(responseData)
+                        .build()
+        );
     }
 
     @PatchMapping("/{id}/status")

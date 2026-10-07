@@ -25,6 +25,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -209,6 +210,16 @@ public class GlobalExceptionHandler {
         log.warn("Access denied exception handled: {}", ex.getMessage());
 
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Access denied");
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<AuthResponseDTO<Object>> handleMaxUploadSizeExceededException(
+            MaxUploadSizeExceededException ex
+    ) {
+
+        log.warn("Upload too large: {}", ex.getMessage());
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "File is too large. Maximum allowed size is 2 MB");
     }
 
     @ExceptionHandler(RuntimeException.class)

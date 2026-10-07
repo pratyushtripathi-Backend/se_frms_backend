@@ -62,6 +62,17 @@ public class User {
     @Builder.Default
     private Boolean status = true;
 
+    /**
+     * MIME type of the profile image (image/jpeg, image/png or image/webp), or
+     * null when the user has no image. The image bytes themselves are in the
+     * profile_image column of this same table, mapped by UserProfileImage, so
+     * loading a User (every request / login / user list) never loads the image.
+     */
+    @Column(
+            name = "profile_image_content_type"
+    )
+    private String profileImageContentType;
+
     @ManyToOne
     @JoinColumn(
             name = "created_by"

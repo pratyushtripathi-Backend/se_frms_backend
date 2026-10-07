@@ -38,7 +38,9 @@ public class BlacklistEntryController {
         );
     }
 
-    @PutMapping("/{id}")
+    // Partial update: send only the fields to change (type, value, reason, riskType);
+    // anything not sent keeps its current value.
+    @PatchMapping("/{id}")
     public ResponseEntity<AuthResponseDTO<BlacklistEntryResponseDTO>> updateEntry(
             @PathVariable Integer id,
             @Valid @RequestBody BlacklistEntryUpdateDTO request

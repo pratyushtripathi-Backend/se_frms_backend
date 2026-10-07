@@ -26,6 +26,13 @@ public class UserResponseDTO {
 
     private Boolean status;
 
+    // true when the user has a profile image
+    private Boolean hasProfileImage;
+
+    // GET this (with the login token) to load the image; null when there is none.
+    // The ?v= part changes on every upload, so a cached old image is never shown.
+    private String profileImageUrl;
+
     private String createdBy;
 
     private LocalDateTime createdDate;

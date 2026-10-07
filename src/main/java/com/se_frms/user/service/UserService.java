@@ -4,6 +4,7 @@ package com.se_frms.user.service;
 
 import com.se_frms.user.dto.UserResponseDTO;
 import com.se_frms.user.dto.UpdateUserRequest;
+import com.se_frms.user.dto.ProfileImageData;
 
 import org.springframework.data.domain.Page;
 
@@ -29,6 +30,17 @@ public interface UserService {
             Integer id,
             UserStatusRequestDTO request
     );
+    /** Saves (or replaces) the user's profile image. Only the user or an ADMIN may do this. */
+    UserResponseDTO uploadProfileImage(
+            Integer id,
+            byte[] image
+    );
+
+    ProfileImageData getProfileImage(Integer id);
+
+    /** Removes the user's profile image. Only the user or an ADMIN may do this. */
+    UserResponseDTO deleteProfileImage(Integer id);
+
     Page<UserResponseDTO> getAllNonAdminUsers(
             int page,
             int size,
